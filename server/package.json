@@ -1,0 +1,21 @@
+{
+  "name": "server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start-robo-1": "ROBO=robotont-1 node ./bin/www",
+    "start-robo-2": "ROBO=robotont-2 node ./bin/www",
+    "start-robo-3": "ROBO=robotont-3 node ./bin/www",
+    "start-robo-4": "ROBO=robotont-4 node ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "dotenv": "^14.3.2",
+    "express": "~4.16.1",
+    "hbs": "~4.0.4",
+    "http-errors": "~1.6.3",
+    "http-proxy": "^1.18.1",
+    "morgan": "~1.9.1"
+  }
+}

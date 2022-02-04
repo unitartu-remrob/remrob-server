@@ -1,0 +1,27 @@
+# This config file for Travis CI utilizes ros-industrial/industrial_ci package.
+# For more info for the package, see https://github.com/ros-industrial/industrial_ci/blob/master/README.rst
+services:
+  - docker
+language: generic
+compiler:
+  - gcc
+notifications:
+  email:
+    recipients:
+      - maarika.oidekivi@gmail.com
+branches:
+  only:
+  - melodic-devel
+  - melodic-devel-maarika
+env:
+  global: # global settings for all jobs
+    - ROS_REPO=ros
+    - UPSTREAM_WORKSPACE=".travis.rosinstall"
+    - CCACHE_DIR=$HOME/.ccache # enables C/C++ caching in industrial_ci
+  matrix:
+    - ROS_DISTRO="kinetic" 
+    - ROS_DISTRO="melodic"
+install:
+  - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master
+script:
+  - .industrial_ci/travis.sh

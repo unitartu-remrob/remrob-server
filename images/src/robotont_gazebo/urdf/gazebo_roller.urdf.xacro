@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">   
+    <xacro:macro name="gazebo_roller_macro" params="parent z_distance_reflect no_of_roller prefix">
+        <xacro:if value="${z_distance_reflect==-1}">
+            <xacro:property name="name" value="front_${no_of_roller}" />
+            <xacro:property name="offset" value="0" />
+        </xacro:if>
+        <xacro:unless value="${z_distance_reflect==-1}">
+            <xacro:property name="name" value="back_${no_of_roller}" />
+            <xacro:property name="offset" value="${pi}" />
+        </xacro:unless>     
+        <gazebo reference="${prefix}roller_${name}_rim_${parent}_link">
+            <material>Robotont/DarkGreen</material>
+        </gazebo>
+    </xacro:macro>
+</robot>

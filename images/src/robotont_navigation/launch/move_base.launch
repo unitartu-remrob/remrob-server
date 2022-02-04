@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<launch>
+  <!--
+    '__ns' is needed as an explicit argument because it does not propagate as an argument to the included launch files.
+    as eval may not contain double underscore expressions, a new argument (eval_underscore_bypass) is defined to by-pass this issue.
+    when a namespace is specified, it is also converted into prefix with a trailing slash. 'prefix' is passed to yaml file (enabled by subst_value="true").
+  -->
+  <arg name="__ns" default=""/>
+  <arg name="eval_underscore_bypass" value="$(arg __ns)"/>
+  <arg if="$(eval eval_underscore_bypass == '')" name="prefix" default=''/> 
+  <arg unless="$(eval eval_underscore_bypass == '')" name="prefix" default="$(arg __ns)/"/>
+
+  <!-- Launch navigation stack -->
+  <arg name="no_static_map" default="false"/>
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find robotont_navigation)/config/move_base_params.yaml" command="load"/>
+    <rosparam file="$(find robotont_navigation)/config/planner_local_params.yaml" command="load" />
+    <rosparam file="$(find robotont_navigation)/config/planner_global_params.yaml" command="load" />
+    <!-- observation sources located in costmap_common.yaml -->
+    <rosparam file="$(find robotont_navigation)/config/costmap_common.yaml" subst_value="true" command="load" ns="global_costmap" />
+    <rosparam file="$(find robotont_navigation)/config/costmap_common.yaml" subst_value="true" command="load" ns="local_costmap" />
+    <!-- local costmap, needs size -->
+    <rosparam file="$(find robotont_navigation)/config/costmap_local.yaml" command="load" ns="local_costmap" />
+    <param name="local_costmap/width" value="6.0"/>
+    <param name="local_costmap/height" value="6.0"/>
+    <!-- static global costmap, static map provides size -->
+    <rosparam file="$(find robotont_navigation)/config/costmap_global_static.yaml" subst_value="true" command="load" ns="global_costmap" unless="$(arg no_static_map)"/>
+    <!-- global costmap with laser, for odom_navigation_demo -->
+    <rosparam file="$(find robotont_navigation)/config/costmap_global_laser.yaml" subst_value="true" command="load" ns="global_costmap" if="$(arg no_static_map)"/>
+  </node>
+</launch>

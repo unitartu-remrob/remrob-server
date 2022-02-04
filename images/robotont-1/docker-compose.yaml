@@ -1,0 +1,27 @@
+version: '3.6'
+
+services:
+  dock:
+    image: robotont:base
+    container_name: robo-1
+    hostname: robo-1
+    extra_hosts:
+      - "robotont-7:192.168.0.39"
+    environment:
+      - "ROS_MASTER_URI=http://robotont-7:11311" # Can be also set in ~/.bashrc
+      - "PASSWORD=password"
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    cap_add:
+      - SYS_BOOT
+      - SYS_ADMIN
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup
+    networks:
+      - ros_net
+networks:
+  ros_net:
+    external: true
+    name: pub_net # - macvlan network

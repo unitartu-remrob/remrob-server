@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+
+<launch>
+  <!--
+    '__ns' is needed as an explicit argument because it does not propagate as an argument to the included launch files.
+    as eval may not contain double underscore expressions, a new argument (eval_underscore_bypass) is defined to by-pass this issue.
+    when a namespace is specified, it is also converted into prefix with a trailing slash.
+  -->
+  <arg name="__ns" default=""/>
+  <arg name="eval_underscore_bypass" value="$(arg __ns)"/>
+  <arg if="$(eval eval_underscore_bypass == '')" name="prefix" default=''/> 
+  <arg unless="$(eval eval_underscore_bypass == '')" name="prefix" default="$(arg __ns)/"/>
+  <param name="odom/child_frame" value="base_footprint"/>
+  <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan">
+    <param name="scan_height" value="10"/>
+    <param name="output_frame_id" value="$(arg prefix)camera_depth_frame"/>
+    <param name="range_min" value="0.45"/>
+    <remap from="image" to="camera/depth/image_rect_raw"/>
+  </node>
+  
+  <!-- Launch navigation stack -->
+  <include file="$(find robotont_navigation)/launch/move_base.launch">
+    <arg name="__ns" value="$(arg __ns)"/>
+  </include>
+
+</launch>

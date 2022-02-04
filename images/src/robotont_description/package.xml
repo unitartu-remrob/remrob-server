@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>robotont_description</name>
+  <version>0.0.8</version>
+  <description>The robotont_description package</description>
+
+  <author>Madis Kaspar Nigol</author>
+  <author>Maarika Oidekivi</author>
+
+  <maintainer email="veiko.vunder@ut.ee">Veiko Vunder</maintainer>
+  <maintainer email="karl.kruusamae@ut.ee">Karl Kruusamäe</maintainer>
+
+  <url type="website">https://wiki.ros.org/robotont</url>
+  <url type="website">http://robotont.ut.ee</url>
+  <url type="repository">http://github.com/robotont/robotont_description</url>
+
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rviz</exec_depend>
+  <exec_depend>urdf</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
+  <export>
+  </export>
+</package>

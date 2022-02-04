@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<launch>
+    <arg name="__ns" default=""/>
+    <arg name="world" default="worlds/empty.world" />
+    <arg name="x_pos" default="0"/>
+    <arg name="model" default="robotont_gazebo_nuc"/>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(arg world)"/>
+    </include>
+    <include file="$(find robotont_gazebo)/launch/upload_description.launch">
+        <arg name="__ns" value="$(arg __ns)"/>
+        <arg name="model" default="$(arg model)"/>
+    </include>
+    <!-- topic for 3d_mapping -->
+    <node if="$(eval model == 'robotont_gazebo_nuc')" name="relay" type="relay" pkg="topic_tools" args="camera/depth/image_rect_raw camera/aligned_depth_to_color/image_raw" />
+
+    <include file="$(find robotont_gazebo)/launch/spawn_urdf.launch" >
+        <arg name="x_pos" value="$(arg x_pos)" />
+    </include>
+
+</launch>   
+

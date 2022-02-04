@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<launch>
+  <!--
+    '__ns' is needed as an explicit argument because it does not propagate as an argument to the included launch files.
+    as eval may not contain double underscore expressions, a new argument (eval_underscore_bypass) is defined to by-pass this issue.
+    when a namespace is specified, it is also converted into prefix with a trailing slash.
+  -->
+  <arg name="__ns" default=""/>
+  <arg name="eval_underscore_bypass" value="$(arg __ns)"/>
+  <arg if="$(eval eval_underscore_bypass == '')" name="prefix" default=''/> 
+  <arg unless="$(eval eval_underscore_bypass == '')" name="prefix" default="$(arg __ns)/"/>
+
+  <arg name="rviz_fixed_frame" default="$(arg prefix)base_link"/>
+  
+  <include file="$(find robotont_description)/launch/upload_description.launch">
+    <arg name="__ns" value="$(arg __ns)"/>
+  </include>
+
+  <node name="rviz" pkg="rviz" type="rviz" required="true" args="-d $(find robotont_description)/config/robotont_description.rviz -f $(arg rviz_fixed_frame)"/>
+</launch>

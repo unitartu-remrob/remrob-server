@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>robotont_demos</name>
+  <version>0.0.0</version>
+  <description>The robotont_demos package</description>
+
+  <maintainer email="veiko.vunder@ut.ee">Veiko Vunder</maintainer>
+  <maintainer email="karl.kruusamae@ut.ee">Karl Kruusamäe</maintainer>
+
+  <url type="website">https://wiki.ros.org/robotont</url>
+  <url type="website">http://robotont.ut.ee</url>
+  <url type="repository">http://github.com/robotont/robotont_demos</url>
+
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>robotont_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>joy</build_depend>
+
+  <build_export_depend>robotont_msgs</build_export_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>joy</build_export_depend>
+
+  <exec_depend>robotont_description</exec_depend>
+  <exec_depend>robotont_nuc_description</exec_depend>
+  <exec_depend>robotont_driver</exec_depend>
+  <exec_depend>robotont_msgs</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>ar_track_alvar</exec_depend>
+  <exec_depend>cartographer_ros</exec_depend>
+  <exec_depend>gmapping</exec_depend>
+  <exec_depend>hector_mapping</exec_depend>
+  <exec_depend>move_base</exec_depend>
+  <exec_depend>rtabmap_ros</exec_depend>
+  <exec_depend>depthimage_to_laserscan</exec_depend>
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>

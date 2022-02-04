@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<launch>
+  <!--
+    '__ns' is needed as an explicit argument because it does not propagate as an argument to the included launch files.
+    as eval may not contain double underscore expressions, a new argument (eval_underscore_bypass) is defined to by-pass this issue.
+    when a namespace is specified, it is also converted into prefix with a trailing slash.
+  -->
+  <arg name="__ns" default=""/>
+  <arg name="eval_underscore_bypass" value="$(arg __ns)"/>
+  <arg if="$(eval eval_underscore_bypass == '')" name="prefix" default=''/> 
+  <arg unless="$(eval eval_underscore_bypass == '')" name="prefix" default="$(arg __ns)/"/>
+
+  <arg name="model" default="robotont_gazebo_nuc"/>
+
+  <param name="robot_description" command="$(find xacro)/xacro $(find robotont_gazebo)/urdf/$(arg model).urdf.xacro prefix:=$(arg prefix) __ns:=$(arg __ns)"/>
+
+</launch>
