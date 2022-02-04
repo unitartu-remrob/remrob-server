@@ -1,0 +1,21 @@
+[submodule "images/realsense-ros"]
+	path = images/realsense-ros
+	url = https://github.com/IntelRealSense/realsense-ros
+[submodule "images/src/robotont_nuc_description"]
+	path = images/src/robotont_nuc_description
+	url = https://github.com/robotont/robotont_nuc_description
+[submodule "images/src/robotont_description"]
+	path = images/src/robotont_description
+	url = https://github.com/robotont/robotont_description
+[submodule "images/src/robotont_msgs"]
+	path = images/src/robotont_msgs
+	url = https://github.com/robotont/robotont_msgs
+[submodule "images/src/robotont_demos"]
+	path = images/src/robotont_demos
+	url = https://github.com/robotont/robotont_demos
+[submodule "images/src/robotont_navigation"]
+	path = images/src/robotont_navigation
+	url = https://github.com/robotont/robotont_navigation
+[submodule "images/src/robotont_gazebo"]
+	path = images/src/robotont_gazebo
+	url = https://github.com/robotont/robotont_gazebo

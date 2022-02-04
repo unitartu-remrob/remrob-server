@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="robotont">
-    <xacro:include filename="$(find robotont_description)/urdf/robotont_base.urdf.xacro"/>
-    <xacro:include filename="$(find robotont_gazebo)/urdf/robotont_gazebo_common.urdf.xacro" />
-</robot>

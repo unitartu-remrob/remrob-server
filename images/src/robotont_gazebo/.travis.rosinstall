@@ -1,6 +1,0 @@
-- git:
-    local-name: robotont/robotont_description
-    uri: https://github.com/robotont/robotont_description.git
-- git:
-    local-name: robotont/robotont_nuc_description
-    uri: https://github.com/robotont/robotont_nuc_description.git
