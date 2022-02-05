@@ -16,7 +16,7 @@ To allow full communication between the containers and the robotonts *macvlan* d
 ### Create the macvlan docker network
 1. Toggle promiscuous mode
 
-`sudo ifconfig {interface} promisc`
+`sudo ifconfig {eth_iface} promisc`
 
 2. Create the docker network
 
@@ -48,23 +48,27 @@ Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-mac
 ### Building the image
 
 1. Build the base image first (uses this [image](https://github.com/wwwshwww/novnc-ros-desktop) as its source)
+
 `cd images && docker build -t robotont:base .`
 
 2. Specify which robotont mirror to run with docker-compose
+
 `cd images/robotont-{x} && docker-compose up`
 
 ### Running the proxy server
 1. Install server modules
+
 `cd server && npm install`
 
 2. Start the robot-specific proxy server
+
 `npm run start-robo-{x}`
 
 ---
 
 ### To do:
 
-- Make the image more user-firnedly
+- Make the image more user-friendly
 - Make a server that can handle multiple websocket proxies at once
 
 ### Limitations & issues:
