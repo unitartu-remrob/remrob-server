@@ -57,7 +57,11 @@ Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-mac
 
 3. To make the robotont capable resolving the container hostname, add an entry to its */etc/hosts*
 
-`robo-{x}	192.168.0.{container_ip}`
+`{container_ip}		robo-{x}`
+
+**Example:**
+`192.168.0.192		robo-1`
+
 
 ### Running the proxy server
 1. Install server modules
