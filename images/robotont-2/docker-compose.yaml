@@ -20,7 +20,8 @@ services:
     volumes: 
       - /sys/fs/cgroup:/sys/fs/cgroup
     networks:
-      - ros_net
+      ros_net:
+        ipv4_address: 192.168.0.193
 networks:
   ros_net:
     external: true
