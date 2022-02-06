@@ -45,6 +45,8 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+COPY noVNC /home/novnc
+
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
         python \
@@ -53,7 +55,7 @@ RUN apt-get update -y \
         net-tools \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && git clone https://github.com/novnc/noVNC.git /home/novnc \
+    # && git clone https://github.com/novnc/noVNC.git /home/novnc \
     && cp home/novnc/vnc.html /home/novnc/index.html \
     && git clone https://github.com/kanaka/websockify /home/novnc/utils/websockify
 
