@@ -1022,7 +1022,7 @@ const UI = {
         if (port) {
             url += ':' + port;
         }
-        url += window.location.path + path;
+        url += window.location.pathname + path;
 
         UI.rfb = new RFB(document.getElementById('noVNC_container'), url,
                          { shared: UI.getSetting('shared'),
