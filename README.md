@@ -33,7 +33,18 @@ To allow full communication between the containers and the robotonts *macvlan* d
 **Example:**
 `ip link add my_nic link enp46s0 type macvlan mode bridge`
 
-2. Create an ip route to the custom macvlan interface
+2. Give it an IP address
+
+`ip addr add {ip_addr} dev {if_name}`
+
+**Example:**
+`ip addr add 192.168.0.224/32 dev my_nic`
+
+3. Enable it
+
+`ip link set {if_name} up`
+
+4. Route all the containers through it
 
 `ip route add {docker_macvlan_ip_range} dev {if_name}`
 
