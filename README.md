@@ -62,6 +62,7 @@ Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-mac
 1. Build the base image first (uses this [image](https://github.com/wwwshwww/novnc-ros-desktop) as its source)
 
 `cd images/novnc-ros-desktop/noetic && docker build -t moyash/novnc-ros:custom .`
+
 `cd images && docker build -t robotont:base .`
 
 2. Specify which robotont mirror to run with docker-compose
@@ -83,6 +84,7 @@ Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-mac
 2. Install main server modules and run (assumes port 3000 as default)
 
 `cd server && npm install`
+
 `npm run start`
 
 ---
