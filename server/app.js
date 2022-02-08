@@ -3,18 +3,11 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var httpProxy = require('http-proxy');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
-require('dotenv').config({ path: path.join(__dirname, `./env/.${process.env.ROBO}`)})
 var app = express();
-
-// create the websocket proxy
-app.proxy = httpProxy.createProxy({
-  ws: true
-})
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -26,15 +19,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', indexRouter);
+app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
-// reroute on index
-app.use('/', function(req, res, next) {
-  app.proxy.web(req, res, {
-    target: `ws://${process.env.CONTAINER}`
-  })
-});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

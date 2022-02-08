@@ -3,10 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  // res.render('index', { title: 'Express' });
-  // proxy.web(req, res, {
-  //   target: `ws://${process.env.CONTAINER}`
-  // })
+  res.render('index', { title: 'Welcome to remrob' });
 });
 
 module.exports = router;

@@ -26,16 +26,8 @@ var server = http.createServer(app);
  */
 
 server.listen(port);
-console.info(`Started the proxy server for ${process.env.ROBO} container on port ${process.env.PORT}`)
-
 server.on('error', onError);
 server.on('listening', onListening);
-
-server.on('upgrade', function (req, socket, head) {
-  app.proxy.ws(req, socket, head, {
-    target: `ws://${process.env.CONTAINER}`
-  });
-})
 
 /**
  * Normalize a port into a number, string, or false.
