@@ -1,4 +1,4 @@
-FROM moyash/novnc-ros-desktop:noetic
+FROM moyash/novnc-ros:custom
 
 ENV ROS_DISTRO=noetic
 ENV ROS_ROOT=/opt/ros/${ROS_DISTRO}
