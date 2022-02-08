@@ -5,6 +5,7 @@ Clone recursively, project uses [existing robotont software](https://github.com/
 # Requirements
 
 - Docker & docker-compose
+- nginx
 - Nodejs & npm
 
 
@@ -60,6 +61,7 @@ Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-mac
 
 1. Build the base image first (uses this [image](https://github.com/wwwshwww/novnc-ros-desktop) as its source)
 
+`cd images/novnc-ros-desktop/noetic && docker build -t moyash/novnc-ros:custom .`
 `cd images && docker build -t robotont:base .`
 
 2. Specify which robotont mirror to run with docker-compose
@@ -75,20 +77,20 @@ Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-mac
 
 
 ### Running the proxy server
-1. Install server modules
+
+1. Copy the nginx configuration to default
+
+2. Install main server modules and run (assumes port 3000 as default)
 
 `cd server && npm install`
-
-2. Start the robot-specific proxy server
-
-`npm run start-robo-{x}`
+`npm run start`
 
 ---
 
 ### To do:
 
 - Make the image more user-friendly
-- Make a server that can handle multiple websocket proxies at once
+- Make a server that can handle multiple websocket proxies at once ✅
 
 ### Limitations & issues:
 
