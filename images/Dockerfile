@@ -41,5 +41,8 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
     catkin init && \
     catkin build
 
+# GNOME customized config
+COPY user /root/.config/dconf/user
+
 RUN echo 'source /opt/ros/${ROS_DISTRO}/setup.bash' >> /root/.bashrc
 RUN echo 'source /catkin_ws/devel/setup.bash' >> /root/.bashrc

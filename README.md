@@ -88,11 +88,15 @@ Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-mac
 
 `npm run start`
 
+## Customizing the gnome GUI
+
+Copy your custom binary (found at `~/.config/dconf/user`) into `images` and rebuild
+
 ---
 
 ### To do:
 
-- Make the image more user-friendly
+- Make the image more user-friendly ✅
 - Make a server that can handle multiple websocket proxies at once ✅
 
 ### Limitations & issues:
