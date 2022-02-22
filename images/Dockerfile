@@ -4,6 +4,12 @@ ENV ROS_DISTRO=noetic
 ENV ROS_ROOT=/opt/ros/${ROS_DISTRO}
 ENV ROS_PYTHON_VERSION=3
 
+# nvidia-container-runtime
+ENV NVIDIA_VISIBLE_DEVICES \
+    ${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES \
+    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+
 
 SHELL ["/bin/bash", "-c"]
 
@@ -35,5 +41,5 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
     catkin init && \
     catkin build
 
-# RUN echo 'source /opt/ros/${ROS_DISTRO}/setup.bash' >> /root/.bashrc # already done in src image
+RUN echo 'source /opt/ros/${ROS_DISTRO}/setup.bash' >> /root/.bashrc
 RUN echo 'source /catkin_ws/devel/setup.bash' >> /root/.bashrc
