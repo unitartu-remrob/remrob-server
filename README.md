@@ -4,7 +4,8 @@ Clone recursively, project uses [existing robotont software](https://github.com/
 
 # Requirements
 
-- Docker & docker-compose
+- Docker & docker-compose(1.28.0+)
+- [nvidia-docker-runtime](https://docs.docker.com/config/containers/resource_constraints/#gpu) (comes with nvidia-docker2)
 - nginx
 - Nodejs & npm
 
