@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3.8'
 
 services:
   dock:
@@ -6,9 +6,9 @@ services:
     container_name: robo-2
     hostname: robo-2
     extra_hosts:
-      - "robotont-12:192.168.0.40"
+      - "robotont-11:192.168.0.41"
     environment:
-      - "ROS_MASTER_URI=http://robotont-12:11311" # Can be also set in ~/.bashrc
+      - "ROS_MASTER_URI=http://robotont-11:11311" # Can be also set in ~/.bashrc
       - "PASSWORD=password"
     tmpfs:
       - /run
@@ -19,6 +19,12 @@ services:
       - SYS_ADMIN
     volumes: 
       - /sys/fs/cgroup:/sys/fs/cgroup
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu, utility]
     networks:
       ros_net:
         ipv4_address: 192.168.0.193
