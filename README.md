@@ -60,9 +60,7 @@ Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-mac
 
 ### Building the image
 
-1. Build the base image first (uses this [image](https://github.com/wwwshwww/novnc-ros-desktop) as its source)
-
-`cd images/novnc-ros-desktop/noetic && docker build -t moyash/novnc-ros:custom .`
+1. Building the image (based on this [image](https://github.com/darkdragon-001/Dockerfile-Ubuntu-Gnome)
 
 `cd images && docker build -t robotont:base .`
 
@@ -98,10 +96,11 @@ Copy your custom binary (found at `~/.config/dconf/user`) into `images` and rebu
 
 - Make the image more user-friendly ✅
 - Make a server that can handle multiple websocket proxies at once ✅
+- Run the containers as a non-root user
 
 ### Limitations & issues:
 
-- The containers are running as root by default
+- After starting the container it takes about half a minute before it loads the graphical gnome config for the user
 
 ---
 
