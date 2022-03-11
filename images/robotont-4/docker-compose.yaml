@@ -9,7 +9,7 @@ services:
       - "robotont-14:192.168.0.42"
     environment:
       - "ROS_MASTER_URI=http://robotont-14:11311" # Can be also set in ~/.bashrc
-      - "PASSWORD=password"
+      # - "PASSWORD=password"
     tmpfs:
       - /run
       - /run/lock
