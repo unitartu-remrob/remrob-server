@@ -96,8 +96,9 @@ Copy your custom binary (found at `~/.config/dconf/user`) into `images` and rebu
 
 ### To do:
 
-- Make the image more user-friendly ✅
 - Make a server that can handle multiple websocket proxies at once ✅
+- Make the image more user-friendly ✅
+- Enable NVIDIA hardware acceleration in the containers ✅
 - Run the containers as a non-root user ✅
 
 ### Limitations & issues:
@@ -106,6 +107,6 @@ Copy your custom binary (found at `~/.config/dconf/user`) into `images` and rebu
 
 ---
 
-A very configurable docker-vnc setup providing options between lxde, lxqt and xfce4 environments (no gnome) can be found [here](https://github.com/fcwu/docker-ubuntu-vnc-desktop), but I've run into some issues trying to proxy the nginx server that is running inside it.
+A very configurable docker-vnc setup providing options between lxde, lxqt and xfce4 environments (no gnome) can be found [here](https://github.com/fcwu/docker-ubuntu-vnc-desktop).
 
 
