@@ -104,6 +104,9 @@ Copy your custom binary (found at `~/.config/dconf/user`) into `images` and rebu
 ### Limitations & issues:
 
 - After starting the container it takes about half a minute before it loads the graphical gnome config for the user
+- Cannot edit files that require sudo privileges with GUI applications (e.g. `sudo gedit /etc/hosts`), must use a CLI editor (e.g. nano)
+- VNC password hardcoded into the image, need to set it so that it's passable as env variable in compose
+- SYS_ADMIN container privileges currently required
 
 ---
 

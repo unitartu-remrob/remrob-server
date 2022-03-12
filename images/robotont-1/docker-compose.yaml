@@ -8,17 +8,21 @@ services:
     extra_hosts:
       - "robotont-7:192.168.0.39"
     environment:
-      - "ROS_MASTER_URI=http://robotont-7:11311" # Can be also set in ~/.bashrc
-      #- "PASSWORD=password"
+      #- "ROS_MASTER_URI=http://robotont-7:11311"
+      - ROS_MASTER=robotont-7 # Will be used to set master in ~/.bashrc
+      #- "PASSWORD=password" 
     tmpfs:
       - /run
       - /run/lock
       - /tmp
     cap_add:
-      - SYS_BOOT
+    # Not required for initiation (tmpfs and cgroup enough, but there are some issues with running applications without SYS_ADMIN privileges)
+      #- SYS_BOOT
       - SYS_ADMIN
     volumes: 
       - /sys/fs/cgroup:/sys/fs/cgroup
+    # ports:
+    #   - 6080:6080
     deploy:
       resources:
         reservations:

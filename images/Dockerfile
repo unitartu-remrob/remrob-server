@@ -34,6 +34,7 @@ CMD [ "/sbin/init" ]
 
 RUN apt-get update -y \
     && apt-get install -y \
+        ca-certificates \
         ubuntu-gnome-desktop \
     && apt-get remove gnome-initial-setup -y \
     && apt-get clean \
@@ -76,6 +77,7 @@ RUN apt-get update -y \
 COPY novnc.service /etc/systemd/system/novnc.service
 RUN systemctl enable novnc
 
+
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
         iputils-ping \
@@ -105,9 +107,11 @@ RUN useradd ${USER} -u ${UID} -U -d /home/${USER} -m -s /bin/bash
 RUN apt-get update && apt-get install -y sudo && apt-get clean && rm -rf /var/lib/apt/lists/* && \
     echo "${USER} ALL=(ALL) NOPASSWD: ALL" > "/etc/sudoers.d/${USER}" && \
     chmod 440 "/etc/sudoers.d/${USER}"
-USER "${USER}"
+
 ENV USER="${USER}" \
     HOME="/home/${USER}"
+USER "${USER}"
+
 WORKDIR "/home/${USER}"
 
 # Set up VNC
@@ -134,9 +138,9 @@ RUN echo 'source /opt/ros/noetic/setup.bash' >> $HOME/.bashrc
 RUN echo 'source ${HOME}/catkin_ws/devel/setup.bash' >> $HOME/.bashrc
 
 # GNOME customized config
-
 COPY user $HOME/.config/dconf/user
-RUN sudo chmod 777 "${HOME}/.config/dconf"
+#RUN sudo chmod 777 "${HOME}/.config/dconf"
+RUN sudo chown -R $USER:$USER $HOME
 
 # switch back to root to start systemd
 USER root
@@ -146,8 +150,9 @@ EXPOSE 6000 6080 5901
 # RUN mkdir -p /root/.vnc & mkdir -p /root/.config/autostart
 # COPY startup.desktop /root/.config/autostart/startup.desktop
 # COPY set.sh /root/.vnc/set.sh
-COPY docker-entrypoint.sh /
+COPY .docker-entrypoint.sh /
+COPY .env.sh /
 # COPY custom.conf /etc/gdm3/custom.conf
 # COPY xserverrc /etc/X11/xinit/xserverrc
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/.docker-entrypoint.sh"]

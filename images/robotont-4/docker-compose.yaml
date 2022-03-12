@@ -8,14 +8,15 @@ services:
     extra_hosts:
       - "robotont-14:192.168.0.42"
     environment:
-      - "ROS_MASTER_URI=http://robotont-14:11311" # Can be also set in ~/.bashrc
+      #- "ROS_MASTER_URI=http://robotont-14:11311" # Can be also set in ~/.bashrc
+      - ROS_MASTER=robotont-14 # Will be used to set master in ~/.bashrc
       # - "PASSWORD=password"
     tmpfs:
       - /run
       - /run/lock
       - /tmp
     cap_add:
-      - SYS_BOOT
+    #   - SYS_BOOT
       - SYS_ADMIN
     volumes: 
       - /sys/fs/cgroup:/sys/fs/cgroup
