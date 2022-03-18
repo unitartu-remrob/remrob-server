@@ -117,7 +117,7 @@ WORKDIR "/home/${USER}"
 # Set up VNC
 RUN mkdir -p $HOME/.vnc
 COPY xstartup $HOME/.vnc/xstartup
-RUN echo "remrob" | vncpasswd -f >> $HOME/.vnc/passwd && chmod 600 $HOME/.vnc/passwd
+# RUN echo "password" | vncpasswd -f >> $HOME/.vnc/passwd && chmod 600 $HOME/.vnc/passwd
 
 SHELL ["/bin/bash", "-c"]
 
@@ -145,7 +145,7 @@ RUN sudo chown -R $USER:$USER $HOME
 # switch back to root to start systemd
 USER root
 
-EXPOSE 6000 6080 5901
+EXPOSE 6080 5901
 
 # RUN mkdir -p /root/.vnc & mkdir -p /root/.config/autostart
 # COPY startup.desktop /root/.config/autostart/startup.desktop

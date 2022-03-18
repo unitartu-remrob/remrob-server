@@ -10,7 +10,7 @@ services:
     environment:
       #- "ROS_MASTER_URI=http://robotont-7:11311"
       - ROS_MASTER=robotont-7 # Will be used to set master in ~/.bashrc
-      #- "PASSWORD=password" 
+      - PASSWORD=remrob
     tmpfs:
       - /run
       - /run/lock
@@ -21,17 +21,17 @@ services:
       - SYS_ADMIN
     volumes: 
       - /sys/fs/cgroup:/sys/fs/cgroup
-    # ports:
-    #   - 6080:6080
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              capabilities: [gpu, utility]
-    networks:
-      ros_net:
-        ipv4_address: 192.168.0.192
+    ports:
+      - 5901:5901
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           capabilities: [gpu, utility]
+    # networks:
+    #   ros_net:
+    #     ipv4_address: 192.168.0.192
 networks:
   ros_net:
     external: true
