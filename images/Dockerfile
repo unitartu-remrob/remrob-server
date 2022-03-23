@@ -61,8 +61,6 @@ COPY tigervnc@.service /etc/systemd/system/tigervnc@.service
 ENV DISPLAY=:1
 RUN systemctl enable tigervnc@:1
 
-COPY noVNC /usr/share/novnc
-
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
         python \
@@ -70,13 +68,7 @@ RUN apt-get update -y \
         pwgen \
         net-tools \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && cp usr/share/novnc/vnc.html /usr/share/novnc/index.html \
-    && git clone https://github.com/kanaka/websockify /usr/share/novnc/utils/websockify
-
-COPY novnc.service /etc/systemd/system/novnc.service
-RUN systemctl enable novnc
-
+    && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
