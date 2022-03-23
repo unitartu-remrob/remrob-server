@@ -3,14 +3,24 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "server": "nodemon ./bin/www",
+    "vnc-client": "websockify --web ./noVNC --token-plugin=TokenFile --token-source=${PWD}/websockify-token.cfg 6085"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
     "debug": "~2.6.9",
+    "docker-compose": "^0.23.17",
+    "dockerode": "^3.3.1",
     "express": "~4.16.1",
+    "generate-password": "^1.7.0",
     "hbs": "~4.0.4",
     "http-errors": "~1.6.3",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "read-yaml-file": "^2.1.0",
+    "write-yaml-file": "^4.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
   }
 }
