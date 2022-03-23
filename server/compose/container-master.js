@@ -75,10 +75,6 @@ const listContainers = ((req, res) => {
 	}
 	docker.listContainers(options, function(err, containers) {
 		res.json(containers)
-		// const ids = containers.map(container => container.Id);
-		// console.log(ids);
-		// console.log('ALL: ' + containers.length);
-		// res.json({ids: ids, length: containers.length})
 	});
 })
 
@@ -160,7 +156,6 @@ const inspectContainer = ((req, res) => {
  */
 //  Container.prototype.inspect = function(opts, callback)
 
-// var container = docker.getContainer('71501a8ab0f8');
 
 /**
  * Stop
@@ -172,27 +167,6 @@ const inspectContainer = ((req, res) => {
 const containerStatus = ((req, res) => {
   res.json({hello: "world"})
 })
-
-
-// const startContainer = ((req, res) => {
-// 	const id = req.params.id;
-// 	const env = build_env();
-// 	console.log(`${env} docker-compose -f ./robotont-${id}/docker-compose.yaml up`)
-// 	exec(`${env} docker-compose -f ./robotont-${id}/docker-compose.yaml`, (error, stdout, stderr) => {
-//     if (error) {
-//         console.log(`error: ${error.message}`);
-// 				res.json({whoops: "real bad"})
-//         return;
-//     }
-//     if (stderr) {
-//         console.log(`stderr: ${stderr}`);
-// 				res.json({whoops: "you made whoopsie"})
-//         return;
-//     }
-//     console.log(`stdout: ${stdout}`);
-// 		res.json({hello: "container started"})
-// 	});
-// })
 
 
 module.exports = {
