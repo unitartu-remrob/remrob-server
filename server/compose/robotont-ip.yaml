@@ -1,0 +1,17 @@
+# Can be used later on to automate everything from a single docker-compose template instead of having a separate one for each robot
+#
+# CURRENTLY NOT IN USE
+
+ip-config:
+  robo-7:
+    self: 192.168.0.192
+    master: 192.168.0.39
+  robo-6:
+    self: 192.168.0.193
+    master: 192.168.0.40
+  robo-11:
+    self: 192.168.0.194
+    master: 192.168.0.41
+  robo-14:
+    self: 192.168.0.195
+    master: 192.168.0.42

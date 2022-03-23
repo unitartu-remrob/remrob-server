@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  vnc:
+    image: robotont:base
+    container_name: robo-2
+    hostname: robo-2
+    extra_hosts:
+      - robotont-11:192.168.0.41
+    environment:
+      - ROS_MASTER=robotont-11
+      - PASSWORD=q1f2nsk9DTRaMxzx89un
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    cap_add:
+      - SYS_ADMIN
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup
+    ports:
+      - '6081:6080'
+      - '5902:5901'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities:
+                - gpu
+                - utility
+networks:
+  ros_net:
+    external: true
+    name: pub_net
