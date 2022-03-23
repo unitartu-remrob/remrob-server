@@ -1,1 +1,3 @@
-## Create with express-generator
+## Created with express-generator
+
+Requires websockify (`sudo apt install websockify`)

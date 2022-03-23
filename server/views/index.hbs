@@ -1,5 +1,7 @@
 <h1>{{title}}</h1>
-<a href="/robo-1/"><button>Connect to robo 1</button></a>
-<a href="/robo-2/"><button>Connect to robo 2</button></a>
-<a href="/robo-3/"><button>Connect to robo 3</button></a>
-<a href="/robo-4/"><button>Connect to robo 4</button></a>
+<script></script>
+<div class="robo-connectors">
+  {{#each links}}
+    <a href={{this.href}} target="_blank"><button>Connect to robo {{this.index}}</button></a>
+  {{/each}}
+</div>
