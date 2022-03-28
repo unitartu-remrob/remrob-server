@@ -10,7 +10,6 @@ import {
 import ContainerRow from './TableRow';
 
 export default function AcccessibleTable({containers, reload}) {
-
   return (
     <TableContainer>
       <Table sx={{ minWidth: 650 }} aria-label="caption table">
@@ -19,14 +18,15 @@ export default function AcccessibleTable({containers, reload}) {
             <TableCell>Container</TableCell>
             <TableCell align="left">Status</TableCell>
             <TableCell align="left">Uptime</TableCell>
+            <TableCell align="left">Ip</TableCell>
+            {/* <TableCell align="left">%CPU</TableCell> */}
             <TableCell align="center">Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {containers.map((container, i) => {
-						container.index = i+1;
+          {containers.map(container => {
 						return <ContainerRow
-							key={container.Id}
+							key={container.id}
 							container={container}
 							reload={reload}/>
           })}

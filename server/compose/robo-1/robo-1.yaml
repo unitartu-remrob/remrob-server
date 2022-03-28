@@ -8,7 +8,7 @@ services:
       - robotont-7:192.168.0.39
     environment:
       - ROS_MASTER=robotont-7
-      - PASSWORD=60YRxad4E4XzgWpiD1zr
+      - PASSWORD=975ccqL41gQAds7xjGlI
     tmpfs:
       - /run
       - /run/lock
@@ -19,7 +19,6 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup
     ports:
       - '5901:5901'
-      - '6080:6080'
     deploy:
       resources:
         reservations:
