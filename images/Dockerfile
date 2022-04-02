@@ -85,6 +85,7 @@ RUN apt-get update -y \
         python3-rosdep \
         ros-${ROS_DISTRO}-joy \
         ros-${ROS_DISTRO}-teleop-twist-keyboard \
+        ros-${ROS_DISTRO}-serial \
         ros-${ROS_DISTRO}-tf \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
