@@ -19,3 +19,9 @@
 [submodule "images/src/robotont_gazebo"]
 	path = images/src/robotont_gazebo
 	url = https://github.com/robotont/robotont_gazebo
+[submodule "server/noVNC"]
+	path = server/noVNC
+	url = https://github.com/novnc/noVNC
+[submodule "images/src/robotont_driver"]
+	path = images/src/robotont_driver
+	url = https://github.com/robotont/robotont_driver
