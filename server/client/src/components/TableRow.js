@@ -35,14 +35,21 @@ const ContainerRow = ({container, reload}) => {
 			IPAddress
 
 	if (data.statusCode === 404) {
-		Status = "disconnected";
+		Status = "inactive";
 	} else {
 		({ Status, StartedAt } = data.State);
 
 		const network = Object.keys(data.NetworkSettings.Networks)[0];
 		({ IPAddress } = data.NetworkSettings.Networks[network]) // what is this abomination :D
 	}
-	const INACTIVE = (Status === "exited" || Status === "disconnected");
+	const RUNNING = (Status === "running");
+	const DISCONNECTED = (Status === "inactive");
+	const INACTIVE = (Status === "exited" || DISCONNECTED);
+
+	const colorCode =
+		RUNNING ? "green" :
+		DISCONNECTED ? "black" : "red"
+
 	// ----------------------------------------------------
 
 	const startContainer = async (id) => {
@@ -88,6 +95,17 @@ const ContainerRow = ({container, reload}) => {
 		}
 	}
 
+	const removeContainer = async (id) => {
+		try {
+			const res = await axios.post(`${baseUrl}/remove/${id}`);
+			const { data } = res;
+			Status = "disconnected";
+			reload();
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
 	useEffect(() => {
 		getVncLink(id);
 		// setInterval(function() {
@@ -95,14 +113,13 @@ const ContainerRow = ({container, reload}) => {
 		// }, 1000);
 	}, [])
 
-
 	return (
 		<TableRow>
 			<TableCell component="th" scope="row">
 				{id /* {Names[0].replace('/','')} */}
 			</TableCell>
-			<TableCell align="left">{Status}</TableCell>
-			<TableCell align="left">{!INACTIVE ? getUptime(StartedAt): '-'}</TableCell>
+			<TableCell align="left" sx={{color: colorCode}}>{Status}</TableCell>
+			<TableCell align="left">{!INACTIVE ? getUptime(StartedAt): DISCONNECTED ? '' : '-'}</TableCell>
 			<TableCell align="left">{IPAddress}</TableCell>
 			{/* <TableCell align="left">{cpu_perc}</TableCell> */}
 			<TableCell align="right">
@@ -115,6 +132,10 @@ const ContainerRow = ({container, reload}) => {
 						onClick={() => stopContainer(id)}
 						color="warning"
 						disabled={INACTIVE}>Stop</Button>
+					<Button
+						onClick={() => removeContainer(id)}
+						color="secondary"
+						disabled={DISCONNECTED || RUNNING}>Remove</Button>
 				</ButtonGroup>
 				<ButtonGroup>
 				<Button
