@@ -1,4 +1,4 @@
-Clone recursively, project uses [existing robotont software](https://github.com/robotont)
+Clone recursively, project uses [existing robotont software](https://github.com/robotont) and the [noVNC](https://github.com/novnc/noVNC) client as submodules
 
 `git clone --recursive https://github.com/Tsapu/rem-rob`
 
@@ -8,6 +8,7 @@ Clone recursively, project uses [existing robotont software](https://github.com/
 - [nvidia-docker-runtime](https://docs.docker.com/config/containers/resource_constraints/#gpu) (comes with nvidia-docker2)
 - nginx
 - Nodejs & npm
+- [websockify](https://github.com/novnc/websockify)
 
 
 # Network specification
@@ -60,31 +61,29 @@ Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-mac
 
 ### Building the image
 
-1. Building the image (based on this [image](https://github.com/darkdragon-001/Dockerfile-Ubuntu-Gnome))
+A vnc-ros-gnome image (inspired by and built upon from this [image](https://github.com/darkdragon-001/Dockerfile-Ubuntu-Gnome))
 
 `cd images && docker build -t robotont:base .`
 
-2. Specify which robotont mirror to run with docker-compose
+Can manually start a specific robotont mirror with docker-compose:
 
-`cd images/robotont-{x} && docker-compose up`
+`cd images/robo-{x} && docker-compose up`
 
-3. To make the robotont capable resolving the container hostname, add an entry to its */etc/hosts*
+### Running the vnc client and the server that acts as the connector
 
-`{container_ip}		robo-{x}`
+1. Copy the nginx configuration to your system
 
-**Example:**
-`192.168.0.192		robo-1`
+2. Build frontend
 
+`cd server/client && npm run build`
 
-### Running the proxy server
-
-1. Copy the nginx configuration to default
-
-2. Install main server modules and run (assumes port 3000 as default)
+3. Install main server modules, start the websockify proxy and the main server
 
 `cd server && npm install`
 
-`npm run start`
+`npm run vnc-client && npm run server`
+
+![Dockerode in action](./API_interface.png)
 
 ## Customizing the gnome GUI
 
@@ -100,13 +99,17 @@ Copy your custom binary (found at `~/.config/dconf/user`) into `images` and rebu
 - Make the image more user-friendly ✅
 - Enable NVIDIA hardware acceleration in the containers ✅
 - Run the containers as a non-root user ✅
+- Pipe everything through a single VNC client (instead of having separate one for each container) ✅
+- Dynamic passwords ✅
+- Basic container control API ✅
+- Hook up a database to test user systems and save committed container states
 
 ### Limitations & issues:
 
-- After starting the container it takes about half a minute before it loads the graphical gnome config for the user
+- If port mapping is used, then after starting the container it takes about half a minute before it loads the graphical gnome config for the user. With macvlan no such delay encountere
+- For some reason after the 9th container the vnc servers running in new containers become unresponsive (10+) 
 - Cannot edit files that require sudo privileges with GUI applications (e.g. `sudo gedit /etc/hosts`), must use a CLI editor (e.g. nano)
-- VNC password hardcoded into the image, need to set it so that it's passable as env variable in compose
-- SYS_ADMIN container privileges currently required
+- SYS_ADMIN container privileges currently required to run systemd, which is needed for gnome
 
 ---
 
