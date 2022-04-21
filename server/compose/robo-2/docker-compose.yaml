@@ -20,17 +20,17 @@ services:
       - SYS_ADMIN
     volumes: 
       - /sys/fs/cgroup:/sys/fs/cgroup
-    ports:
-      - 5902:5901
+    # ports:
+    #   - 5902:5901
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               capabilities: [gpu, utility]
-    # networks:
-    #   ros_net:
-    #     ipv4_address: 192.168.0.193
+    networks:
+      ros_net:
+        ipv4_address: 192.168.0.193
 networks:
   ros_net:
     external: true

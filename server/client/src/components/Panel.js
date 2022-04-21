@@ -5,8 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import CachedIcon from '@mui/icons-material/Cached';
 
 
-const baseUrl = "http://localhost/api/container"
-
+const baseUrl = `${process.env.REACT_APP_URL}/api/container`;
 const Panel = () => {
 
 	const ids = React.useRef()

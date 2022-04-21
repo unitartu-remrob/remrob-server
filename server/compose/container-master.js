@@ -58,14 +58,14 @@ const generateCompose = async (id) => {
 }
 
 const generateUrl = (id) => {
-	const vncUrl = new URL("http://localhost/novnc/vnc.html");
+	const vncUrl = new URL(`http:/localhost/novnc/vnc.html`);
 	vncUrl.searchParams.append("autoconnect", "true");
   vncUrl.searchParams.append("resize", "remote");
 	vncUrl.searchParams.append("password", roboPasswords[id]);
 	// order for the following matters
 	vncUrl.searchParams.append("path", "novnc");
 	vncUrl.href = vncUrl.href.concat(`?token=${id}`);
-	return vncUrl
+	return vncUrl.pathname + vncUrl.search
 }
 
 const testRoute = (async (req, res) => {
@@ -110,7 +110,7 @@ const startContainer = (async (req, res) => {
 				// await new Promise(resolve => setTimeout(resolve, 10000)); // Artificial buffer
 				const targetUrl = generateUrl(id);
 				res.json({
-					link: targetUrl
+					path: targetUrl
 				})
 			},
 			(err) => {

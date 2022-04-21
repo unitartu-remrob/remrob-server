@@ -8,7 +8,7 @@ services:
       - robotont-14:192.168.0.42
     environment:
       - ROS_MASTER=robotont-14
-      - PASSWORD=0hrm1rn5LVbZKu3s9kDQ
+      - PASSWORD=CFXVv4lRRRGy2SWg1G1X
     tmpfs:
       - /run
       - /run/lock
@@ -17,8 +17,6 @@ services:
       - SYS_ADMIN
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup
-    ports:
-      - '5904:5901'
     deploy:
       resources:
         reservations:
@@ -27,6 +25,9 @@ services:
               capabilities:
                 - gpu
                 - utility
+    networks:
+      ros_net:
+        ipv4_address: 192.168.0.195
 networks:
   ros_net:
     external: true

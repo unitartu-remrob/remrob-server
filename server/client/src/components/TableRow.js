@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 
 
-const baseUrl = `http://localhost/api/container`;
+const baseUrl = `${process.env.REACT_APP_URL}/api/container`;
 
 const getUptime = (date) => {
 	const startTime = new Date(date);
@@ -56,7 +56,7 @@ const ContainerRow = ({container, reload}) => {
 		try {
 			const res = await axios.post(`${baseUrl}/start/${id}`);
 			const { data } = res;
-			setVncLink(data.link);
+			setVncLink(`${process.env.REACT_APP_URL}/${data.path}`);
 			reload()
 		} catch (e) {
 			console.error(e);
@@ -68,8 +68,8 @@ const ContainerRow = ({container, reload}) => {
 			const res = await axios.get(`${baseUrl}/connection/${id}`);
 			const { data } = res;
 			console.log("fetched vncLink")
-			console.log(data.link)
-			setVncLink(data.link);
+			console.log(data.path)
+			setVncLink(`${process.env.REACT_APP_URL}/${data.path}`);
 		} catch (e) {
 			console.error(e);
 		}
