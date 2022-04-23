@@ -1,6 +1,4 @@
-Clone recursively, project uses [existing robotont software](https://github.com/robotont) and the [noVNC](https://github.com/novnc/noVNC) client as submodules
-
-`git clone --recursive https://github.com/Tsapu/rem-rob`
+Clone recursively, [noVNC](https://github.com/novnc/noVNC) required as a submodule
 
 # Requirements
 
@@ -58,7 +56,7 @@ To allow full communication between the containers and the robotonts *macvlan* d
 Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/)
 
 
-# Setup steps
+# Settting up the server
 
 1. Copy the nginx configuration to your system
 
