@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 
 const  {
-	test,
 	names,
 	list,
 	start,
@@ -13,10 +12,6 @@ const  {
 	cpu
 } = require('../compose/container-master.js')
 
-
-router.get('/', function(req, res) {
-  res.json({api: "located"});
-});
 
 router.get('/names', names)
 
@@ -30,9 +25,6 @@ router.post('/remove/:id', remove);
 
 router.get('/inspect/:id', inspect);
 router.get('/cpu/:id', cpu);
-
-router.get('/test', test);
-
 
 
 module.exports = router

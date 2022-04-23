@@ -5,6 +5,7 @@ Clone recursively, project uses [existing robotont software](https://github.com/
 # Requirements
 
 - Docker & docker-compose(1.28.0+)
+- [ros-vnc image tagged as robotont:base](https://github.com/unitartu-remrob/remrob-docker)
 - [nvidia-docker-runtime](https://docs.docker.com/config/containers/resource_constraints/#gpu) (comes with nvidia-docker2)
 - nginx
 - Nodejs & npm
@@ -59,18 +60,6 @@ Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-mac
 
 # Setup steps
 
-### Building the image
-
-A vnc-ros-gnome image (inspired by and built upon from this [image](https://github.com/darkdragon-001/Dockerfile-Ubuntu-Gnome))
-
-`cd images && docker build -t robotont:base .`
-
-Can manually start a specific robotont mirror with docker-compose:
-
-`cd images/robo-{x} && docker-compose up`
-
-### Running the vnc client and the server that acts as the connector
-
 1. Copy the nginx configuration to your system
 
 2. Build frontend
@@ -81,7 +70,9 @@ Can manually start a specific robotont mirror with docker-compose:
 
 `cd server && npm install`
 
-`npm run vnc-client && npm run server`
+`npm run vnc-client`
+
+`npm run server`
 
 ![Dockerode in action](./API_interface.png)
 
@@ -106,7 +97,7 @@ Copy your custom binary (found at `~/.config/dconf/user`) into `images` and rebu
 
 ### Limitations & issues:
 
-- If port mapping is used, then after starting the container it takes about half a minute before it loads the graphical gnome config for the user. With macvlan no such delay encountere
+- For reasons unknown after starting the container it takes about half a minute before it loads the graphical gnome config for the user.
 - For some reason after the 9th container the vnc servers running in new containers become unresponsive (10+) 
 - Cannot edit files that require sudo privileges with GUI applications (e.g. `sudo gedit /etc/hosts`), must use a CLI editor (e.g. nano)
 - SYS_ADMIN container privileges currently required to run systemd, which is needed for gnome

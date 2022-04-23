@@ -68,11 +68,6 @@ const generateUrl = (id) => {
 	return vncUrl.pathname + vncUrl.search
 }
 
-const testRoute = (async (req, res) => {
-	// await generateCompose("1");
-	res.json(roboPasswords)
-});
-
 const listContainers = ((req, res) => {
 	const options = {
 		all: true,
@@ -157,9 +152,7 @@ const inspectContainer = ((req, res) => {
 
 	container.inspect((err, data) => {
 		if (!err) {
-			// console.log(util.inspect(data))
 			const { Id, State, Config, NetworkSettings, Extrahosts } = data
-			// res.json(data);
 			res.json({
 				Id,
 				State,
@@ -231,5 +224,4 @@ module.exports = {
 	remove: removeContainer,
 	inspect: inspectContainer,
 	cpu: getCpuPercentage,
-	test: testRoute
 }
