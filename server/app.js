@@ -25,14 +25,12 @@ app.use(cookieParser());
 // app.use('/users', usersRouter);
 app.use('/api/container', containerAPI)
 
+// serve frontend at index
 app.use(express.static(path.join(__dirname, 'client/build')));
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'client/build/index.html'));
 });
 
-// app.get('/api', function (req, res) {
-//   res.send("Hello");
-// })
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
