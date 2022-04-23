@@ -5,10 +5,10 @@ services:
     container_name: robo-1
     hostname: robo-1
     extra_hosts:
-      - robotont-7:192.168.0.39
+      - robotont-6:192.168.88.6
     environment:
-      - ROS_MASTER=robotont-7
-      - PASSWORD=Dhvj4V0ww1J306wfmoiN
+      - ROS_MASTER=robotont-6
+      - PASSWORD=MMPCZgnxyFXBYqNwZ410
     tmpfs:
       - /run
       - /run/lock
@@ -17,6 +17,8 @@ services:
       - SYS_ADMIN
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup
+    ports:
+      - '5901:5901'
     deploy:
       resources:
         reservations:
@@ -27,7 +29,7 @@ services:
                 - utility
     networks:
       ros_net:
-        ipv4_address: 192.168.0.192
+        ipv4_address: 192.168.88.192
 networks:
   ros_net:
     external: true

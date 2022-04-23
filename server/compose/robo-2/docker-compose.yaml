@@ -6,10 +6,10 @@ services:
     container_name: robo-2
     hostname: robo-2
     extra_hosts:
-      - "robotont-11:192.168.0.41"
+      - "robotont-14:192.168.88.14"
     environment:
       #- "ROS_MASTER_URI=http://robotont-11:11311" # Can be also set in ~/.bashrc
-      - ROS_MASTER=robotont-11 # Will be used to set master in ~/.bashrc
+      - ROS_MASTER=robotont-14 # Will be used to set master in ~/.bashrc
       - PASSWORD=remrob
     tmpfs:
       - /run
@@ -30,7 +30,7 @@ services:
               capabilities: [gpu, utility]
     networks:
       ros_net:
-        ipv4_address: 192.168.0.193
+        ipv4_address: 192.168.88.193
 networks:
   ros_net:
     external: true

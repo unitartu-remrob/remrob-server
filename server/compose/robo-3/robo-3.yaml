@@ -8,7 +8,7 @@ services:
       - robotont-3:192.168.0.40
     environment:
       - ROS_MASTER=robotont-3
-      - PASSWORD=2PagwqlNuk5omyUM7k48
+      - PASSWORD=9uy3ijDB2aUYiqlXBUN6
     tmpfs:
       - /run
       - /run/lock

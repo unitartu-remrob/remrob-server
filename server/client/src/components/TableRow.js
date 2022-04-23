@@ -56,7 +56,7 @@ const ContainerRow = ({container, reload}) => {
 		try {
 			const res = await axios.post(`${baseUrl}/start/${id}`);
 			const { data } = res;
-			setVncLink(`${process.env.REACT_APP_URL}/${data.path}`);
+			setVncLink(`${process.env.REACT_APP_URL}${data.path}`);
 			reload()
 		} catch (e) {
 			console.error(e);
@@ -69,7 +69,7 @@ const ContainerRow = ({container, reload}) => {
 			const { data } = res;
 			console.log("fetched vncLink")
 			console.log(data.path)
-			setVncLink(`${process.env.REACT_APP_URL}/${data.path}`);
+			setVncLink(`${process.env.REACT_APP_URL}${data.path}`);
 		} catch (e) {
 			console.error(e);
 		}

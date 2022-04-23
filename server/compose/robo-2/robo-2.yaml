@@ -5,10 +5,10 @@ services:
     container_name: robo-2
     hostname: robo-2
     extra_hosts:
-      - robotont-11:192.168.0.41
+      - robotont-14:192.168.88.14
     environment:
-      - ROS_MASTER=robotont-11
-      - PASSWORD=KYC3f7PKoCczNwAsHHkk
+      - ROS_MASTER=robotont-14
+      - PASSWORD=saOASLx9N6hQOpCtUsFG
     tmpfs:
       - /run
       - /run/lock
@@ -27,7 +27,7 @@ services:
                 - utility
     networks:
       ros_net:
-        ipv4_address: 192.168.0.193
+        ipv4_address: 192.168.88.193
 networks:
   ros_net:
     external: true
