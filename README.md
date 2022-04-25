@@ -104,4 +104,12 @@ Copy your custom binary (found at `~/.config/dconf/user`) into `images` and rebu
 
 A very configurable docker-vnc setup providing options between lxde, lxqt and xfce4 environments (no gnome) can be found [here](https://github.com/fcwu/docker-ubuntu-vnc-desktop).
 
+&nbsp;
 
+&nbsp;
+
+# Acknowledgments
+
+Completed with the support by IT Acadamy Programme of Education and Youth Board of Estonia.
+
+Valminud Haridus- ja Noorteameti IT Akadeemia programmi toel.
