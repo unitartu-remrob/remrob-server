@@ -74,12 +74,6 @@ Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-mac
 
 ![Dockerode in action](./API_interface.png)
 
-## Customizing the gnome GUI
-
-Copy your custom binary (found at `~/.config/dconf/user`) into `images` and rebuild
-
-![GNOME ROS VNC](./desktop.png)
-
 ---
 
 ### To do:
