@@ -1,12 +1,17 @@
 {
-  "name": "server",
+  "name": "remrob",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "server": "nodemon ./bin/www",
-    "vnc-client": "websockify --web ./noVNC --token-plugin=TokenFile --token-source=${PWD}/websockify-token.cfg 6085"
+    "server": "NODE_ENV=production node ./bin/www",
+    "dev": "nodemon ./bin/www --ignore node_modules/",
+    "vnc-client": "websockify --web ./noVNC --token-plugin=TokenFile --token-source=${PWD}/websockify-token.cfg 6085",
+    "dev-server": "concurrently \"npm run dev\" \"npm run vnc-client\"",
+    "prod": "concurrently \"npm run server\" \"npm run vnc-client\"",
+    "pm2:prod": "pm2 start npm --no-automation --name \"remrob\" -- run server"
   },
   "dependencies": {
+    "concurrently": "^7.2.1",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",

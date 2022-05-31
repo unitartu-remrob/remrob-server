@@ -1,26 +1,44 @@
 ## Created with express-generator
 
-Requires websockify (`sudo apt install websockify`)
+Requires websockify, can install with apt (`sudo apt install websockify`)
 
 1. Install the server modules
 
-`npm install`
-
+	`npm install`
 
 2. Run the noVNC client on port 6085
 
-`npm run vnc-client`
+	`npm run vnc-client`
 
-If the 6085 port is being proxied via `/novnc` path then the containers running VNC servers can now be excessed with a link of the following format:
+	If the 6085 port is being proxied via `/novnc` path then the containers running VNC servers can now be excessed with a link of the following format:
 
-http://localhost/novnc/vnc.html?autoconnect=true&resize=remote&password=remrob&path=novnc?token=robo-1
+	http://localhost/novnc/vnc.html?autoconnect=true&resize=remote&password=remrob&path=novnc?token=robo-1
 
 3. Run the server that will serve the front-end and provide links to the vnc client with token passwords
 
-`npm run server`
+	`npm run server`
+
 
 ---
 
 To change to ip's of different subnet being used (other than 192.168.88.192/27), change `websockify-token.cfg` and compose files under `compose/robo-{}`
 
 To run locally the network configuration in the compose files can be replaced with port mapping (also change `websockify-token.cfg` in that case)
+
+### Dev env
+
+`npm run dev-server`
+
+### Running as an auto-restarting background process under systemd
+
+Install the pm2 daemon process manager (available via npm)
+
+	npm install p2m@latest -g
+
+	pm2 startup // follow instructions
+
+	npm run pm2:prod
+
+Restart with changes
+
+	pm2 restart remrob
