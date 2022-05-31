@@ -37,8 +37,12 @@ Install the pm2 daemon process manager (available via npm)
 
 	pm2 startup // follow instructions
 
-	npm run pm2:prod
+	pm2 start ecosystem.config.js
 
 Restart with changes
 
-	pm2 restart remrob
+	pm2 reload remrob
+
+Stream logs
+
+	pm2 logs

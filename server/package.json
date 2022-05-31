@@ -8,7 +8,8 @@
     "vnc-client": "websockify --web ./noVNC --token-plugin=TokenFile --token-source=${PWD}/websockify-token.cfg 6085",
     "dev-server": "concurrently \"npm run dev\" \"npm run vnc-client\"",
     "prod": "concurrently \"npm run server\" \"npm run vnc-client\"",
-    "pm2:prod": "pm2 start npm --no-automation --name \"remrob\" -- run server"
+    "pm2:prod": "pm2 start npm --no-automation --name \"remrob\" -- run server",
+    "pm2:cluster": "pm2 start ecosystem.config.js --env production"
   },
   "dependencies": {
     "concurrently": "^7.2.1",
