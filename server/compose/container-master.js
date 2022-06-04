@@ -34,7 +34,7 @@ const setPassword = (composeData) => {
 	
 	// Check if template already has something set, either replace or push new
 	const pwi = environment.findIndex(env => env.includes("PASSWORD"));
-	if (pwi) {
+	if (pwi >= 0) {
 		environment[pwi] = passwordEnv;
 	} else {
 		environment.push(passwordEnv);
@@ -47,7 +47,8 @@ const setPassword = (composeData) => {
 const generateCompose = async (id) => {
 	const yamlPath =
 		(process.env.NET === "local") ? "local" : "macvlan";
-	
+
+	// Read in the template
 	const composeFile = path.join(__dirname, `${yamlPath}/${id}.yaml`);
 	const yamlData = await readYamlFile(composeFile);
 
@@ -58,7 +59,14 @@ const generateCompose = async (id) => {
 	// const yamlData = await readYamlFile(`${__dirname}/robotont-ip.yaml`);
 	console.log(yamlData.services.vnc.environment)
 
-	const tempFile = path.join(__dirname, `${yamlPath}/temp/${id}.yaml`);
+	// Write out the compose file to be used for a session
+
+	const tempComposeDir = path.join(__dirname, `${yamlPath}/temp/${id}`);
+	if (!fs.existsSync(tempComposeDir)){
+		fs.mkdirSync(tempComposeDir);
+	}
+
+	const tempFile = path.join(__dirname, `${yamlPath}/temp/${id}/docker-compose.yaml`);
 	return writeYamlFile(tempFile, yamlData);
 }
 
@@ -103,26 +111,28 @@ const startContainer = (async (req, res) => {
 	const yamlPath =
 		(process.env.NET === "local") ? "local" : "macvlan";
 
-	const composeDir = path.join(__dirname, `${yamlPath}/temp`)
+	// cannot run multiple container in the same directory through docker-compose, so create separate ones
+	const composeDir = path.join(__dirname, `${yamlPath}/temp/${id}`)
+
 	if (!fs.existsSync(composeDir)) {
-		res.json("Not available")
-  } else {
-		await generateCompose(id);
-		const options = { cwd: composeDir, composeOptions: ["--file", `${id}.yaml`], log: true }
-		compose.upAll(options).then(
-			() => {
-				// await new Promise(resolve => setTimeout(resolve, 10000)); // Artificial buffer
-				const targetUrl = generateUrl(id);
-				res.json({
-					path: targetUrl
-				})
-			},
-			(err) => {
-				console.log("Starting container failed", err.message)
-				res.json("Error in starting the container via the compose file.")
-			}
-		)
-	}
+		console.log("Could not find temp dir")
+  }
+
+	await generateCompose(id);
+	const options = { cwd: composeDir, composeOptions: ["--file", `docker-compose.yaml`], log: true }
+	compose.upAll(options).then(
+		() => {
+			// await new Promise(resolve => setTimeout(resolve, 10000)); // Artificial buffer
+			const targetUrl = generateUrl(id);
+			res.json({
+				path: targetUrl
+			})
+		},
+		(err) => {
+			console.log("Starting container failed", err.message)
+			res.json("Error in starting the container via the compose file.")
+		}
+	)
 });
 
 const getUrl = (req, res) => {
