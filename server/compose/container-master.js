@@ -45,8 +45,12 @@ const setPassword = (composeData) => {
 }
 
 const generateCompose = async (id) => {
-	const composeDir = path.join(__dirname, `${id}/`);
-	const yamlData = await readYamlFile(`${composeDir}/docker-compose.yaml`);
+	const yamlPath =
+		(process.env.NET === "local") ? "local" : "macvlan";
+	
+	const composeFile = path.join(__dirname, `${yamlPath}/${id}.yaml`);
+	const yamlData = await readYamlFile(composeFile);
+
 	// Set the temporary container password
 	roboPasswords[id] = setPassword(yamlData);
 	console.log(roboPasswords)
@@ -54,7 +58,8 @@ const generateCompose = async (id) => {
 	// const yamlData = await readYamlFile(`${__dirname}/robotont-ip.yaml`);
 	console.log(yamlData.services.vnc.environment)
 
-	return writeYamlFile(`${composeDir}/${id}.yaml`, yamlData);
+	const tempFile = path.join(__dirname, `${yamlPath}/temp/${id}.yaml`);
+	return writeYamlFile(tempFile, yamlData);
 }
 
 const generateUrl = (id) => {
@@ -94,7 +99,11 @@ const listContainers = ((req, res) => {
 
 const startContainer = (async (req, res) => {
 	const { id } = req.params;
-	const composeDir = path.join(__dirname, `${id}/`)
+
+	const yamlPath =
+		(process.env.NET === "local") ? "local" : "macvlan";
+
+	const composeDir = path.join(__dirname, `${yamlPath}/temp`)
 	if (!fs.existsSync(composeDir)) {
 		res.json("Not available")
   } else {
@@ -110,7 +119,7 @@ const startContainer = (async (req, res) => {
 			},
 			(err) => {
 				console.log("Starting container failed", err.message)
-				res.json("failed")
+				res.json("Error in starting the container via the compose file.")
 			}
 		)
 	}
@@ -125,7 +134,7 @@ const getUrl = (req, res) => {
 const stopContainer = ((req, res) => {
 	const { id } = req.params;
 	const container = docker.getContainer(id);
-	container.stop({t: 5}, (err, data) => {
+	container.stop({t: 2}, (err, data) => {
 		if (!err) {
 			res.json(data)
 		} else {

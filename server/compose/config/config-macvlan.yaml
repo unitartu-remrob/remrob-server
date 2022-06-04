@@ -1,0 +1,18 @@
+# Automate everything from a single docker-compose template instead of having a separate one for each robot
+
+- name: robo-1
+  master-name: robotont-1
+  self-ip: 192.168.88.192
+  master-ip: 192.168.88.1
+- name: robo-2
+  master-name: robotont-2
+  self-ip: 192.168.88.193
+  master-ip: 192.168.88.2
+- name: robo-3
+  master-name: robotont-3
+  self-ip: 192.168.88.194
+  master-ip: 192.168.88.3
+- name: robo-4
+  master-name: robotont-4
+  self-ip: 192.168.88.195
+  master-ip: 192.168.88.4

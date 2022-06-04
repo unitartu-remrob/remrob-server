@@ -1,3 +1,7 @@
+# Temporarily generated compose files
+compose/local/temp/
+compose/macvlan/temp/
+
 # Logs
 logs
 *.log
@@ -55,7 +59,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-# .env
+.env
 
 # next.js build output
 .next

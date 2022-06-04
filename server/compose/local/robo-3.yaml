@@ -1,34 +1,26 @@
 version: '3.8'
+
 services:
   vnc:
     image: robotont:base
     container_name: robo-3
     hostname: robo-3
-    extra_hosts:
-      - robotont-3:192.168.0.40
     environment:
-      - ROS_MASTER=robotont-3
-      - PASSWORD=9uy3ijDB2aUYiqlXBUN6
+      - PASSWORD=remrob # placeholder
     tmpfs:
       - /run
       - /run/lock
       - /tmp
     cap_add:
       - SYS_ADMIN
-    volumes:
+    volumes: 
       - /sys/fs/cgroup:/sys/fs/cgroup
+    ports:
+      - 5903:5901
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              capabilities:
-                - gpu
-                - utility
-    networks:
-      ros_net:
-        ipv4_address: 192.168.0.194
-networks:
-  ros_net:
-    external: true
-    name: pub_net
+              capabilities: [gpu, utility]
+    network_mode: bridge

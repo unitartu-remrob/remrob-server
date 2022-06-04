@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  vnc:
+    image: robotont:base
+    container_name: {{ name }}
+    hostname: {{ name }}
+    environment:
+      - PASSWORD=remrob # placeholder
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    cap_add:
+      - SYS_ADMIN
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup
+    ports:
+      - {{ port }}:5901
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu, utility]
+    network_mode: bridge

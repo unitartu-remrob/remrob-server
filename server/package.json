@@ -5,6 +5,7 @@
   "scripts": {
     "server": "NODE_ENV=production node ./bin/www",
     "dev": "nodemon ./bin/www --ignore node_modules/",
+    "dev-local": "NET=local nodemon ./bin/www --ignore node_modules/",
     "vnc-client": "websockify --web ./noVNC --token-plugin=TokenFile --token-source=${PWD}/websockify-token.cfg 6085",
     "dev-server": "concurrently \"npm run dev\" \"npm run vnc-client\"",
     "prod": "concurrently \"npm run server\" \"npm run vnc-client\"",

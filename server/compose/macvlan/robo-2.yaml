@@ -3,25 +3,22 @@ version: '3.8'
 services:
   vnc:
     image: robotont:base
-    container_name: robo-4
-    hostname: robo-4
+    container_name: robo-2
+    hostname: robo-2
     extra_hosts:
-      - "robotont-14:192.168.0.42"
+      - "robotont-2:192.168.88.2"
     environment:
-      #- "ROS_MASTER_URI=http://robotont-14:11311" # Can be also set in ~/.bashrc
-      - ROS_MASTER=robotont-14 # Will be used to set master in ~/.bashrc
-      - PASSWORD=remrob
+      - ROS_MASTER=robotont-2 # Will be used to set master in ~/.bashrc
+      - PASSWORD=remrob # placeholder
     tmpfs:
       - /run
       - /run/lock
       - /tmp
     cap_add:
-    #   - SYS_BOOT
+      - SYS_BOOT
       - SYS_ADMIN
     volumes: 
       - /sys/fs/cgroup:/sys/fs/cgroup
-    # ports:
-    #   - 5904:5901
     deploy:
       resources:
         reservations:
@@ -30,7 +27,7 @@ services:
               capabilities: [gpu, utility]
     networks:
       ros_net:
-        ipv4_address: 192.168.88.195
+        ipv4_address: 192.168.88.193
 networks:
   ros_net:
     external: true

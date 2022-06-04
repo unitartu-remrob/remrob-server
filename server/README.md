@@ -21,9 +21,9 @@ Requires websockify, can install with apt (`sudo apt install websockify`)
 
 ---
 
-To change to ip's of different subnet being used (other than 192.168.88.192/27), change `websockify-token.cfg` and compose files under `compose/robo-{}`
+To change to ip's of different subnet being used (other than 192.168.88.192/27), modify the compose config under `compose/config` and run the Jinja2 template parser (`compose_generator.py`), to enable connections also change `websockify-token.cfg`
 
-To run locally the network configuration in the compose files can be replaced with port mapping (also change `websockify-token.cfg` in that case)
+To run locally the network configuration in the compose files can be replaced with port mapping by running `npm run dev-local` (also change `websockify-token.cfg` accordingly)
 
 ### Dev env
 

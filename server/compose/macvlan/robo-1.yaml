@@ -6,23 +6,19 @@ services:
     container_name: robo-1
     hostname: robo-1
     extra_hosts:
-      - "robotont-6:192.168.88.6"
+      - "robotont-1:192.168.88.1"
     environment:
-      #- "ROS_MASTER_URI=http://robotont-7:11311"
-      - ROS_MASTER=robotont-6 # Will be used to set master in ~/.bashrc
-      - PASSWORD=remrob
+      - ROS_MASTER=robotont-1 # Will be used to set master in ~/.bashrc
+      - PASSWORD=remrob # placeholder
     tmpfs:
       - /run
       - /run/lock
       - /tmp
     cap_add:
-    # Not required for initiation (tmpfs and cgroup enough, but there are some issues with running applications without SYS_ADMIN privileges)
-      #- SYS_BOOT
+      - SYS_BOOT
       - SYS_ADMIN
     volumes: 
       - /sys/fs/cgroup:/sys/fs/cgroup
-    ports:
-      - 5901:5901
     deploy:
       resources:
         reservations:
