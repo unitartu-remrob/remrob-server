@@ -1,6 +1,6 @@
 # Temporarily generated compose files
-compose/local/temp/**
-compose/macvlan/temp/**
+compose/local/temp/robo-*
+compose/macvlan/temp/robo-*
 
 # Logs
 logs
