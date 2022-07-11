@@ -6,6 +6,7 @@ services:
     container_name: robo-3
     hostname: robo-3
     environment:
+      - ROS_MASTER=localhost
       - PASSWORD=remrob # placeholder
     tmpfs:
       - /run

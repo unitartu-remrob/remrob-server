@@ -17,10 +17,10 @@ const roboPasswords = {
 	"robo-4": '',
 }
 
-const getContainerNames = (async (req, res) => {
+const getContainerNames = async (req, res) => {
 	// This endpoint can be used to get all the fetchable containers before sending inspect calls
 	res.json({names: Object.keys(roboPasswords)});
-});
+};
 
 const setPassword = (composeData) => {
 	// Generate the password for vnc and push it into the compose data
@@ -81,7 +81,18 @@ const generateUrl = (id) => {
 	return vncUrl.pathname + vncUrl.search
 }
 
-const listContainers = ((req, res) => {
+const getUrl = (req, res) => {
+	const { id } = req.params;
+	const vncUrl = generateUrl(id);
+	res.json({link: vncUrl});
+}
+
+
+const listContainers = (req, res) => {
+	//console.log(req);
+	const id = res.locals.user.sub;
+	// res.json({"user": id}) // req.user
+	// return
 	const options = {
 		all: true,
 		filters: {
@@ -91,7 +102,7 @@ const listContainers = ((req, res) => {
 	docker.listContainers(options, function(err, containers) {
 		res.json(containers)
 	});
-})
+}
 
 // const listAllContainers = ((req, res) => {
 // 	const options = {
@@ -105,8 +116,9 @@ const listContainers = ((req, res) => {
 // 	});
 // })
 
-const startContainer = (async (req, res) => {
+const startContainer = async (req, res) => {
 	const { id } = req.params;
+	console.log(id);
 
 	const yamlPath =
 		(process.env.NET === "local") ? "local" : "macvlan";
@@ -133,15 +145,9 @@ const startContainer = (async (req, res) => {
 			res.json("Error in starting the container via the compose file.")
 		}
 	)
-});
-
-const getUrl = (req, res) => {
-	const { id } = req.params;
-	const vncUrl = generateUrl(id);
-	res.json({link: vncUrl});
 }
 
-const stopContainer = ((req, res) => {
+const stopContainer = (req, res) => {
 	const { id } = req.params;
 	const container = docker.getContainer(id);
 	container.stop({t: 2}, (err, data) => {
@@ -151,9 +157,9 @@ const stopContainer = ((req, res) => {
 			res.send("whoopsie")
 		}
 	})
-});
+};
 
-const removeContainer = ((req, res) => {
+const removeContainer = (req, res) => {
 	const { id } = req.params;
 	const container = docker.getContainer(id);
 	container.remove((err, data) => {
@@ -163,12 +169,11 @@ const removeContainer = ((req, res) => {
 			res.send("whoopsie")
 		}
 	})
-});
+};
 
-const inspectContainer = ((req, res) => {
+const inspectContainer = (req, res) => {
 	const { id } = req.params;
 	const container = docker.getContainer(id);
-
 	container.inspect((err, data) => {
 		if (!err) {
 			const { Id, State, Config, NetworkSettings, Extrahosts } = data
@@ -179,11 +184,13 @@ const inspectContainer = ((req, res) => {
 				NetworkSettings,
 				Extrahosts,
 			})
+		} else if (err.statusCode === 404) {
+			res.status(404).send('no such container')
 		} else {
-			res.json(err)
+			res.status(502).send('Could not connect to the Docker socket')
 		}
 	})
-})
+}
 
 const calculate_cpu_percent = (d) => {
 	if (Object.keys(d.pids_stats).length === 0) {
@@ -201,10 +208,10 @@ const calculate_cpu_percent = (d) => {
 	return cpu_percent.toFixed(2);
 }
 
-const getCpuPercentage = ((req, res) => {
+const getCpuPercentage = (req, res) => {
 	const { id } = req.params;
 	const container = docker.getContainer(id);
-	container.stats({stream: false}, (err, data) => {
+	container.stats({ stream: false }, (err, data) => {
 		if (!err) {
 			const cpu_percent = calculate_cpu_percent(data);
 			res.json({
@@ -214,7 +221,7 @@ const getCpuPercentage = ((req, res) => {
 			res.json(err);
 		}
 	})
-})
+}
 
 
 /**

@@ -1,6 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
+const {
+	authenticateJWT,
+	authenticateAdminJWT,
+	checkSession
+}  = require('../middleware/auth');
+
 const  {
 	names,
 	list,
@@ -14,16 +20,17 @@ const  {
 
 
 router.get('/names', names)
+//
+router.get('/list', [authenticateJWT, checkSession], list);
 
-router.get('/list', list);
+router.post('/start/:id', [authenticateJWT, checkSession], start);
+router.post('/stop/:id', [authenticateJWT, checkSession], stop);
 
-router.post('/start/:id', start);
 router.get('/connection/:id', connect);
 
-router.post('/stop/:id', stop);
-router.post('/remove/:id', remove);
+router.post('/remove/:id', [authenticateAdminJWT], remove);
 
-router.get('/inspect/:id', inspect);
+router.get('/inspect/:id', [authenticateJWT, checkSession], inspect);
 router.get('/cpu/:id', cpu);
 
 
