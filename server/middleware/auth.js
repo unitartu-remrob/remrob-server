@@ -3,13 +3,19 @@
 const jwt = require("jsonwebtoken");
 const axios = require('axios');
 
+var db = require("../data/db.js");
 const verifyTimeInterval = require('../util/time');
 
 const authenticateJWT = (req, res, next) => {
-	const authHeader = req.headers.authorization;
-	console.log(authHeader)
-	if (authHeader) {
-			const token = authHeader.split(' ')[1];
+	const tokenHeader = req.headers.authorization;
+
+	const authHeader = {
+			'Authorization': tokenHeader,
+			'Content-Type': 'application/json'
+	}
+
+	if (tokenHeader) {
+			const token = tokenHeader.split(' ')[1];
 
 			jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
 					if (err) {
@@ -17,7 +23,7 @@ const authenticateJWT = (req, res, next) => {
 					}
 
 					res.locals.user = user;
-					// res.locals.authHeader = authHeader;
+					res.locals.authHeader = authHeader;
 					next();
 			});
 	} else {
@@ -26,10 +32,15 @@ const authenticateJWT = (req, res, next) => {
 }
 
 const authenticateAdminJWT = (req, res, next) => {
-	const authHeader = req.headers.authorization;
+	const tokenHeader = req.headers.authorization;
 
-	if (authHeader) {
-			const token = authHeader.split(' ')[1];
+	const authHeader = {
+		'Authorization': tokenHeader,
+		'Content-Type': 'application/json'
+	}
+
+	if (tokenHeader) {
+			const token = tokenHeader.split(' ')[1];
 
 			jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
 					if (err) {
@@ -39,6 +50,7 @@ const authenticateAdminJWT = (req, res, next) => {
 						return res.sendStatus(401);
 					}
 					res.locals.user = user;
+					res.locals.authHeader = authHeader;
 					next();
 			});
 	} else {
@@ -47,31 +59,52 @@ const authenticateAdminJWT = (req, res, next) => {
 }
 
 const checkSession = async (req, res, next) => {
-
-	console.log("Checking session validity...")
 	// Get the user ID of who's trying to access container management
 	const { user } = res.locals;
 
-	if (user.is_administrator === true) {
-		// Admin validated without time restrictions
-		next()
+	axios.get(`${process.env.DB_SERVER}/bookings/${user.sub}`, { headers: req.headers }).then((resp) => {
+		const { user_bookings } = resp.data;
+		
+		const active_booking = verifyTimeInterval(user_bookings)
+
+		if (active_booking !== undefined || user.is_administrator === true) {
+			// If valid session, pass forward to container api with the corresponding container allowed
+			res.locals.user_booking = active_booking;
+			next()
+		} else {
+			res.status(403).send('No active sessions available')
+		}
+	}).catch(err => {
+		console.warn("error", err.response.data);
+		res.sendStatus(err.response.status)
+	})
+}
+
+const checkContainerOwnership = (req, res, next) => {
+	// MIDDLEWARE THAT CHECKS IF THE CONTAINER THAT IS TARGETED BELONGS TO THE USER BY QUERYING DB
+	const { user } = res.locals;
+	const { id } = req.params; 
+
+	if (user.is_administrator !== true) {
+		// const { user_booking } = res.locals;
+		db('inventory')
+			.where({ user: user.sub })
+			.select('slug')
+			.then(inv_item => {
+				if (inv_item[0].slug !== id) {
+					res.status(403).send('This container does not belong to you')
+				} else {
+					next()
+				}
+			})
 	} else {
-		axios.get(`http://localhost:5000/api/v1/bookings/${user.sub}`, { headers: req.headers }).then((resp) => {
-			if (verifyTimeInterval(resp.data.user_bookings)) {
-				// If valid session, pass forward to container api
-				next()
-			} else {
-				res.status(403).send('No active sessions available')
-			}
-		}).catch(err => {
-			console.warn("error", err.response.data);
-			res.sendStatus(err.response.status)
-		})
-	}
+		next()
+	} 
 }
 
 module.exports = {
 	authenticateJWT,
 	authenticateAdminJWT,
-	checkSession
+	checkSession,
+	checkOwnership: checkContainerOwnership
 }
