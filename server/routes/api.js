@@ -4,34 +4,40 @@ var router = express.Router();
 const {
 	authenticateJWT,
 	authenticateAdminJWT,
-	checkSession
+	checkSession,
+	checkOwnership
 }  = require('../middleware/auth');
 
 const  {
-	names,
 	list,
 	start,
 	stop,
+	restart,
 	connect,
 	remove,
 	inspect,
-	cpu
+	stats,
+	assign
 } = require('../compose/container-master.js')
 
 
-router.get('/names', names)
 //
 router.get('/list', [authenticateJWT, checkSession], list);
 
-router.post('/start/:id', [authenticateJWT, checkSession], start);
-router.post('/stop/:id', [authenticateJWT, checkSession], stop);
+router.get('/inspect/:id', [authenticateJWT, checkSession, checkOwnership], inspect);
+router.get('/stats/:id', [authenticateJWT, checkSession, checkOwnership], stats);
+
+router.get('/assign', [authenticateJWT, checkSession], assign)
+
+router.post('/start/:id', [authenticateJWT, checkSession, checkOwnership], start);
+router.post('/stop/:id', [authenticateJWT, checkSession, checkOwnership], stop);
+router.post('/restart/:id', [authenticateJWT, checkSession, checkOwnership], stop);
+router.post('/remove/:id', [authenticateAdminJWT], remove);
 
 router.get('/connection/:id', connect);
 
-router.post('/remove/:id', [authenticateAdminJWT], remove);
 
-router.get('/inspect/:id', [authenticateJWT, checkSession], inspect);
-router.get('/cpu/:id', cpu);
+// router.get('/cpu/:id', cpu);
 
 
 module.exports = router

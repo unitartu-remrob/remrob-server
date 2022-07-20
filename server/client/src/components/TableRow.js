@@ -56,6 +56,7 @@ const ContainerRow = ({container, reload}) => {
 		try {
 			const res = await axios.post(`${baseUrl}/start/${id}`);
 			const { data } = res;
+			console.log(data)
 			setVncLink(`${process.env.REACT_APP_URL}${data.path}`);
 			reload()
 		} catch (e) {

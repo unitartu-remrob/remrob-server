@@ -14,7 +14,7 @@ const verifyTimeInterval = (bookings) => {
 			return true
 		}
 	})
-	return timeSlot != undefined ? true : false;
+	return timeSlot;
 }
 
 module.exports = verifyTimeInterval
