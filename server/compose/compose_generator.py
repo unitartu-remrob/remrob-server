@@ -7,10 +7,10 @@ if __name__ == "__main__":
 	robo_config_local = yaml.safe_load(open('config/config-local.yaml'))
 
 	# Load templates file from templtes folder
-	env = Environment(loader = FileSystemLoader('./templates'),   						trim_blocks=True, lstrip_blocks=True)
+	env = Environment(loader = FileSystemLoader('./templates'), trim_blocks=True, lstrip_blocks=True)
 
-	template_macvlan = env.get_template('config-macvlan.j2')
-	template_local = env.get_template('config-local.j2')
+	template_macvlan = env.get_template('macvlan.j2')
+	template_local = env.get_template('local.j2')
 
 	for i, robot in enumerate(robo_config_macvlan):
 		
@@ -30,7 +30,7 @@ if __name__ == "__main__":
 			name=robot["name"],
 			port=robot["port"]
 		)
-		file = open(f"./local/robo-{i+1}.yaml", "w")
+		file = open(f"./local/robosim-{i+1}.yaml", "w")
 		file.write(output)
 		file.close()
 
