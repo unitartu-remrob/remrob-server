@@ -1,10 +1,20 @@
 # Automate everything from a single docker-compose template instead of having a separate one for each robot
 
-- name: robo-1
+- name: robosim-1
   port: 5901
-- name: robo-2
+- name: robosim-2
   port: 5902
-- name: robo-3
+- name: robosim-3
   port: 5903
-- name: robo-4
+- name: robosim-4
   port: 5904
+- name: robosim-5
+  port: 5905
+- name: robosim-6
+  port: 5906
+- name: robosim-7
+  port: 5907
+- name: robosim-8
+  port: 5908
+- name: robosim-9
+  port: 5909

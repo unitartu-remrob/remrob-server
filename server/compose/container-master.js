@@ -42,9 +42,7 @@ const setPassword = (composeData) => {
 	return passwordToken
 }
 
-const generateCompose = async (id) => {
-	const yamlPath =
-		(process.env.NET === "local") ? "local" : "macvlan";
+const generateCompose = async (id, yamlPath) => {
 
 	// Read in the template
 	const composeFile = path.join(__dirname, `${yamlPath}/${id}.yaml`);
@@ -93,12 +91,14 @@ const assignContainer = (req, res) => {
 	if (user_booking === undefined) {
 		return res.status(403).send('No active sessions available')
 	}
-	console.log(user_booking, user)
+
+	const inventoryTable = (user_booking.is_simulation) ? 'simulation_containers' : 'inventory';
+	// If simulation container, add an empty filter, else check if the corresponding robot is active
+	const status_filter = (user_booking.is_simulation) ? (b) => {b.where('container_id', '<', 1000)}: { status: true } 
 	let now = new Date();
 
-	// TODO: differentiate between simulation and physical robot containers
 	// Check first if there is an already active session
-	db('inventory')
+	db(inventoryTable)
 		.where({ user: user.sub })
 		.andWhere('end_time', '>', now.toISOString())
 		.then((inv) => {
@@ -107,20 +107,18 @@ const assignContainer = (req, res) => {
 			// res.status(400).json('You already have an assigned container')
 		} else {		
 			// Get the first entry that is free (booking expired or user null)
-			db('inventory').first()
-				.where({
-					status: true,
-				})
+			db(inventoryTable).first()
+				.where(status_filter)
 				.andWhere({ user: null })
 				.orWhere('end_time', '<', now.toISOString(),)
 				.then(item => {
 					// Update the user column with the respective user ID coming from the JWT token
-					if (item) {
+					if (item) {					
 						const bookingData = {
 							'user': user.sub,
 							'end_time': user_booking.end
 						}
-						db('inventory')
+						db(inventoryTable)
 							.update(bookingData)
 							.where('id', item["id"])
 							.then(id => {
@@ -135,6 +133,7 @@ const assignContainer = (req, res) => {
 }
 
 const listContainers = (req, res) => {
+	// Testing function
 	db('inventory')
 		.where({ id: 11 })
 		.update({
@@ -173,7 +172,6 @@ const startContainer = (req, res) => {
 	// Try to start it, if error -> means it doesn't exist and we need to build it from compose
 
 	const container = docker.getContainer(id);
-	//res.json(container)
 	container.start(async (err, data) => {
 		if (!err) {
 			// res.json("Container started successfully")
@@ -192,17 +190,15 @@ const startContainer = (req, res) => {
 
 const startFromCompose = async (id, res) => {
 	console.log(`Started ${id} from compose`)
+	const { is_simulation } = res.locals.user_booking;
+
 	const yamlPath =
-		(process.env.NET === "local") ? "local" : "macvlan";
+		(is_simulation) ? "local" : "macvlan";
 
 	// cannot run multiple container in the same directory through docker-compose, so create separate ones
 	const composeDir = path.join(__dirname, `${yamlPath}/temp/${id}`)
 
-	if (!fs.existsSync(composeDir)) {
-		console.log("Could not find temp dir")
-	}
-
-	await generateCompose(id);
+	await generateCompose(id, yamlPath);
 	const options = { cwd: composeDir, composeOptions: ["--file", `docker-compose.yaml`], log: true }
 
 	compose.upAll(options).then(
