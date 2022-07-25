@@ -9,10 +9,10 @@ require('dotenv').config()
 
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
-var containerAPI = require('./routes/api');
-
 var app = express();
-app.use(cors());
+var expressWs = require('express-ws')(app);
+
+var containerAPI = require('./routes/api'); // must be loaded after setting up ws
 
 process.env.NODE_ENV = process.env.NODE_ENV || "development";
 // console.log(`Running ${process.env.NODE_ENV} environment`);
@@ -21,6 +21,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || "development";
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
+app.use(cors());
 app.use(logger('dev'));
 app.use(express.json()); // body-parser
 app.use(express.urlencoded({ extended: false }));
@@ -28,7 +29,6 @@ app.use(cookieParser());
 
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
-
 
 app.use('/api/container', containerAPI)
 

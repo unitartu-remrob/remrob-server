@@ -8,6 +8,7 @@ const {
 	checkOwnership
 }  = require('../middleware/auth');
 
+const { liveStats } = require('../compose/live.js')
 const  {
 	list,
 	start,
@@ -20,6 +21,8 @@ const  {
 	assign
 } = require('../compose/container-master.js')
 
+
+router.ws("/live/:version", liveStats);
 
 //
 router.get('/list', [authenticateJWT, checkSession], list);
@@ -37,7 +40,7 @@ router.post('/remove/:id', [authenticateAdminJWT], remove);
 router.get('/connection/:id', connect);
 
 
-// router.get('/cpu/:id', cpu);
+
 
 
 module.exports = router
