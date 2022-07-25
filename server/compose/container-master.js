@@ -181,19 +181,21 @@ const startContainer = (req, res) => {
 			})
 		} else if (err.statusCode === 404) {
 			// proceed with compose
-			await startFromCompose(id, res);
+			await startFromCompose(id, req, res);
 		} else {
 			res.json(err)
 		}
 	})
 }
 
-const startFromCompose = async (id, res) => {
+const startFromCompose = async (id, req, res) => {
 	console.log(`Started ${id} from compose`)
-	const { is_simulation } = res.locals.user_booking;
+	// If no active booking, admin client expected to inform if the container to be started is a sim
+	const { is_simulation } = res.locals.user_booking || req.query;
 
-	const yamlPath =
-		(is_simulation) ? "local" : "macvlan";
+
+	const yamlPath = (is_simulation) ? "local" : "macvlan";
+	const inventoryTable = (is_simulation) ? 'simulation_containers' : 'inventory';
 
 	// cannot run multiple container in the same directory through docker-compose, so create separate ones
 	const composeDir = path.join(__dirname, `${yamlPath}/temp/${id}`)
@@ -205,7 +207,7 @@ const startFromCompose = async (id, res) => {
 		() => {
 			// await new Promise(resolve => setTimeout(resolve, 10000)); // Artificial buffer
 			const targetUrl = generateUrl(id);
-			db('inventory')
+			db(inventoryTable)
 				.returning('end_time')
 				.where({ slug: id })
 				.update({
@@ -350,5 +352,8 @@ module.exports = {
 	remove: removeContainer,
 	inspect: inspectContainer,
 	stats: inspectStats,
-	assign: assignContainer
+	assign: assignContainer,
+
+	docker,
+	calculate_cpu_percent
 }
