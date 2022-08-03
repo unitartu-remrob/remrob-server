@@ -9,37 +9,34 @@ const {
 }  = require('../middleware/auth');
 
 const { liveStats } = require('../compose/live.js')
+const { assignContainer } = require('./assignment')
 const  {
 	list,
 	start,
 	stop,
 	restart,
-	connect,
+	commit,
 	remove,
 	inspect,
 	stats,
-	assign
 } = require('../compose/container-master.js')
 
 
 router.ws("/live/:version", liveStats);
 
 //
-router.get('/list', [authenticateJWT, checkSession], list);
+router.get('/list', [authenticateJWT], list);
 
 router.get('/inspect/:id', [authenticateJWT, checkSession, checkOwnership], inspect);
 router.get('/stats/:id', [authenticateJWT, checkSession, checkOwnership], stats);
 
-router.get('/assign', [authenticateJWT, checkSession], assign)
+router.get('/assign', [authenticateJWT, checkSession], assignContainer)
 
 router.post('/start/:id', [authenticateJWT, checkSession, checkOwnership], start);
 router.post('/stop/:id', [authenticateJWT, checkSession, checkOwnership], stop);
 router.post('/restart/:id', [authenticateJWT, checkSession, checkOwnership], stop);
-router.post('/remove/:id', [authenticateAdminJWT], remove);
-
-router.get('/connection/:id', connect);
-
-
+router.post('/commit/:id', [authenticateJWT, checkSession, checkOwnership], commit);
+router.post('/remove/:id', [authenticateJWT, checkSession, checkOwnership], remove);
 
 
 

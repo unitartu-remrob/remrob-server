@@ -7,11 +7,9 @@ var generator = require('generate-password');
 var path = require('path');
 const fs = require("fs");
 var db = require("../data/db.js");
+const { resolve } = require('path');
 
 var docker = new Dockerode();
-
-// Proto-DB (please don't crash mr server)
-const roboPasswords = { }
 
 const filterOptions = {
 	all: true,
@@ -20,7 +18,7 @@ const filterOptions = {
 	}
 }
 
-const setPassword = (composeData) => {
+const setEnvironment = (composeData, user) => {
 	// Generate the password for vnc and push it into the compose data
 	const {services: {vnc: {environment}}} = composeData;
 
@@ -29,7 +27,7 @@ const setPassword = (composeData) => {
 		numbers: true
 	});
 	const passwordEnv = `PASSWORD=${passwordToken}`
-	
+
 	// Check if template already has something set, either replace or push new
 	const pwi = environment.findIndex(env => env.includes("PASSWORD"));
 	if (pwi >= 0) {
@@ -39,114 +37,79 @@ const setPassword = (composeData) => {
 	}
 	// Now set the reference
 	composeData.services.vnc.environment = environment
-	return passwordToken
+
+	return new Promise((resolve, reject) => {
+		if (!user.fresh) {
+			const name = `robotont:${user.sub}`
+			const image = docker.getImage(name);
+			image.inspect((err, data) => {
+				// If no error, means the image exists, else retain base image
+				if (!err) {
+					composeData.services.vnc.image = name
+				}
+				resolve(passwordToken)
+			})
+		} else {
+			resolve(passwordToken)
+		}
+	})
+	// Set the user image if required
 }
 
-const generateCompose = async (id, yamlPath) => {
-
+const generateCompose = async (id, yamlPath, user) => {
 	// Read in the template
 	const composeFile = path.join(__dirname, `${yamlPath}/${id}.yaml`);
 	const yamlData = await readYamlFile(composeFile);
 
-	// Set the temporary container password
-	roboPasswords[id] = setPassword(yamlData);
-	console.log(roboPasswords)
-
-	// const yamlData = await readYamlFile(`${__dirname}/robotont-ip.yaml`);
-	console.log(yamlData.services.vnc.environment)
+	// Create the token, add it to the yaml as a side effect
+	const passwordToken = await setEnvironment(yamlData, user);
+	console.log(yamlData.services.vnc.image)
 
 	// Write out the compose file to be used for a session
-
 	const tempComposeDir = path.join(__dirname, `${yamlPath}/temp/${id}`);
 	if (!fs.existsSync(tempComposeDir)){
 		fs.mkdirSync(tempComposeDir);
 	}
 
 	const tempFile = path.join(__dirname, `${yamlPath}/temp/${id}/docker-compose.yaml`);
-	return writeYamlFile(tempFile, yamlData);
+	await writeYamlFile(tempFile, yamlData);
+	return passwordToken
 }
 
-const generateUrl = (id) => {
+const generateUrl = (id, tokenPw) => {
 	const vncUrl = new URL(`http:/localhost/novnc/vnc.html`); // hostname excluded in return
 	vncUrl.searchParams.append("autoconnect", "true");
   vncUrl.searchParams.append("resize", "remote");
-	vncUrl.searchParams.append("password", roboPasswords[id]);
+	vncUrl.searchParams.append("password", tokenPw);
 	// order for the following matters
 	vncUrl.searchParams.append("path", "novnc");
 	vncUrl.href = vncUrl.href.concat(`?token=${id}`);
 	return vncUrl.pathname + vncUrl.search
 }
 
-const getUrl = (req, res) => {
-	const { id } = req.params;
-	const vncUrl = generateUrl(id);
-	res.json({ link: vncUrl });
-}
-
-
-const assignContainer = (req, res) => {
-	const { user, user_booking } = res.locals;
-	
-	// In case admin tries to get a container without an active booking
-	if (user_booking === undefined) {
-		return res.status(403).send('No active sessions available')
-	}
-
-	const inventoryTable = (user_booking.is_simulation) ? 'simulation_containers' : 'inventory';
-	// If simulation container, add an empty filter, else check if the corresponding robot is active
-	const status_filter = (user_booking.is_simulation) ? (b) => {b.where('container_id', '<', 1000)}: { status: true } 
-	let now = new Date();
-
-	// Check first if there is an already active session
-	db(inventoryTable)
-		.where({ user: user.sub })
-		.andWhere('end_time', '>', now.toISOString())
-		.then((inv) => {
-		if (inv.length) {
-			res.json(inv[0])
-			// res.status(400).json('You already have an assigned container')
-		} else {		
-			// Get the first entry that is free (booking expired or user null)
-			db(inventoryTable).first()
-				.where(status_filter)
-				.andWhere({ user: null })
-				.orWhere('end_time', '<', now.toISOString(),)
-				.then(item => {
-					// Update the user column with the respective user ID coming from the JWT token
-					if (item) {					
-						const bookingData = {
-							'user': user.sub,
-							'end_time': user_booking.end
-						}
-						db(inventoryTable)
-							.update(bookingData)
-							.where('id', item["id"])
-							.then(id => {
-								res.json({ ...item, ...bookingData })
-							})
-					} else {
-						res.status(500).send('No free inventory available')
-					}
-				})
-		}
-	})
-}
-
 const listContainers = (req, res) => {
 	// Testing function
-	db('inventory')
-		.where({ id: 11 })
-		.update({
-			"status": false,
-			"user": 1
-		}).then(console.log("updated"))
+	// db('inventory')
+	// 	.where({ id: 11 })
+	// 	.update({
+	// 		"status": false,
+	// 		"user": 1
+	// 	}).then(console.log("updated"))
 	
-	db('inventory').where({ id: 11 }).then(item => {
-		res.json(item)
+	// db('inventory').where({ id: 11 }).then(item => {
+	// 	res.json(item)
+	// })
+	const { user } = res.locals;
+	const name = `robotont:${user.sub+5}`
+	console.log(name)
+	const image = docker.getImage(name);
+	image.inspect((err, data) => {
+		if (!err) {
+			res.json(data)
+		} else {
+			res.send("whoopsie")
+		}
 	})
-		
-	//db('inventory').where('id', 11)
-	// console.log()
 	
 	//console.log(req);
 	// const id = res.locals.user.sub;
@@ -170,15 +133,21 @@ const startContainer = (req, res) => {
 	// Two states for the container - exited or stopped
 	// If exited, we need to start from compose, if it is just stopped, we need to simply start it
 	// Try to start it, if error -> means it doesn't exist and we need to build it from compose
-
+	
 	const container = docker.getContainer(id);
 	container.start(async (err, data) => {
 		if (!err) {
 			// res.json("Container started successfully")
 			// Unchanged, but return the same expected format
-			res.json({
-				path: generateUrl(id)
-			})
+			const { is_simulation } = res.locals.user_booking || (req.query.is_simulation === 'true');
+			const inventoryTable = (is_simulation) ? 'simulation_containers' : 'inventory';
+			db(inventoryTable)
+				.where({ slug: id })
+				.select('vnc_uri').then(vnc_uri => {
+					res.json({
+						path: vnc_uri
+					})
+				})
 		} else if (err.statusCode === 404) {
 			// proceed with compose
 			await startFromCompose(id, req, res);
@@ -189,24 +158,32 @@ const startContainer = (req, res) => {
 }
 
 const startFromCompose = async (id, req, res) => {
-	console.log(`Started ${id} from compose`)
-	// If no active booking, admin client expected to inform if the container to be started is a sim
-	const { is_simulation } = res.locals.user_booking || req.query;
+	console.log(`Starting ${id} from compose...`)
+	
+	// Check whether to use a saved image or start fresh, if no image available start fresh
+	const { fresh } = req.query;
+	const { user } = res.locals;
+	user.fresh = (fresh === 'true');
 
+	// If no active booking, admin client expected to inform if the container to be started is a sim
+	const { is_simulation } = res.locals.user_booking || (req.query.is_simulation === 'true');
 
 	const yamlPath = (is_simulation) ? "local" : "macvlan";
 	const inventoryTable = (is_simulation) ? 'simulation_containers' : 'inventory';
 
 	// cannot run multiple container in the same directory through docker-compose, so create separate ones
 	const composeDir = path.join(__dirname, `${yamlPath}/temp/${id}`)
+	if (!fs.existsSync(composeDir)){
+		return res.sendStatus(404);
+	}
 
-	await generateCompose(id, yamlPath);
+	const tokenPw = await generateCompose(id, yamlPath, user);
 	const options = { cwd: composeDir, composeOptions: ["--file", `docker-compose.yaml`], log: true }
 
 	compose.upAll(options).then(
 		() => {
 			// await new Promise(resolve => setTimeout(resolve, 10000)); // Artificial buffer
-			const targetUrl = generateUrl(id);
+			const targetUrl = generateUrl(id, tokenPw);
 			db(inventoryTable)
 				.returning('end_time')
 				.where({ slug: id })
@@ -214,13 +191,12 @@ const startFromCompose = async (id, req, res) => {
 					"vnc_uri": targetUrl,
 				}).then((item) => {
 					// If the user isn't an admin, set container expiration
-					const { user } = res.locals;
 					if (user.is_administrator !== true) {
 						const expiry = item[0].end_time;
 						let now = new Date();
 						let end = new Date(expiry);
 						setTimeout(() => {
-							docker.getContainer(id).stop({t: 1});
+							docker.getContainer(id).stop({t: 5});
 							console.log(`${id} stopped`)
 						}, end - now)
 					}
@@ -239,7 +215,7 @@ const stopContainer = (req, res) => {
 	const { id } = req.params;
 	
 	const container = docker.getContainer(id);
-	container.stop({t: 1}, (err, data) => {
+	container.stop({t: 2}, (err, data) => {
 		if (!err) {
 			res.json(data)
 		} else {
@@ -267,6 +243,21 @@ const restartContainer = (req, res) => {
 	const container = docker.getContainer(id);
 	container.restart({t: 1}, (err, data) => {
 		if (!err) {
+			res.json(data)
+		} else {
+			res.send("whoopsie")
+		}
+	})
+};
+
+const commitContainer = (req, res) => {
+	const { id } = req.params;
+	const { user } = res.locals;
+
+	const container = docker.getContainer(id);
+	container.commit({repo: "robotont", tag: user.sub}, (err, data) => {
+		if (!err) {
+			docker.pruneImages() // Clean up old versions
 			res.json(data)
 		} else {
 			res.send("whoopsie")
@@ -348,11 +339,10 @@ module.exports = {
 	start: startContainer,
 	stop: stopContainer,
 	restart: restartContainer,
-	connect: getUrl,
+	commit: commitContainer,
 	remove: removeContainer,
 	inspect: inspectContainer,
 	stats: inspectStats,
-	assign: assignContainer,
 
 	docker,
 	calculate_cpu_percent
