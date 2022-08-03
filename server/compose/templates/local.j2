@@ -8,6 +8,7 @@ services:
     environment:
       - ROS_MASTER=localhost
       - PASSWORD=remrob # placeholder
+      - VGL_DISPLAY=:1
     tmpfs:
       - /run
       - /run/lock
@@ -15,12 +16,13 @@ services:
     cap_add:
       - SYS_ADMIN
     volumes: 
-      - /sys/fs/cgroup:/sys/fs/cgroup
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /tmp/.X11-unix/X1:/tmp/.X11-unix/X1:ro
     ports:
-      - {{ port }}:5901
+      - {{ port }}:5902
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              capabilities: [gpu, utility]
+              capabilities: [gpu, utility, graphics]

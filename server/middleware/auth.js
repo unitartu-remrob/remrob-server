@@ -19,7 +19,7 @@ const authenticateJWT = (req, res, next) => {
 
 			jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
 					if (err) {
-							return res.sendStatus(403);
+						return res.sendStatus(403);
 					}
 
 					res.locals.user = user;
@@ -33,7 +33,6 @@ const authenticateJWT = (req, res, next) => {
 
 const authenticateAdminJWT = (req, res, next) => {
 	const tokenHeader = req.headers.authorization;
-
 	const authHeader = {
 		'Authorization': tokenHeader,
 		'Content-Type': 'application/json'
@@ -44,13 +43,14 @@ const authenticateAdminJWT = (req, res, next) => {
 
 			jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
 					if (err) {
-							return res.sendStatus(403);
+						return res.sendStatus(403);
 					}
 					if (user.is_administrator !== true) {
 						return res.sendStatus(401);
 					}
 					res.locals.user = user;
 					res.locals.authHeader = authHeader;
+					
 					next();
 			});
 	} else {
@@ -82,15 +82,18 @@ const checkSession = async (req, res, next) => {
 
 const checkContainerOwnership = (req, res, next) => {
 	// MIDDLEWARE THAT CHECKS IF THE CONTAINER THAT IS TARGETED BELONGS TO THE USER BY QUERYING DB
-	const { user } = res.locals;
-	const { id } = req.params; 
-
+	const { user, user_booking } = res.locals;
+	const { id } = req.params;
+	
 	if (user.is_administrator !== true) {
 		// const { user_booking } = res.locals;
-		db('inventory')
+		const { is_simulation } = user_booking;
+		const table_id = (is_simulation) ? "simulation_containers": "inventory";
+		db(table_id)
 			.where({ user: user.sub })
 			.select('slug')
 			.then(inv_item => {
+				console.log(inv_item)
 				if (inv_item[0].slug !== id) {
 					res.status(403).send('This container does not belong to you')
 				} else {
