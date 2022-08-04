@@ -7,7 +7,6 @@ var generator = require('generate-password');
 var path = require('path');
 const fs = require("fs");
 var db = require("../data/db.js");
-const { resolve } = require('path');
 
 var docker = new Dockerode();
 
@@ -88,42 +87,7 @@ const generateUrl = (id, tokenPw) => {
 }
 
 const listContainers = (req, res) => {
-	// Testing function
-	// db('inventory')
-	// 	.where({ id: 11 })
-	// 	.update({
-	// 		"status": false,
-	// 		"user": 1
-	// 	}).then(console.log("updated"))
-	
-	// db('inventory').where({ id: 11 }).then(item => {
-	// 	res.json(item)
-	// })
-	const { user } = res.locals;
-	const name = `robotont:${user.sub+5}`
-	console.log(name)
-	const image = docker.getImage(name);
-	image.inspect((err, data) => {
-		if (!err) {
-			res.json(data)
-		} else {
-			res.send("whoopsie")
-		}
-	})
-	
-	//console.log(req);
-	// const id = res.locals.user.sub;
-	// // res.json({"user": id}) // req.user
-	// // return
-	// const options = {
-	// 	all: true,
-	// 	filters: {
-	// 		ancestor: ["robotont:base"],
-	// 	}
-	// }
-	// docker.listContainers(options, function(err, containers) {
-	// 	res.json(containers)
-	// });
+	// Testing endpoint
 }
 
 const startContainer = (req, res) => {
@@ -141,7 +105,7 @@ const startContainer = (req, res) => {
 			// Unchanged, but return the same expected format
 			const { is_simulation } = res.locals.user_booking || (req.query.is_simulation === 'true');
 			const inventoryTable = (is_simulation) ? 'simulation_containers' : 'inventory';
-			db(inventoryTable)
+			db(inventoryTable).first()
 				.where({ slug: id })
 				.select('vnc_uri').then(vnc_uri => {
 					res.json({
@@ -149,7 +113,7 @@ const startContainer = (req, res) => {
 					})
 				})
 		} else if (err.statusCode === 404) {
-			// proceed with compose
+			// TODO: check if the id is valid, otherwise gonna crash
 			await startFromCompose(id, req, res);
 		} else {
 			res.json(err)
@@ -174,7 +138,8 @@ const startFromCompose = async (id, req, res) => {
 	// cannot run multiple container in the same directory through docker-compose, so create separate ones
 	const composeDir = path.join(__dirname, `${yamlPath}/temp/${id}`)
 	if (!fs.existsSync(composeDir)){
-		return res.sendStatus(404);
+		fs.mkdirSync(composeDir);
+		// return res.sendStatus(404);
 	}
 
 	const tokenPw = await generateCompose(id, yamlPath, user);

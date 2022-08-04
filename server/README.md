@@ -33,7 +33,7 @@ To run locally the network configuration in the compose files can be replaced wi
 
 Install the pm2 daemon process manager (available via npm)
 
-	npm install p2m@latest -g
+	npm install pm2@latest -g
 
 	pm2 startup // follow instructions
 

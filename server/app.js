@@ -30,10 +30,10 @@ app.use(cookieParser());
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
 
-app.use('/api/container', containerAPI)
+app.use('/', containerAPI)
 
 // serve frontend at index
-app.use(express.static(path.join(__dirname, 'client/build')));
+// app.use(express.static(path.join(__dirname, 'client/build')));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

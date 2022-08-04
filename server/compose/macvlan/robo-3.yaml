@@ -10,21 +10,22 @@ services:
     environment:
       - ROS_MASTER=robotont-3 # Will be used to set master in ~/.bashrc
       - PASSWORD=remrob # placeholder
+      - VGL_DISPLAY=:1
     tmpfs:
       - /run
       - /run/lock
       - /tmp
     cap_add:
-      - SYS_BOOT
       - SYS_ADMIN
-    volumes: 
-      - /sys/fs/cgroup:/sys/fs/cgroup
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /tmp/.X11-unix/X1:/tmp/.X11-unix/X1:ro
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              capabilities: [gpu, utility]
+              capabilities: [gpu, utility, graphics]
     networks:
       ros_net:
         ipv4_address: 192.168.88.194

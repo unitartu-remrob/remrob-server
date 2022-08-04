@@ -32,7 +32,7 @@ router.get('/stats/:id', [authenticateJWT, checkSession, checkOwnership], stats)
 
 router.get('/assign', [authenticateJWT, checkSession], assignContainer)
 
-router.post('/start/:id', [authenticateJWT, checkSession, checkOwnership], start);
+router.post('/start/:id', [authenticateJWT, checkSession], start);
 router.post('/stop/:id', [authenticateJWT, checkSession, checkOwnership], stop);
 router.post('/restart/:id', [authenticateJWT, checkSession, checkOwnership], stop);
 router.post('/commit/:id', [authenticateJWT, checkSession, checkOwnership], commit);

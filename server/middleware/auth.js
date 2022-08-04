@@ -58,13 +58,12 @@ const authenticateAdminJWT = (req, res, next) => {
 	}
 }
 
-const checkSession = async (req, res, next) => {
+const checkSession = (req, res, next) => {
 	// Get the user ID of who's trying to access container management
 	const { user } = res.locals;
 
 	axios.get(`${process.env.DB_SERVER}/bookings/${user.sub}`, { headers: req.headers }).then((resp) => {
 		const { user_bookings } = resp.data;
-		
 		const active_booking = verifyTimeInterval(user_bookings)
 
 		if (active_booking !== undefined || user.is_administrator === true) {
@@ -75,8 +74,7 @@ const checkSession = async (req, res, next) => {
 			res.status(403).send('No active sessions available')
 		}
 	}).catch(err => {
-		console.warn("error", err.response.data);
-		res.sendStatus(err.response.status)
+		console.log("Node request to Flask DB rejected");
 	})
 }
 
@@ -86,7 +84,7 @@ const checkContainerOwnership = (req, res, next) => {
 	const { id } = req.params;
 	
 	if (user.is_administrator !== true) {
-		// const { user_booking } = res.locals;
+		const { user_booking } = res.locals;
 		const { is_simulation } = user_booking;
 		const table_id = (is_simulation) ? "simulation_containers": "inventory";
 		db(table_id)

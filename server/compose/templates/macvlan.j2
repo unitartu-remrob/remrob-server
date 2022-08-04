@@ -16,9 +16,8 @@ services:
       - /run/lock
       - /tmp
     cap_add:
-      - SYS_BOOT
       - SYS_ADMIN
-    volumes: 
+    volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - /tmp/.X11-unix/X1:/tmp/.X11-unix/X1:ro
     deploy:
