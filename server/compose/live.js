@@ -39,9 +39,13 @@ const containerMonitor = async (table_id, ws) => {
 
 		const results = await Promise.allSettled(calls);
 		
-		inv.forEach(({ slug }, index) => {
+		inv.forEach(({ slug, user, end_time, issue }, index) => {
 			// Add slug ID to know which container was rejected
+			// Add booking info about the specific container
 			results[index]["slug"] = slug;
+			results[index]["booking"] = {
+				user, end_time, issue
+			}
 		})
 		ws.send(JSON.stringify(results))
 }

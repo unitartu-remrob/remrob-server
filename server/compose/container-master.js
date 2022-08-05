@@ -103,7 +103,8 @@ const startContainer = (req, res) => {
 		if (!err) {
 			// res.json("Container started successfully")
 			// Unchanged, but return the same expected format
-			const { is_simulation } = res.locals.user_booking || (req.query.is_simulation === 'true');
+			const { user_booking } = res.locals;
+			const is_simulation = (user_booking) ? user_booking.is_simulation : (req.query.is_simulation === 'true')
 			const inventoryTable = (is_simulation) ? 'simulation_containers' : 'inventory';
 			db(inventoryTable).first()
 				.where({ slug: id })
@@ -126,11 +127,11 @@ const startFromCompose = async (id, req, res) => {
 	
 	// Check whether to use a saved image or start fresh, if no image available start fresh
 	const { fresh } = req.query;
-	const { user } = res.locals;
+	const { user, user_booking } = res.locals;
 	user.fresh = (fresh === 'true');
 
 	// If no active booking, admin client expected to inform if the container to be started is a sim
-	const { is_simulation } = res.locals.user_booking || (req.query.is_simulation === 'true');
+	const is_simulation = (user_booking) ? user_booking.is_simulation : (req.query.is_simulation === 'true');
 
 	const yamlPath = (is_simulation) ? "local" : "macvlan";
 	const inventoryTable = (is_simulation) ? 'simulation_containers' : 'inventory';
