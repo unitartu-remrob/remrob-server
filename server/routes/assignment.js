@@ -26,6 +26,7 @@ const assignContainer = (req, res) => {
 			db(inventoryTable).first()
 				.where(status_filter)
 				.andWhere({ user: null })
+				.orWhere({ end_time: null })
 				.orWhere('end_time', '<', now.toISOString(),)
 				.then(item => {
 					// Update the user column with the respective user ID coming from the JWT token
@@ -48,6 +49,26 @@ const assignContainer = (req, res) => {
 	})
 }
 
+const yieldContainer = (req, res) => {
+	const { id } = req.params;
+	const { user, user_booking } = res.locals;
+	const inventoryTable = (user_booking.is_simulation) ? 'simulation_containers' : 'inventory';
+
+	const clear = {
+		'user': null,
+		'end_time': null
+	}
+
+	db(inventoryTable)
+		.update(clear)
+		.where({ slug: id })
+		.then(item => {
+			res.json("Container yielded")
+		})
+}
+
+
 module.exports = {
-	assignContainer
+	assignContainer,
+	yieldContainer
 }

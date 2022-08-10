@@ -108,7 +108,7 @@ const startContainer = (req, res) => {
 			const inventoryTable = (is_simulation) ? 'simulation_containers' : 'inventory';
 			db(inventoryTable).first()
 				.where({ slug: id })
-				.select('vnc_uri').then(vnc_uri => {
+				.select('vnc_uri').then(({vnc_uri}) => {
 					res.json({
 						path: vnc_uri
 					})
@@ -128,16 +128,18 @@ const startFromCompose = async (id, req, res) => {
 	// Check whether to use a saved image or start fresh, if no image available start fresh
 	const { fresh } = req.query;
 	const { user, user_booking } = res.locals;
+	const is_admin = (user.is_administrator === true)
 	user.fresh = (fresh === 'true');
 
-	// If no active booking, admin client expected to inform if the container to be started is a sim
-	const is_simulation = (user_booking) ? user_booking.is_simulation : (req.query.is_simulation === 'true');
+	// Admin client expected to inform if the container to be started is a sim
+	const is_simulation = (user_booking && !is_admin) ? user_booking.is_simulation : (req.query.is_simulation === 'true');
 
 	const yamlPath = (is_simulation) ? "local" : "macvlan";
 	const inventoryTable = (is_simulation) ? 'simulation_containers' : 'inventory';
 
 	// cannot run multiple container in the same directory through docker-compose, so create separate ones
 	const composeDir = path.join(__dirname, `${yamlPath}/temp/${id}`)
+
 	if (!fs.existsSync(composeDir)){
 		fs.mkdirSync(composeDir);
 		// return res.sendStatus(404);
@@ -157,12 +159,17 @@ const startFromCompose = async (id, req, res) => {
 					"vnc_uri": targetUrl,
 				}).then((item) => {
 					// If the user isn't an admin, set container expiration
-					if (user.is_administrator !== true) {
+					if (!is_admin) {
 						const expiry = item[0].end_time;
 						let now = new Date();
 						let end = new Date(expiry);
 						setTimeout(() => {
-							docker.getContainer(id).stop({t: 5});
+							const container = docker.getContainer(id);
+							container.stop({t: 4}, (err, data) => {
+								if (!err) {
+									container.remove()
+								}
+							})
 							console.log(`${id} stopped`)
 						}, end - now)
 					}

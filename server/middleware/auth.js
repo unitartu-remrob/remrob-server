@@ -65,7 +65,7 @@ const checkSession = (req, res, next) => {
 	axios.get(`${process.env.DB_SERVER}/bookings/${user.sub}`, { headers: req.headers }).then((resp) => {
 		const { user_bookings } = resp.data;
 		const active_booking = verifyTimeInterval(user_bookings)
-
+		
 		if (active_booking !== undefined || user.is_administrator === true) {
 			// If valid session, pass forward to container api with the corresponding container allowed
 			res.locals.user_booking = active_booking;
@@ -80,7 +80,7 @@ const checkSession = (req, res, next) => {
 
 const checkContainerOwnership = (req, res, next) => {
 	// MIDDLEWARE THAT CHECKS IF THE CONTAINER THAT IS TARGETED BELONGS TO THE USER BY QUERYING DB
-	const { user, user_booking } = res.locals;
+	const { user } = res.locals;
 	const { id } = req.params;
 	
 	if (user.is_administrator !== true) {
@@ -92,6 +92,7 @@ const checkContainerOwnership = (req, res, next) => {
 			.select('slug')
 			.then(inv_item => {
 				console.log(inv_item)
+				// Assuming there is no case where a user can have multiple containers at once, 
 				if (inv_item[0].slug !== id) {
 					res.status(403).send('This container does not belong to you')
 				} else {
