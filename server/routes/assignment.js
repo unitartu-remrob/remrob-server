@@ -1,4 +1,6 @@
 var db = require("../data/db.js");
+// const axios = require('axios');
+const { killContainer } = require("../compose/container-master")
 
 const assignContainer = (req, res) => {
 	const { user, user_booking } = res.locals;
@@ -26,11 +28,12 @@ const assignContainer = (req, res) => {
 			db(inventoryTable).first()
 				.where(status_filter)
 				.andWhere({ user: null })
-				.orWhere({ end_time: null })
+				.orWhere({ end_time: null }) // This probably redundant
 				.orWhere('end_time', '<', now.toISOString(),)
 				.then(item => {
 					// Update the user column with the respective user ID coming from the JWT token
-					if (item) {					
+					if (item) {	
+						console.log(item)				
 						const bookingData = {
 							'user': user.sub,
 							'end_time': user_booking.end
@@ -38,15 +41,33 @@ const assignContainer = (req, res) => {
 						db(inventoryTable)
 							.update(bookingData)
 							.where('id', item["id"])
-							.then(id => {
-								res.json({ ...item, ...bookingData })
-							})
+							.then(blank => {
+								const claimed_item = { ...item, ...bookingData } // start_time: user_booking.start 
+								setSessionTimeout(claimed_item, inventoryTable)
+								res.json(claimed_item)
+							})	
 					} else {
 						res.status(500).send('No free inventory available')
 					}
 				})
 		}
 	})
+}
+
+const setSessionTimeout = (item, inv) => {
+		let now = new Date();
+		let end = new Date(item['end_time']);
+		setTimeout(() => {
+			db(inv)
+				.update({
+					'user': null,
+					'end_time': null
+				})
+				.where('id', item['id'])
+				.then(blank => {
+					console.log(`Session @${item['slug']} expired (user #${item['user']})`)
+				})
+		}, end - now)
 }
 
 const yieldContainer = (req, res) => {
@@ -59,11 +80,19 @@ const yieldContainer = (req, res) => {
 		'end_time': null
 	}
 
+	killContainer(id);
+
 	db(inventoryTable)
 		.update(clear)
 		.where({ slug: id })
 		.then(item => {
 			res.json("Container yielded")
+		})
+	db('bookings')
+		.update({ user_id: null })
+		.where({ id: user_booking.id })
+		.then(item => {
+			
 		})
 }
 

@@ -108,10 +108,14 @@ const startContainer = (req, res) => {
 			const inventoryTable = (is_simulation) ? 'simulation_containers' : 'inventory';
 			db(inventoryTable).first()
 				.where({ slug: id })
-				.select('vnc_uri').then(({vnc_uri}) => {
-					res.json({
-						path: vnc_uri
-					})
+				.select('vnc_uri').then(item => {
+					if (item) {
+						res.json({
+							path: item.vnc_uri
+						})
+					} else {
+						res.json("Invalid id")
+					}
 				})
 		} else if (err.statusCode === 404) {
 			// TODO: check if the id is valid, otherwise gonna crash
@@ -164,13 +168,7 @@ const startFromCompose = async (id, req, res) => {
 						let now = new Date();
 						let end = new Date(expiry);
 						setTimeout(() => {
-							const container = docker.getContainer(id);
-							container.stop({t: 4}, (err, data) => {
-								if (!err) {
-									container.remove()
-								}
-							})
-							console.log(`${id} stopped`)
+							killContainer(id)
 						}, end - now)
 					}
 				})	
@@ -222,6 +220,17 @@ const restartContainer = (req, res) => {
 		}
 	})
 };
+
+const killContainer = (id) => {
+	const container = docker.getContainer(id);
+	console.log(`${id} stopping`)
+	container.stop({t: 3}, (err, data) => {
+		if (!err) {
+			container.remove()
+			console.log(`${id} purged`)
+		}
+	})
+}
 
 const commitContainer = (req, res) => {
 	const { id } = req.params;
@@ -318,5 +327,6 @@ module.exports = {
 	stats: inspectStats,
 
 	docker,
-	calculate_cpu_percent
+	calculate_cpu_percent,
+	killContainer
 }

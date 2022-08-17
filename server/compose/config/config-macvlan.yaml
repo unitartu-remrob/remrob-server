@@ -34,15 +34,15 @@
   master-ip: 192.168.88.8
 - name: robo-9
   master-name: robotont-9
-  self-ip: 192.168.88.199
+  self-ip: 192.168.88.200
   master-ip: 192.168.88.9
 - name: robo-10
   master-name: robotont-10
-  self-ip: 192.168.88.200
+  self-ip: 192.168.88.201
   master-ip: 192.168.88.10
 - name: robo-11
   master-name: robotont-11
-  self-ip: 192.168.88.201
+  self-ip: 192.168.88.202
   master-ip: 192.168.88.11
 - name: robo-12
   master-name: robotont-12
@@ -52,8 +52,8 @@
   master-name: robotont-13
   self-ip: 192.168.88.203
   master-ip: 192.168.88.13
-- name: robo-13
+- name: robo-14
   master-name: robotont-14
-  self-ip: 192.168.88.204
+  self-ip: 192.168.88.205
   master-ip: 192.168.88.14
 
