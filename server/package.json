@@ -30,6 +30,7 @@
     "morgan": "~1.9.1",
     "pg": "^8.7.3",
     "read-yaml-file": "^2.1.0",
+    "rtsp-relay": "^1.6.1",
     "write-yaml-file": "^4.2.0"
   },
   "devDependencies": {

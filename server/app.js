@@ -6,16 +6,20 @@ var logger = require('morgan');
 var cors = require('cors');
 
 require('dotenv').config()
+process.env.NODE_ENV = process.env.NODE_ENV || "development";
+// console.log(`Running ${process.env.NODE_ENV} environment`);
 
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
 var app = express();
 var expressWs = require('express-ws')(app);
-
 var containerAPI = require('./routes/api'); // must be loaded after setting up ws
 
-process.env.NODE_ENV = process.env.NODE_ENV || "development";
-// console.log(`Running ${process.env.NODE_ENV} environment`);
+const { proxy, scriptUrl } = require('rtsp-relay')(app);
+// const handler = proxy({
+//   url: `rtsp://admin:@192.168.200.211:554/h264Preview_01_sub`,
+//   verbose: false,
+// });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -31,6 +35,13 @@ app.use(cookieParser());
 // app.use('/users', usersRouter);
 
 app.use('/', containerAPI)
+//app.ws('/api/stream', handler);
+app.ws('/api/stream/:cameraIP', (ws, req) =>
+  proxy({
+    url: `rtsp://admin:@${req.params.cameraIP}:554/h264Preview_01_sub`,
+    verbose: false,
+  })(ws),
+);
 
 // serve frontend at index
 // app.use(express.static(path.join(__dirname, 'client/build')));
