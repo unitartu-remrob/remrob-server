@@ -2,58 +2,77 @@
 
 - name: robo-1
   master-name: robotont-1
-  self-ip: 192.168.88.192
-  master-ip: 192.168.88.1
+  self-ip: 192.168.200.101
+  master-ip: 192.168.200.1
 - name: robo-2
   master-name: robotont-2
-  self-ip: 192.168.88.193
-  master-ip: 192.168.88.2
+  self-ip: 192.168.200.102
+  master-ip: 192.168.200.2
 - name: robo-3
   master-name: robotont-3
-  self-ip: 192.168.88.194
-  master-ip: 192.168.88.3
+  self-ip: 192.168.200.103
+  master-ip: 192.168.200.3
 - name: robo-4
   master-name: robotont-4
-  self-ip: 192.168.88.195
-  master-ip: 192.168.88.4
+  self-ip: 192.168.200.104
+  master-ip: 192.168.200.4
 - name: robo-5
   master-name: robotont-5
-  self-ip: 192.168.88.196
-  master-ip: 192.168.88.5
+  self-ip: 192.168.200.105
+  master-ip: 192.168.200.5
 - name: robo-6
   master-name: robotont-6
-  self-ip: 192.168.88.197
-  master-ip: 192.168.88.6
+  self-ip: 192.168.200.106
+  master-ip: 192.168.200.6
 - name: robo-7
   master-name: robotont-7
-  self-ip: 192.168.88.198
-  master-ip: 192.168.88.7
+  self-ip: 192.168.200.107
+  master-ip: 192.168.200.7
 - name: robo-8
   master-name: robotont-8
-  self-ip: 192.168.88.199
-  master-ip: 192.168.88.8
+  self-ip: 192.168.200.108
+  master-ip: 192.168.200.8
 - name: robo-9
   master-name: robotont-9
-  self-ip: 192.168.88.200
-  master-ip: 192.168.88.9
+  self-ip: 192.168.200.109
+  master-ip: 192.168.200.9
 - name: robo-10
   master-name: robotont-10
-  self-ip: 192.168.88.201
-  master-ip: 192.168.88.10
+  self-ip: 192.168.200.110
+  master-ip: 192.168.200.10
 - name: robo-11
   master-name: robotont-11
-  self-ip: 192.168.88.202
-  master-ip: 192.168.88.11
+  self-ip: 192.168.200.111
+  master-ip: 192.168.200.11
 - name: robo-12
   master-name: robotont-12
-  self-ip: 192.168.88.202
-  master-ip: 192.168.88.12
+  self-ip: 192.168.200.112
+  master-ip: 192.168.200.12
 - name: robo-13
   master-name: robotont-13
-  self-ip: 192.168.88.203
-  master-ip: 192.168.88.13
+  self-ip: 192.168.200.113
+  master-ip: 192.168.200.13
 - name: robo-14
   master-name: robotont-14
-  self-ip: 192.168.88.205
-  master-ip: 192.168.88.14
-
+  self-ip: 192.168.200.114
+  master-ip: 192.168.200.14
+- name: robo-15
+  master-name: robotont-15
+  self-ip: 192.168.200.115
+  master-ip: 192.168.200.15
+- name: robo-16
+  master-name: robotont-16
+  self-ip: 192.168.200.116
+  master-ip: 192.168.200.16
+- name: robo-17
+  master-name: robotont-17
+  self-ip: 192.168.200.117
+  master-ip: 192.168.200.17
+- name: robo-18
+  master-name: robotont-18
+  self-ip: 192.168.200.118
+  master-ip: 192.168.200.18
+- name: robo-19
+  master-name: robotont-19
+  self-ip: 192.168.200.119
+  master-ip: 192.168.200.19

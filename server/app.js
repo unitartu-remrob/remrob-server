@@ -38,7 +38,7 @@ app.use('/', containerAPI)
 //app.ws('/api/stream', handler);
 app.ws('/api/stream/:cameraIP', (ws, req) =>
   proxy({
-    url: `rtsp://admin:@${req.params.cameraIP}:554/h264Preview_01_sub`,
+    url: `rtsp://${process.env.CAM_CREDENTIALS}@${req.params.cameraIP}:554/h264Preview_01_sub`,
     verbose: false,
   })(ws),
 );
