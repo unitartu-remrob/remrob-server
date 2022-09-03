@@ -36,12 +36,26 @@ app.use(cookieParser());
 
 app.use('/', containerAPI)
 //app.ws('/api/stream', handler);
-app.ws('/api/stream/:cameraIP', (ws, req) =>
-  proxy({
-    url: `rtsp://${process.env.CAM_CREDENTIALS}@${req.params.cameraIP}:554/h264Preview_01_sub`,
-    verbose: false,
-  })(ws),
-);
+
+var db = require('./data/db.js');
+
+app.ws('/api/stream/:workcell', (ws, req) => {
+  const { workcell } = req.params  
+  const query_cell = parseInt(workcell)
+  if (!query_cell) {
+    console.log("Invalid stream param")
+    return ws.close()
+  }
+  db('cameras').first()
+    .where({ cell: query_cell })
+    .then( ({ camera_ip }) => {
+      console.log(camera_ip);
+      proxy({
+        url: `rtsp://${process.env.CAM_CREDENTIALS}@${camera_ip}:554/h264Preview_01_sub`,
+        verbose: false,
+      })(ws)
+    })
+});
 
 // serve frontend at index
 // app.use(express.static(path.join(__dirname, 'client/build')));
