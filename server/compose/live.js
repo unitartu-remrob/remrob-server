@@ -27,39 +27,39 @@ const getStats = async (slug, vnc_uri) => {
 	}
 }
 
-const containerMonitor = async (table_id, ws) => {
-		const inv = await getInventory(table_id);
+const containerMonitor = async (inv, ws) => {
+	const calls = [];
+	inv.forEach(({ slug, vnc_uri }) => {
+		calls.push(
+			getStats(slug, vnc_uri)
+		);
+	})
 
-		const calls = [];
-		inv.forEach(({ slug, vnc_uri }) => {
-			calls.push(
-				getStats(slug, vnc_uri)
-			);
-		})
-
-		const results = await Promise.allSettled(calls);
-		
-		inv.forEach(({ slug, user, end_time, issue }, index) => {
-			// Add slug ID to know which container was rejected
-			// Add booking info about the specific container
-			results[index]["slug"] = slug;
-			results[index]["booking"] = {
-				user, end_time, issue
-			}
-		})
-		ws.send(JSON.stringify(results))
+	const results = await Promise.allSettled(calls);
+	
+	inv.forEach(({ slug, user, end_time, issue }, index) => {
+		// Add slug ID to know which container was rejected
+		// Add booking info about the specific container
+		results[index]["slug"] = slug;
+		results[index]["booking"] = {
+			user, end_time, issue
+		}
+	})
+	ws.send(JSON.stringify(results))
 }
 
 const liveStats = async (ws, req) => {
 	const { version } = req.params;
+	console.log("New socket from client")
+
 	const table_id =
 		(version == "simulation")
 			? "simulation_containers"
 			: "inventory"; // anything else defaults to physbots
 
-  console.log("New socket from client")
+	const inv = await getInventory(table_id);
 
-	const pollInterval = setInterval(containerMonitor, 1500, table_id, ws)
+	const pollInterval = setInterval(containerMonitor, 1500, inv, ws)
 
 	ws.on('message', msg => {
 		// Force update
