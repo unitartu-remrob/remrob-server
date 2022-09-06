@@ -8,7 +8,10 @@ const {
 	checkOwnership
 }  = require('../middleware/auth');
 
-const { liveStats } = require('../compose/live.js')
+const {
+	liveStats,
+	robotMonitor
+} = require('../compose/live.js')
 const {
 	assignContainer,
 	yieldContainer
@@ -26,6 +29,7 @@ const  {
 
 
 router.ws("/live/:version", liveStats);
+router.ws("/robot-status/:id", robotMonitor);
 
 //
 router.get('/list', [authenticateJWT], list);

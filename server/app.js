@@ -49,7 +49,7 @@ app.ws('/api/stream/:workcell', (ws, req) => {
   db('cameras').first()
     .where({ cell: query_cell })
     .then( ({ camera_ip }) => {
-      console.log(camera_ip);
+      // console.log(camera_ip);
       proxy({
         url: `rtsp://${process.env.CAM_CREDENTIALS}@${camera_ip}:554/h264Preview_01_sub`,
         verbose: false,

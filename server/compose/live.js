@@ -1,6 +1,7 @@
 const  { docker, calculate_cpu_percent } = require('./container-master.js')
 // const axios = require('axios');
 var db = require("../data/db.js");
+const ping = require('ping');
 
 const getInventory = async (stock) => {
 	const id = (stock === "simulation_containers") ? 'container_id' : 'robot_id';
@@ -27,20 +28,32 @@ const getStats = async (slug, vnc_uri) => {
 	}
 }
 
-const containerMonitor = async (inv, ws) => {
+const containerMonitor = async (table_id, ws) => {
+	const inv = await getInventory(table_id);
 	const calls = [];
-	inv.forEach(({ slug, vnc_uri }) => {
+	const hosts = [];
+	inv.forEach(({ slug, vnc_uri, robot_id }) => {
 		calls.push(
 			getStats(slug, vnc_uri)
 		);
+		if (table_id == "inventory") {
+			let host = `192.168.200.${robot_id}`
+			hosts.push(ping.promise.probe(host))
+		}
 	})
 
 	const results = await Promise.allSettled(calls);
-	
-	inv.forEach(({ slug, user, end_time, issue }, index) => {
+	const pings = await Promise.allSettled(hosts);
+
+	inv.forEach(({ robot_id, slug, user, end_time, issue }, index) => {
 		// Add slug ID to know which container was rejected
-		// Add booking info about the specific container
 		results[index]["slug"] = slug;
+		results[index]["robot_id"] = robot_id;
+		//
+		if (table_id == "inventory") {
+			results[index]["robot_status"] = pings[index].value.alive;
+		}
+		// Add booking info about the specific container
 		results[index]["booking"] = {
 			user, end_time, issue
 		}
@@ -57,9 +70,7 @@ const liveStats = async (ws, req) => {
 			? "simulation_containers"
 			: "inventory"; // anything else defaults to physbots
 
-	const inv = await getInventory(table_id);
-
-	const pollInterval = setInterval(containerMonitor, 1500, inv, ws)
+	const pollInterval = setInterval(containerMonitor, 1500, table_id, ws)
 
 	ws.on('message', msg => {
 		// Force update
@@ -72,6 +83,23 @@ const liveStats = async (ws, req) => {
 	})
 }
 
+const robotMonitor = (ws, req) => {
+	const { id } = req.params;
+	// console.log("received robot monitor websocket request")
+	const pollInterval = setInterval(() => {
+		let host = `192.168.200.${id}`
+		ping.sys.probe(host, function(isAlive) {
+			ws.send(JSON.stringify(isAlive))
+		})
+	}, 1500)
+	
+	ws.on('close', something => {
+		clearInterval(pollInterval);
+		console.log("they left...  what a pity")
+	})
+}
+
 module.exports = {
-	liveStats
+	liveStats,
+	robotMonitor
 }
