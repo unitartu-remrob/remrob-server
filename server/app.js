@@ -51,7 +51,7 @@ app.ws('/api/stream/:workcell', (ws, req) => {
     .then( ({ camera_ip }) => {
       // console.log(camera_ip);
       proxy({
-        url: `rtsp://${process.env.CAM_CREDENTIALS}@${camera_ip}:554/h264Preview_01_sub`,
+        url: `rtsp://${process.env.CAM_CREDENTIALS}@${camera_ip}:554/h264Preview_01_main`,
         verbose: false,
       })(ws)
     })
