@@ -169,7 +169,7 @@ const startFromCompose = async (id, req, res) => {
 						let end = new Date(expiry);
 						setTimeout(() => {
 							killContainer(id)
-						}, end - now)
+						}, end - now - 6000)
 					}
 				})	
 			res.json({
