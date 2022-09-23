@@ -67,7 +67,7 @@ const setSessionTimeout = (item, inv) => {
 				.then(blank => {
 					console.log(`Session @${item['slug']} expired (user #${item['user']})`)
 				})
-		}, end - now)
+		}, end - now - 5000) // 5 second buffer for edge cases, maybe should be one minute idk
 }
 
 const yieldContainer = (req, res) => {
