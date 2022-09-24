@@ -32,7 +32,8 @@ const containerMonitor = async (table_id, ws) => {
 	const inv = await getInventory(table_id);
 	const calls = [];
 	const hosts = [];
-	inv.forEach(({ slug, vnc_uri, robot_id }) => {
+	const users = [];
+	inv.forEach(({ slug, vnc_uri, robot_id, user }) => {
 		calls.push(
 			getStats(slug, vnc_uri)
 		);
@@ -40,15 +41,23 @@ const containerMonitor = async (table_id, ws) => {
 			let host = `192.168.200.${robot_id}`
 			hosts.push(ping.promise.probe(host))
 		}
+		users.push(
+			db('user').where({id: user}).first()
+		)
 	})
 
 	const results = await Promise.allSettled(calls);
 	const pings = await Promise.allSettled(hosts);
+	const user_info = await Promise.allSettled(users);
 
 	inv.forEach(({ robot_id, slug, user, end_time, issue }, index) => {
 		// Add slug ID to know which container was rejected
 		results[index]["slug"] = slug;
 		results[index]["robot_id"] = robot_id;
+		if (user_info[index].value != undefined) {
+			const { first_name, last_name } = user_info[index].value;
+			results[index]["user"] = `${first_name} ${last_name}`;
+		}
 		//
 		if (table_id == "inventory") {
 			results[index]["robot_status"] = pings[index].value.alive;
