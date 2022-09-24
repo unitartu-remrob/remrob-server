@@ -7,8 +7,11 @@ var generator = require('generate-password');
 var path = require('path');
 const fs = require("fs");
 var db = require("../data/db.js");
+const { v4: uuidv4 } = require('uuid');
 
 var docker = new Dockerode();
+
+let HEADERS;
 
 const filterOptions = {
 	all: true,
@@ -17,7 +20,47 @@ const filterOptions = {
 	}
 }
 
-const setEnvironment = (composeData, user) => {
+const setGitRepository = async (composeData, user) => {
+	const { services: { vnc: { environment, volumes } } } = composeData;
+	
+	const user_data = await db('user').first().where({ id: user.sub }).select(['first_name', 'last_name']);
+	const { first_name, last_name } = user_data;
+
+	const repoContainerName = `${first_name}-${last_name}`;
+	const repoHostName = `${first_name}-${last_name}-${user.sub}`;
+
+	// Authentication token for pushing from inside the container:
+	const git_auth_token = uuidv4();
+
+	// Update the db with the session token and repo name
+	db('user').update({ git_token: git_auth_token, user_repo: repoHostName }).where({ id: user.sub }).then(res => {
+	}).catch(e => console.log(e)); // tralalalalalalalalalalalalalalalalala
+
+	// Push to the compose data:
+	environment.push(`GIT_PAT=${git_auth_token}`)
+	volumes.push("${HOME}" + `/repos/${repoHostName}:/home/kasutaja/${repoContainerName}`) // lil bit of hard coding
+	
+	// Pass back the reference:
+	composeData.services.vnc.volumes = volumes
+	composeData.services.vnc.environment = environment
+
+	// Create the repo, if it already existed - nothing happens
+	await axios.get(`${process.env.DB_SERVER}/check_user`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
+	
+	// Now we need to pull the repository we just created
+	// TODO: don't attempt clone if it already exists
+	await axios.get(`${process.env.DB_SERVER}/clone_jwt`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
+
+	return composeData
+}
+
+const pushToRepo = (token) => {
+	axios.get(`${process.env.DB_SERVER}/commit_push`, { params: { 'token': token } }).then(res => {
+		
+	});
+}
+
+const setEnvironment = async (composeData, user) => {
 	// Generate the password for vnc and push it into the compose data
 	const {services: {vnc: {environment}}} = composeData;
 
@@ -34,8 +77,9 @@ const setEnvironment = (composeData, user) => {
 	} else {
 		environment.push(passwordEnv);
 	}
-	// Now set the reference
-	composeData.services.vnc.environment = environment
+	
+	composeData = await setGitRepository(composeData, user);
+	composeData.services.vnc.environment = environment // git has been set, top of with vnc pw token
 
 	return new Promise((resolve, reject) => {
 		if (!user.fresh) {
@@ -128,7 +172,8 @@ const startContainer = (req, res) => {
 
 const startFromCompose = async (id, req, res) => {
 	console.log(`Starting ${id} from compose...`)
-	
+
+	HEADERS = res.locals.authHeader; // REF for talking to flask
 	// Check whether to use a saved image or start fresh, if no image available start fresh
 	const { fresh } = req.query;
 	const { user, user_booking } = res.locals;
@@ -224,7 +269,7 @@ const restartContainer = (req, res) => {
 const killContainer = (id) => {
 	const container = docker.getContainer(id);
 	console.log(`${id} stopping`)
-	container.stop({t: 3}, (err, data) => {
+	container.stop({t: 2}, (err, data) => {
 		if (!err) {
 			container.remove()
 			console.log(`${id} purged`)

@@ -1,6 +1,7 @@
 var db = require("../data/db.js");
 // const axios = require('axios');
-const { killContainer } = require("../compose/container-master")
+const { killContainer } = require("../compose/container-master");
+const { kill } = require("docker-compose");
 
 const assignContainer = (req, res) => {
 	const { user, user_booking } = res.locals;
@@ -30,10 +31,12 @@ const assignContainer = (req, res) => {
 				.andWhere({ user: null })
 				.orWhere({ end_time: null }) // This probably redundant
 				.orWhere('end_time', '<', now.toISOString(),)
-				.then(item => {
+				.then(async item => {
 					// Update the user column with the respective user ID coming from the JWT token
 					if (item) {	
-						console.log(item)				
+						console.log(item)
+						killContainer(item.slug)
+						await new Promise(resolve => setTimeout(resolve, 3000));
 						const bookingData = {
 							'user': user.sub,
 							'end_time': user_booking.end

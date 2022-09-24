@@ -32,6 +32,7 @@
     "ping": "^0.4.2",
     "read-yaml-file": "^2.1.0",
     "rtsp-relay": "^1.6.1",
+    "uuid": "^9.0.0",
     "write-yaml-file": "^4.2.0"
   },
   "devDependencies": {
