@@ -38,7 +38,7 @@ const setGitRepository = async (composeData, user) => {
 
 	// Push to the compose data:
 	environment.push(`GIT_PAT=${git_auth_token}`)
-	volumes.push("${HOME}" + `/repos/${repoHostName}:/home/kasutaja/${repoContainerName}`) // lil bit of hard coding
+	volumes.push(`${process.env.REPOS_ROOT}/${repoHostName}:/home/kasutaja/${repoContainerName}`) // lil bit of hard coding
 	
 	// Pass back the reference:
 	composeData.services.vnc.volumes = volumes
