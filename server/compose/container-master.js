@@ -24,7 +24,9 @@ const setGitRepository = async (composeData, user) => {
 	const { services: { vnc: { environment, volumes } } } = composeData;
 	
 	const user_data = await db('user').first().where({ id: user.sub }).select(['first_name', 'last_name']);
-	const { first_name, last_name } = user_data;
+	let { first_name, last_name } = user_data;
+	first_name = first_name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '_')
+	last_name = last_name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '_')
 
 	const repoContainerName = `${first_name}-${last_name}`;
 	const repoHostName = `${first_name}-${last_name}-${user.sub}`;
