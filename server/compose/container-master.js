@@ -62,7 +62,7 @@ const pushToRepo = (token) => {
 	});
 }
 
-const setEnvironment = async (composeData, user) => {
+const setEnvironment = async (composeData, user, robot_cell) => {
 	// Generate the password for vnc and push it into the compose data
 	const {services: {vnc: {environment}}} = composeData;
 
@@ -79,7 +79,9 @@ const setEnvironment = async (composeData, user) => {
 	} else {
 		environment.push(passwordEnv);
 	}
-	
+	// lalalalalalalalaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+	environment.push(`ROBOT_CELL=${robot_cell}`)
+
 	composeData = await setGitRepository(composeData, user);
 	composeData.services.vnc.environment = environment // git has been set, top of with vnc pw token
 
@@ -106,8 +108,13 @@ const generateCompose = async (id, yamlPath, user) => {
 	const composeFile = path.join(__dirname, `${yamlPath}/${id}.yaml`);
 	const yamlData = await readYamlFile(composeFile);
 
+	let cell = await db('inventory').first().where({ slug: id }).select('cell')
+	if (cell === undefined) {
+		cell = null
+	} else { cell = cell.cell} // haha what dis
+
 	// Create the token, add it to the yaml as a side effect
-	const passwordToken = await setEnvironment(yamlData, user);
+	const passwordToken = await setEnvironment(yamlData, user, cell);
 	console.log(yamlData.services.vnc.image)
 
 	// Write out the compose file to be used for a session
