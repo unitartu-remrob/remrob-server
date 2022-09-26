@@ -25,6 +25,12 @@ const setGitRepository = async (composeData, user) => {
 	
 	const user_data = await db('user').first().where({ id: user.sub }).select(['first_name', 'last_name']);
 	let { first_name, last_name } = user_data;
+	if (first_name === null) {
+		first_name = "first_name"
+	}
+	if (last_name === null) {
+		last_name = "last_name"
+	}
 	first_name = first_name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '')
 	last_name = last_name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '')
 
