@@ -31,8 +31,8 @@ const setGitRepository = async (composeData, user) => {
 	if (last_name === null) {
 		last_name = "last_name"
 	}
-	first_name = first_name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '')
-	last_name = last_name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '')
+	first_name = first_name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '').replace(/\s/g,'')
+	last_name = last_name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '').replace(/\s/g,'')
 
 	const repoContainerName = `${first_name}-${last_name}`;
 	const repoHostName = `${first_name}-${last_name}-${user.sub}`;
