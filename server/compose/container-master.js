@@ -47,7 +47,13 @@ const setGitRepository = async (composeData, user) => {
 	// Push to the compose data:
 	environment.push(`GIT_PAT=${git_auth_token}`)
 	volumes.push(`${process.env.REPOS_ROOT}/${repoHostName}:/home/kasutaja/${repoContainerName}`) // lil bit of hard coding
-	
+
+	const mount_path = `${process.env.RECORDING_ROOT}/${repoHostName}`
+	if (!fs.existsSync(mount_path)){
+		fs.mkdirSync(mount_path);
+	}
+	volumes.push(`${mount_path}:/home/kasutaja/submission_videos`)
+
 	// Pass back the reference:
 	composeData.services.vnc.volumes = volumes
 	composeData.services.vnc.environment = environment
