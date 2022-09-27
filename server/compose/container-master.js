@@ -52,7 +52,7 @@ const setGitRepository = async (composeData, user) => {
 	if (!fs.existsSync(mount_path)){
 		fs.mkdirSync(mount_path);
 	}
-	volumes.push(`${mount_path}:/home/kasutaja/submission_videos`)
+	volumes.push(`${mount_path}:/home/kasutaja/Videos`)
 
 	// Pass back the reference:
 	composeData.services.vnc.volumes = volumes
