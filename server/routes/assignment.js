@@ -1,10 +1,10 @@
 var db = require("../data/db.js");
 // const axios = require('axios');
 const { killContainer } = require("../compose/container-master");
-const { kill } = require("docker-compose");
 
 const assignContainer = (req, res) => {
 	const { user, user_booking } = res.locals;
+	console.log(user_booking)
 	
 	// In case admin tries to get a container without an active booking
 	if (user_booking === undefined) {
@@ -32,7 +32,7 @@ const assignContainer = (req, res) => {
 				.orWhere({ end_time: null }) // This probably redundant
 				.orWhere('end_time', '<', now.toISOString(),)
 				.then(async item => {
-					// Update the user column with the respective user ID coming from the JWT token
+					// Update the inventory item user column with the respective user ID coming from the JWT token
 					if (item) {	
 						console.log(item)
 						killContainer(item.slug)
@@ -48,7 +48,14 @@ const assignContainer = (req, res) => {
 								const claimed_item = { ...item, ...bookingData } // start_time: user_booking.start 
 								setSessionTimeout(claimed_item, inventoryTable)
 								res.json(claimed_item)
-							})	
+							})
+						// Mark that the booking has been activated
+						db('bookings')
+							.update({ activated: true })
+							.where('id', user_booking.id)
+							.then(resp => {
+								console.log("Booking activated!")
+							})
 					} else {
 						res.status(500).send('No free inventory available')
 					}
