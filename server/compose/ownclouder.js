@@ -5,14 +5,13 @@ const auth = {
 	password: process.env.OCS_TOKEN
 }
 
-const createShareLink = async (name, email) => {
+const createShareLink = async (name) => {
 	const shareStuff = await axios.post(`${process.env.OCS_URL}/shares`,
 		{
 			// assuming the target cloud account already has a folder named "remrob"
 			path: `remrob/${name}`,
 			shareType: "3",
-			permissions: "1",
-			shareWith: "chooky823@gmail.com"
+			permissions: "1"
 		},
 		{
 			auth,
@@ -22,22 +21,12 @@ const createShareLink = async (name, email) => {
 	}).catch(e => { console.log(e) })
 	if (shareStuff !== undefined) {
 		const { data } = shareStuff.data.ocs;
-		console.log(data)
 		return data.token
 	} else {
 		return null
 	}
 }
 
-
-const getShareLink = async (req, res) => {
-	const { name, email } = req.query;
-	const stuff = await createShareLink(name, email)
-	console.log(stuff)
-	res.send(stuff)
-}
-
 module.exports = {
-	createShareLink,
-	getShareLink
+	createShareLink
 }

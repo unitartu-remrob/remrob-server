@@ -43,7 +43,7 @@ const setSubmissionMount = async(owncloudFolderName, mountPath) => {
 		let userToken;
 		// Wait max 10 seconds for sync to update
 		while (triesCounter < 10) {
-			userToken = await createShareLink(owncloudFolderName, "davis.kruumins@gmail.com"); // input user email here
+			userToken = await createShareLink(owncloudFolderName);
 			if (userToken === null) {
 				console.log("not synced yet", triesCounter)
 				await new Promise(resolve => setTimeout(resolve, 1000));
@@ -89,7 +89,7 @@ const setGitRepository = async (composeData, user) => {
 	// ====================================================================================================
 	// Probably shouldn't do this in the dedicated Git function, but set also the submission mount:
 	// ====================================================================================================
-	const owncloudFolderName = `Remrob ${first_name}-${last_name}-${user.sub}`;
+	const owncloudFolderName = `[Remrob]${first_name}-${last_name}-${user.sub}`;
 	const mountPath = `${process.env.OWNCLOUD_ROOT}/${owncloudFolderName}`;
 
 	const userToken = await setSubmissionMount(owncloudFolderName, mountPath);
@@ -110,11 +110,11 @@ const setGitRepository = async (composeData, user) => {
 	composeData.services.vnc.environment = environment
 
 	// Create the repo, if it already existed - nothing happens
-	// await axios.get(`${process.env.DB_SERVER}/check_user`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
+	await axios.get(`${process.env.DB_SERVER}/check_user`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
 	
 	// Now we need to pull the repository we just created
 	// TODO: don't attempt clone if it already exists
-	// await axios.get(`${process.env.DB_SERVER}/clone_jwt`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
+	await axios.get(`${process.env.DB_SERVER}/clone_jwt`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
 
 	return composeData
 }
