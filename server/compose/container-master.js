@@ -89,7 +89,7 @@ const setGitRepository = async (composeData, user) => {
 	// ====================================================================================================
 	// Probably shouldn't do this in the dedicated Git function, but set also the submission mount:
 	// ====================================================================================================
-	const owncloudFolderName = `[Remrob]${first_name}-${last_name}-${user.sub}`;
+	const owncloudFolderName = `${first_name}-${last_name}-${user.sub}`;
 	const mountPath = `${process.env.OWNCLOUD_ROOT}/${owncloudFolderName}`;
 
 	const userToken = await setSubmissionMount(owncloudFolderName, mountPath);
