@@ -15,11 +15,12 @@ const assignContainer = (req, res) => {
 	// If simulation container, add an empty filter, else check if the corresponding robot is active
 	const status_filter = (user_booking.is_simulation) ? (b) => {b.where('container_id', '<', 1000)}: { status: true } 
 	let now = new Date();
+	const adjustedTime = new Date(now.getTime() + 3 * 3600000);
 
 	// Check first if there is an already active session
 	db(inventoryTable)
 		.where({ user: user.sub })
-		.andWhere('end_time', '>', now.toISOString())
+		.andWhere('end_time', '>', adjustedTime.toISOString())
 		.then((inv) => {
 		if (inv.length) {
 			res.json(inv[0])

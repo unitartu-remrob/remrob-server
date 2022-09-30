@@ -18,3 +18,9 @@
   port: 5908
 - name: robosim-9
   port: 5909
+- name: robosim-10
+  port: 5910
+- name: robosim-11
+  port: 5911
+- name: robosim-12
+  port: 5912
