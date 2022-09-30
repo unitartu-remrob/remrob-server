@@ -1,5 +1,6 @@
 var Dockerode = require('dockerode');
 const compose = require('docker-compose');
+const { exec } = require("child_process");
 const axios = require('axios');
 const writeYamlFile = require('write-yaml-file');
 const readYamlFile = require('read-yaml-file');
@@ -58,10 +59,8 @@ const setSubmissionMount = async(owncloudFolderName, mountPath) => {
 	}
 }
 
-const setGitRepository = async (composeData, user) => {
-	const { services: { vnc: { environment, volumes } } } = composeData;
-	
-	const user_data = await db('user').first().where({ id: user.sub }).select(['first_name', 'last_name']);
+const getUserSlug = async (userId) => {
+	const user_data = await db('user').first().where({ id: userId }).select(['first_name', 'last_name']);
 	let { first_name, last_name } = user_data;
 	if (first_name === null) {
 		first_name = "first_name"
@@ -69,6 +68,15 @@ const setGitRepository = async (composeData, user) => {
 	if (last_name === null) {
 		last_name = "last_name"
 	}
+	return { first_name, last_name }
+}
+
+const setGitRepository = async (composeData, user) => {
+	const { services: { vnc: { environment, volumes } } } = composeData;
+
+	const { first_name, last_name } = await getUserSlug(user.sub)
+	console.log(first_name, last_name)
+
 	clean_name = first_name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '').replace(/\s/g,'')
 	clean_surname = last_name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '').replace(/\s/g,'')
 
@@ -104,6 +112,14 @@ const setGitRepository = async (composeData, user) => {
 	}
 	volumes.push(`${mountPath}:/home/kasutaja/Submission`)
 	// ====================================================================================================
+	const workspaceName = `${owncloudFolderName}/catkin_ws`; // same format
+	const workspaceMount = `${process.env.WORKSPACE_ROOT}/${workspaceName}`
+	if (!fs.existsSync(workspaceMount)) {
+		// create dir if first time connecting
+		fs.mkdirSync(workspaceMount, { recursive: true });
+	} else {
+		volumes.push(`${workspaceMount}:/home/kasutaja/catkin_ws`)
+	}
 
 	// Pass back the reference:
 	composeData.services.vnc.volumes = volumes
@@ -285,7 +301,7 @@ const startFromCompose = async (id, req, res) => {
 						let now = new Date();
 						let end = new Date(expiry);
 						setTimeout(() => {
-							killContainer(id)
+							copyAndClean(id, user.sub)
 						}, end - now - 6000)
 					}
 				})	
@@ -342,11 +358,26 @@ const killContainer = (id) => {
 	const container = docker.getContainer(id);
 	console.log(`${id} stopping`)
 	container.stop({t: 2}, (err, data) => {
-		if (!err) {
-			container.remove()
-			console.log(`${id} purged`)
-		}
+		container.remove()
+		console.log(`${id} purged`)
 	})
+}
+
+const copyAndClean = async (containerId, userId) => {
+	const { first_name, last_name } = await getUserSlug(userId)
+	const userWorkspaceName = `${first_name}-${last_name}-${userId}`
+	exec(`docker cp ${containerId}:/home/kasutaja/catkin_ws ${process.env.WORKSPACE_ROOT}/${userWorkspaceName}`, (error, stdout, stderr) => {
+    if (error) {
+        console.log(`error: ${error.message}`);
+        return;
+    }
+    if (stderr) {
+        console.log(`stderr: ${stderr}`);
+        return;
+    }
+    console.log(`stdout: ${stdout}`);
+		killContainer(containerId)
+	});
 }
 
 const commitContainer = (req, res) => {

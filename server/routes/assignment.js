@@ -31,12 +31,10 @@ const assignContainer = (req, res) => {
 				.andWhere({ user: null })
 				.orWhere({ end_time: null }) // This probably redundant
 				.orWhere('end_time', '<', now.toISOString(),)
-				.then(async item => {
+				.then(item => {
 					// Update the inventory item user column with the respective user ID coming from the JWT token
 					if (item) {	
 						console.log(item)
-						killContainer(item.slug)
-						await new Promise(resolve => setTimeout(resolve, 3000));
 						const bookingData = {
 							'user': user.sub,
 							'end_time': user_booking.end
@@ -44,14 +42,16 @@ const assignContainer = (req, res) => {
 						db(inventoryTable)
 							.update(bookingData)
 							.where('id', item["id"])
-							.then(blank => {
+							.then(async blank => {
+								killContainer(item.slug)
+								await new Promise(resolve => setTimeout(resolve, 3000));
 								const claimed_item = { ...item, ...bookingData } // start_time: user_booking.start 
 								setSessionTimeout(claimed_item, inventoryTable)
 								res.json(claimed_item)
 							})
 						// Mark that the booking has been activated
 						db('bookings')
-							.update({ activated: true })
+							.update({ "activated": true })
 							.where('id', user_booking.id)
 							.then(resp => {
 								console.log("Booking activated!")
