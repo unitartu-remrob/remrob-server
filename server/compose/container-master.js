@@ -59,7 +59,7 @@ const setSubmissionMount = async(owncloudFolderName, mountPath) => {
 	}
 }
 
-const getUserSlug = async (userId) => {
+const getUserName = async (userId) => {
 	const user_data = await db('user').first().where({ id: userId }).select(['first_name', 'last_name']);
 	let { first_name, last_name } = user_data;
 	if (first_name === null) {
@@ -71,14 +71,17 @@ const getUserSlug = async (userId) => {
 	return { first_name, last_name }
 }
 
+const cleanChars = (name) => {
+	return name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '').replace(/\s/g,'')
+}
+
 const setGitRepository = async (composeData, user) => {
 	const { services: { vnc: { environment, volumes } } } = composeData;
 
-	const { first_name, last_name } = await getUserSlug(user.sub)
-	console.log(first_name, last_name)
+	const { first_name, last_name } = await getUserName(user.sub)
 
-	clean_name = first_name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '').replace(/\s/g,'')
-	clean_surname = last_name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '').replace(/\s/g,'')
+	const clean_name = cleanChars(first_name);
+	const clean_surname = cleanChars(last_name);
 
 	const repoContainerName = `${first_name}-${last_name}`;
 	const repoHostName = `${clean_name}-${clean_surname}-${user.sub}`;
@@ -117,6 +120,8 @@ const setGitRepository = async (composeData, user) => {
 	if (!fs.existsSync(workspaceMount)) {
 		// create dir if first time connecting
 		fs.mkdirSync(workspaceMount, { recursive: true });
+		// The only case where this goes wrong, is if the server gets restarted and the timeout functions that copy
+		// the user's workspace over to host after the first session does not get triggered
 	} else {
 		volumes.push(`${workspaceMount}:/home/kasutaja/catkin_ws`)
 	}
@@ -364,7 +369,8 @@ const killContainer = (id) => {
 }
 
 const copyAndClean = async (containerId, userId) => {
-	const { first_name, last_name } = await getUserSlug(userId)
+	const { first_name, last_name } = await getUserName(userId);
+
 	const userWorkspaceName = `${first_name}-${last_name}-${userId}`
 	exec(`docker cp ${containerId}:/home/kasutaja/catkin_ws ${process.env.WORKSPACE_ROOT}/${userWorkspaceName}`, (error, stdout, stderr) => {
     if (error) {
