@@ -131,11 +131,11 @@ const setGitRepository = async (composeData, user) => {
 	composeData.services.vnc.environment = environment
 
 	// Create the repo, if it already existed - nothing happens
-	await axios.get(`${process.env.DB_SERVER}/check_user`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
+	// await axios.get(`${process.env.DB_SERVER}/check_user`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
 	
 	// Now we need to pull the repository we just created
 	// TODO: don't attempt clone if it already exists
-	await axios.get(`${process.env.DB_SERVER}/clone_jwt`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
+	// await axios.get(`${process.env.DB_SERVER}/clone_jwt`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
 
 	return composeData
 }
@@ -377,14 +377,16 @@ const copyAndClean = async (containerId, userId) => {
 	exec(`docker cp ${containerId}:/home/kasutaja/catkin_ws ${process.env.WORKSPACE_ROOT}/${userWorkspaceName}`, (error, stdout, stderr) => {
     if (error) {
         console.log(`error: ${error.message}`);
+				killContainer(containerId);
         return;
     }
     if (stderr) {
         console.log(`stderr: ${stderr}`);
+				killContainer(containerId);
         return;
     }
     console.log(`stdout: ${stdout}`);
-		killContainer(containerId)
+		killContainer(containerId);
 	});
 }
 
