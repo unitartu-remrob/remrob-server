@@ -115,7 +115,7 @@ const setGitRepository = async (composeData, user) => {
 	}
 	volumes.push(`${mountPath}:/home/kasutaja/Submission`)
 	// ====================================================================================================
-	const workspaceName = `${owncloudFolderName}/catkin_ws`; // same format
+	const workspaceName = `${repoHostName}/catkin_ws`; // same format
 	const workspaceMount = `${process.env.WORKSPACE_ROOT}/${workspaceName}`
 	if (!fs.existsSync(workspaceMount)) {
 		// create dir if first time connecting
@@ -370,8 +370,10 @@ const killContainer = (id) => {
 
 const copyAndClean = async (containerId, userId) => {
 	const { first_name, last_name } = await getUserName(userId);
+	const clean_name = cleanChars(first_name);
+	const clean_surname = cleanChars(last_name);
 
-	const userWorkspaceName = `${first_name}-${last_name}-${userId}`
+	const userWorkspaceName = `${clean_name}-${clean_surname}-${userId}`
 	exec(`docker cp ${containerId}:/home/kasutaja/catkin_ws ${process.env.WORKSPACE_ROOT}/${userWorkspaceName}`, (error, stdout, stderr) => {
     if (error) {
         console.log(`error: ${error.message}`);
