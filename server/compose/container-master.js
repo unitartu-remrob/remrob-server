@@ -30,7 +30,12 @@ const setSubmissionMount = async(owncloudFolderName, mountPath) => {
 	if (!fs.existsSync(mountPath)){
 		// If the user folder doesn't exist, we haven't made it before and it means user is connecting for the first time
 		// So let's create a directory with submodule folders for them
-		fs.mkdirSync(mountPath);
+		try {
+			fs.mkdirSync(mountPath);
+		} catch {
+			console.log("sync broken")
+			return 1
+		}
 		// Create submission folders (assumption of 6 modules)
 		const moduleCount = [ ...Array(6).keys() ].map( i => i + 1 );
 		await Promise.all(
@@ -100,7 +105,7 @@ const setGitRepository = async (composeData, user) => {
 	// ====================================================================================================
 	// Probably shouldn't do this in the dedicated Git function, but set also the submission mount:
 	// ====================================================================================================
-	const owncloudFolderName = `[Remrob]${first_name}-${last_name}-${user.sub}`;
+	const owncloudFolderName = `${first_name}-${last_name}-${user.sub}`;
 	const mountPath = `${process.env.OWNCLOUD_ROOT}/${owncloudFolderName}`;
 
 	const userToken = await setSubmissionMount(owncloudFolderName, mountPath);
@@ -113,7 +118,9 @@ const setGitRepository = async (composeData, user) => {
 		db('user').update({ owncloud_id: userToken }).where({ id: user.sub }).then(res => {
 		}).catch(e => console.log(e));
 	}
-	volumes.push(`${mountPath}:/home/kasutaja/Submission`)
+	if (userToken !== 1) {
+		volumes.push(`${mountPath}:/home/kasutaja/Submission`)
+	}
 	// ====================================================================================================
 	const workspaceName = `${repoHostName}/catkin_ws`; // same format
 	const workspaceMount = `${process.env.WORKSPACE_ROOT}/${workspaceName}`
