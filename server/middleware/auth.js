@@ -91,9 +91,8 @@ const checkContainerOwnership = (req, res, next) => {
 			.where({ user: user.sub })
 			.select('slug')
 			.then(inv_item => {
-				console.log(inv_item)
-				// Assuming there is no case where a user can have multiple containers at once, 
-				if (inv_item[0].slug !== id) {
+				const claim_true = inv_item.find(item => item.slug === id);
+				if (claim_true === undefined) {
 					res.status(403).send('This container does not belong to you')
 				} else {
 					next()

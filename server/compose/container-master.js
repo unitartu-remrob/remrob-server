@@ -12,7 +12,8 @@ const { v4: uuidv4 } = require('uuid');
 
 const {
 	createShareLink
-} = require('./ownclouder.js')
+} = require('./ownclouder.js');
+const { kill } = require('process');
 
 var docker = new Dockerode();
 
@@ -127,8 +128,18 @@ const setGitRepository = async (composeData, user) => {
 	if (!fs.existsSync(workspaceMount)) {
 		// create dir if first time connecting
 		fs.mkdirSync(workspaceMount, { recursive: true });
-		// The only case where this goes wrong, is if the server gets restarted and the timeout functions that copy
-		// the user's workspace over to host after the first session does not get triggered
+		// copy new workspace into the folder
+		exec(`cp -r ${process.env.HOME}/catkin_ws ${process.env.WORKSPACE_ROOT}/${repoHostName}`, (error, stdout, stderr) => {
+			if (error) {
+					console.log(`error: ${error.message}`);
+					return;
+			}
+			if (stderr) {
+					console.log(`stderr: ${stderr}`);
+					return;
+			}
+			console.log(`stdout: ${stdout}`);
+		});
 	} else {
 		volumes.push(`${workspaceMount}:/home/kasutaja/catkin_ws`)
 	}
@@ -137,12 +148,11 @@ const setGitRepository = async (composeData, user) => {
 	composeData.services.vnc.volumes = volumes
 	composeData.services.vnc.environment = environment
 
-	// Create the repo, if it already existed - nothing happens
-	// await axios.get(`${process.env.DB_SERVER}/check_user`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
-	
-	// Now we need to pull the repository we just created
-	// TODO: don't attempt clone if it already exists
-	// await axios.get(`${process.env.DB_SERVER}/clone_jwt`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
+	// Create the repo and clone it, if it already existed - nothing happens
+	await axios.get(`${process.env.DB_SERVER}/check_user`, { params: { 'user_name': repoHostName }, headers: HEADERS }).then(async res => {
+		console.log("Created new user repo")
+		await axios.get(`${process.env.DB_SERVER}/clone_jwt`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
+	}).catch(e => console.log(e));
 
 	return composeData
 }
@@ -313,7 +323,8 @@ const startFromCompose = async (id, req, res) => {
 						let now = new Date();
 						let end = new Date(expiry);
 						setTimeout(() => {
-							copyAndClean(id, user.sub)
+							killContainer(id)
+							// copyAndClean(id, user.sub)
 						}, end - now - 6000)
 					}
 				})	
