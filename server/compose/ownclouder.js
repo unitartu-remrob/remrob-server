@@ -23,7 +23,7 @@ const createShareLink = async (name) => {
 		const { data } = shareStuff.data.ocs;
 		return data.token
 	} else {
-		return null
+		return ""
 	}
 }
 

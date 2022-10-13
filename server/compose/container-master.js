@@ -13,7 +13,6 @@ const { v4: uuidv4 } = require('uuid');
 const {
 	createShareLink
 } = require('./ownclouder.js');
-const { kill } = require('process');
 
 var docker = new Dockerode();
 
@@ -26,7 +25,14 @@ const filterOptions = {
 	}
 }
 
-const setSubmissionMount = async(owncloudFolderName, mountPath) => {
+const createShare = (owncloudFolderName, user) => {
+	createShareLink(owncloudFolderName).then(userToken => {
+		db('user').update({ owncloud_id: userToken }).where({ id: user.sub }).then(res => {
+		}).catch(e => console.log(e));
+	})
+}
+
+const setSubmissionMount = async(owncloudFolderName, mountPath, user) => {
 	
 	if (!fs.existsSync(mountPath)){
 		// If the user folder doesn't exist, we haven't made it before and it means user is connecting for the first time
@@ -35,33 +41,24 @@ const setSubmissionMount = async(owncloudFolderName, mountPath) => {
 			fs.mkdirSync(mountPath);
 		} catch {
 			console.log("sync broken")
-			return 1
+			return false
 		}
 		// Create submission folders (assumption of 6 modules)
 		const moduleCount = [ ...Array(6).keys() ].map( i => i + 1 );
 		await Promise.all(
 			moduleCount.map(i => fs.mkdir(`${mountPath}/solutions-module-${i}`, () => undefined))
 		)
+		
 		// Now we need to make a POST request to the owncloud servers and ask them to share the folder we just created.
-		// We are gonna go in a loop until we get a positive response, because the folder we just created
-		// might not be instantly synced up with the cloud services, and we will get a 404, so we just keep
-		// repeating this request until we finally get back a positive response with the view token in payload
-		let triesCounter = 0;
-		let userToken;
-		// Wait max 10 seconds for sync to update
-		while (triesCounter < 10) {
-			userToken = await createShareLink(owncloudFolderName);
-			if (userToken === null) {
-				console.log("not synced yet", triesCounter)
-				await new Promise(resolve => setTimeout(resolve, 1000));
-				triesCounter++
-			} else {
-				break
-			}
-		}
-		return userToken
+		// The sync occurs every 5 minutes, so that is the min time we will wait before requesting the share
+		setTimeout(() => {
+			createShare(owncloudFolderName, user)
+		}, 310000)
+
+		return true
+
 	} else {
-		return 0
+		return true
 	}
 }
 
@@ -109,17 +106,9 @@ const setGitRepository = async (composeData, user) => {
 	const owncloudFolderName = `${first_name}-${last_name}-${user.sub}`;
 	const mountPath = `${process.env.OWNCLOUD_ROOT}/${owncloudFolderName}`;
 
-	const userToken = await setSubmissionMount(owncloudFolderName, mountPath);
-	if (userToken === 0) {
+	const isSet = await setSubmissionMount(owncloudFolderName, mountPath, user);
 
-	} else if (userToken === null) { // if userToken still null after X tries, give up and notify, can add share token manually later on
-		console.log(`Failed to create an access token for ${repoContainerName}`)
-	} else {
-		// Update DB with acquired token (should only happen once, when the user first uses the system)
-		db('user').update({ owncloud_id: userToken }).where({ id: user.sub }).then(res => {
-		}).catch(e => console.log(e));
-	}
-	if (userToken !== 1) {
+	if (isSet) {
 		volumes.push(`${mountPath}:/home/kasutaja/Submission`)
 	}
 	// ====================================================================================================
