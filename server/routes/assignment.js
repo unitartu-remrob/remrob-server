@@ -29,10 +29,11 @@ const assignContainer = (req, res) => {
 			// Get the first entry that is free (booking expired or user null)
 			db(inventoryTable).first()
 				.where(status_filter)
-				.andWhere({ user: null })
-				.orWhere({ end_time: null }) // This probably redundant
-				.orWhere('end_time', '<', now.toISOString(),)
-				.then(item => {
+				.andWhere( function () {
+					this.orWhere({ user: null })
+						.orWhere({ end_time: null }) // This probably redundant
+						.orWhere('end_time', '<', now.toISOString(),)
+				}).then(item => {
 					// Update the inventory item user column with the respective user ID coming from the JWT token
 					if (item) {	
 						console.log(item)
