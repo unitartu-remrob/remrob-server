@@ -1,1 +1,0 @@
-Change server address at .env, rebuild afterwards
