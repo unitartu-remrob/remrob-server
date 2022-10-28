@@ -13,6 +13,7 @@ const { v4: uuidv4 } = require('uuid');
 const {
 	createShareLink
 } = require('./ownclouder.js');
+const e = require('express');
 
 // ----------------------------------------------------------------
 // Initialize Dockerode (the interface to the Docker Engine API)
@@ -372,7 +373,13 @@ const killContainer = (id) => {
 				resolve(0)
 			})		
 		}).catch(err => {
-			resolve(1)
+			if (err.statusCode === 409) {
+				container.remove().then(res => {
+					resolve(0)
+				})	
+			} else {
+				resolve(1)
+			}
 		})
 	})
 }
