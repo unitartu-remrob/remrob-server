@@ -314,7 +314,7 @@ const startFromCompose = async (id, req, res) => {
 						setTimeout(() => {
 							killContainer(id)
 							// copyAndClean(id, user.sub)
-						}, end - now - 6000)
+						}, end - now - 3000)
 					}
 				})	
 			res.json({
@@ -367,34 +367,16 @@ const restartContainer = (req, res) => {
 };
 
 const killContainer = (id) => {
-	const container = docker.getContainer(id);
-	console.log(`${id} stopping`)
-	container.stop({t: 2}, (err, data) => {
-		container.remove()
-		console.log(`${id} purged`)
+	return new Promise((resolve, reject) => {
+		const container = docker.getContainer(id)
+		container.kill().then(res => {
+			container.remove().then(res => {
+				resolve(0)
+			})		
+		}).catch(err => {
+			resolve(1)
+		})
 	})
-}
-
-const copyAndClean = async (containerId, userId) => {
-	const { first_name, last_name } = await getUserName(userId);
-	const clean_name = cleanChars(first_name);
-	const clean_surname = cleanChars(last_name);
-
-	const userWorkspaceName = `${clean_name}-${clean_surname}-${userId}`
-	exec(`docker cp ${containerId}:/home/kasutaja/catkin_ws ${process.env.WORKSPACE_ROOT}/${userWorkspaceName}`, (error, stdout, stderr) => {
-    if (error) {
-        console.log(`error: ${error.message}`);
-				killContainer(containerId);
-        return;
-    }
-    if (stderr) {
-        console.log(`stderr: ${stderr}`);
-				killContainer(containerId);
-        return;
-    }
-    console.log(`stdout: ${stdout}`);
-		killContainer(containerId);
-	});
 }
 
 const commitContainer = (req, res) => {

@@ -45,11 +45,11 @@ const assignContainer = (req, res) => {
 							.update(bookingData)
 							.where('id', item["id"])
 							.then(async blank => {
-								killContainer(item.slug)
-								await new Promise(resolve => setTimeout(resolve, 3000));
-								const claimed_item = { ...item, ...bookingData } // start_time: user_booking.start 
-								setSessionTimeout(claimed_item, inventoryTable)
-								res.json(claimed_item)
+								killContainer(item.slug).then(async() => {
+									const claimed_item = { ...item, ...bookingData } // start_time: user_booking.start 
+									setSessionTimeout(claimed_item, inventoryTable)
+									res.json(claimed_item)
+								})	
 							})
 						// Mark that the booking has been activated
 						db('bookings')
