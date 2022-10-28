@@ -462,7 +462,6 @@ const calculate_cpu_percent = (d) => {
 
 
 module.exports = {
-	list: listContainers,
 	start: startContainer,
 	stop: stopContainer,
 	restart: restartContainer,

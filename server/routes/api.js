@@ -17,7 +17,6 @@ const {
 	yieldContainer
 } = require('./assignment')
 const  {
-	list,
 	start,
 	stop,
 	restart,
@@ -31,8 +30,6 @@ const  {
 router.ws("/live/:version", liveStats);
 router.ws("/robot-status/:id", robotMonitor);
 
-//
-router.get('/list', [authenticateJWT], list);
 
 router.get('/inspect/:id', [authenticateJWT, checkSession, checkOwnership], inspect);
 router.get('/stats/:id', [authenticateJWT, checkSession, checkOwnership], stats);
