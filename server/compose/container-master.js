@@ -13,7 +13,6 @@ const { v4: uuidv4 } = require('uuid');
 const {
 	createShareLink
 } = require('./ownclouder.js');
-const e = require('express');
 
 // ----------------------------------------------------------------
 // Initialize Dockerode (the interface to the Docker Engine API)
