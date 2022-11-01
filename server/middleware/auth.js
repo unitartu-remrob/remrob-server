@@ -19,7 +19,7 @@ const authenticateJWT = (req, res, next) => {
 
 			jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
 					if (err) {
-						return res.sendStatus(403);
+						return res.sendStatus(401);
 					}
 
 					res.locals.user = user;
@@ -43,10 +43,10 @@ const authenticateAdminJWT = (req, res, next) => {
 
 			jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
 					if (err) {
-						return res.sendStatus(403);
+						return res.sendStatus(401);
 					}
 					if (user.is_administrator !== true) {
-						return res.sendStatus(401);
+						return res.sendStatus(403);
 					}
 					res.locals.user = user;
 					res.locals.authHeader = authHeader;
@@ -57,6 +57,21 @@ const authenticateAdminJWT = (req, res, next) => {
 			res.sendStatus(401);
 	}
 }
+
+const authenticateAdminWs = (ws, req, next) => {
+	const token = req.cookies.refresh_token_cookie
+
+	jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+		if (err) {
+			return ws.send(401);
+		}
+		if (user.is_administrator !== true) {
+			return ws.send(403);
+		}		
+		next();
+	});
+}
+
 
 const checkSession = (req, res, next) => {
 	// Get the user ID of who's trying to access container management
@@ -106,6 +121,7 @@ const checkContainerOwnership = (req, res, next) => {
 module.exports = {
 	authenticateJWT,
 	authenticateAdminJWT,
+	authenticateAdminWs,
 	checkSession,
 	checkOwnership: checkContainerOwnership
 }

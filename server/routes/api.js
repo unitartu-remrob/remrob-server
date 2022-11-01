@@ -4,6 +4,7 @@ var router = express.Router();
 const {
 	authenticateJWT,
 	authenticateAdminJWT,
+	authenticateAdminWs,
 	checkSession,
 	checkOwnership
 }  = require('../middleware/auth');
@@ -27,7 +28,7 @@ const  {
 } = require('../compose/container-master.js')
 
 
-router.ws("/live/:version", liveStats);
+router.ws("/live/:version", authenticateAdminWs, liveStats);
 router.ws("/robot-status/:id", robotMonitor);
 
 
@@ -35,7 +36,7 @@ router.get('/inspect/:id', [authenticateJWT, checkSession, checkOwnership], insp
 router.get('/stats/:id', [authenticateJWT, checkSession, checkOwnership], stats);
 
 router.get('/assign', [authenticateJWT, checkSession], assignContainer)
-router.post('/yield/:id', [authenticateJWT, checkSession, checkOwnership], yieldContainer)
+// router.post('/yield/:id', [authenticateJWT, checkSession, checkOwnership], yieldContainer)
 
 router.post('/start/:id', [authenticateJWT, checkSession, checkOwnership], start);
 router.post('/stop/:id', [authenticateJWT, checkSession, checkOwnership], stop);
