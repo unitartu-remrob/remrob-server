@@ -2,6 +2,11 @@ var db = require("../data/db.js");
 // const axios = require('axios');
 const { killContainer } = require("../compose/container-master");
 
+const config = require('config');
+// EST: times 3 summer time, times 2 winter time
+const UTC_OFFSET = config.get('Time.UTC_OFFSET');
+console.log(UTC_OFFSET)
+
 const assignContainer = (req, res) => {
 	const { user, user_booking } = res.locals;
 	console.log(user_booking)
@@ -15,7 +20,7 @@ const assignContainer = (req, res) => {
 	// If simulation container, add an empty filter, else check if the corresponding robot is active
 	const status_filter = (user_booking.is_simulation) ? (b) => {b.where('container_id', '<', 1000)}: { status: true } 
 	let now = new Date();
-	const adjustedTime = new Date(now.getTime() + 2 * 3600000); // times 3 summer time, times 2 winter time, hard coding time zones :thinking:
+	const adjustedTime = new Date(now.getTime() + UTC_OFFSET * 3600000);
 
 	// Check first if there is an already active session
 	db(inventoryTable)
@@ -79,7 +84,7 @@ const setSessionTimeout = (item, inv) => {
 				.then(blank => {
 					console.log(`Session @${item['slug']} expired (user #${item['user']})`)
 				})
-		}, end - now - 5000) // 5 second buffer for edge cases, maybe should be one minute idk
+		}, end - now - 5000) // 5 second buffer for edge cases
 }
 
 const yieldContainer = (req, res) => {
