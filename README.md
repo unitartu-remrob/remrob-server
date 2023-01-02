@@ -1,16 +1,69 @@
-Clone recursively, [noVNC](https://github.com/novnc/noVNC) required as a submodule
+# REMROB: a web-based robotics learning and development environment
 
-# Requirements
+## Requirements
 
-- Docker & docker-compose(1.28.0+)
-- [ros-vnc image tagged as robotont:base](https://github.com/unitartu-remrob/remrob-docker)
-- [nvidia-docker-runtime](https://docs.docker.com/config/containers/resource_constraints/#gpu) (comes with nvidia-docker2)
-- nginx
-- Nodejs & npm
-- [websockify](https://github.com/novnc/websockify)
+This software is known to work with the following:
 
+- Ubuntu 20.04
+- [Docker Engine 20.10](https://docs.docker.com/engine/install/ubuntu/)
+- [docker-compose v2.12.2](https://docs.docker.com/compose/install/other/)
+- nginx v1.18.0
+- PostgreSQL 12.12
+- Nodejs v16.13.0
+- NPM v8.19.2
+- Python 3.8
+- pip 20.0.2
 
-# Network specification
+Additional requirements:
+
+- [websockify](https://github.com/novnc/websockify) (available via apt: `sudo apt install websockify`)
+- Jinja2 template engine | `pip install Jinja2`
+- [nvidia-docker-runtime](https://docs.nvidia.com/ai-enterprise/deployment-guide-vmware/0.1.0/docker.html) (follow the deployment guide)
+
+## Installation 
+### 1) Build the VNC/ROS docker image 
+```
+git clone --recursive https://github.com/unitartu-remrob/remrob-docker
+cd remrob-docker
+docker build -t robotont:base .
+```
+### 2) Build frontend
+```
+git clone https://github.com/unitartu-remrob/remrob-webapp
+cd remrob-webapp
+npm install && npm run build
+```
+### 3) Generate docker-compose templates
+
+*Optional*: change network config at `remrob-server/server/compose/config` for physical robot support
+```
+cd remrob-server/server/compose
+python3 compose-generator.py
+```
+### 4) Build and run the container API
+```
+cd remrob-server/server
+npm install
+# This will start both websockify and node servers:
+npm run prod
+```
+### 5) Build and run the booking backend
+```
+cd remrob-webapp
+pip install -r requirements.txt
+npm run dev-server
+```
+### 6) Set up nginx
+```
+deb https://nginx.org/packages/ubuntu/ focal nginx
+sudo apt update && sudo apt install nginx
+sudo cp nginx.conf /etc/nginx/sites-enabled/default
+sudo systemctl start nginx
+```
+
+Access via http://localhost
+
+# Network specification for enabling containers to connect to physical robots
 
 To allow full communication between the containers and the robotonts *macvlan* docker network type can be used. It requires an ethernet interface with promiscuous mode enabled (does not work with a wireless interface).
 
@@ -55,48 +108,13 @@ To allow full communication between the containers and the robotonts *macvlan* d
 
 Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/)
 
-
-# Settting up the server
-
-1. Copy the nginx configuration to your system
-
-2. Build frontend
-
-`cd server/client && npm run build`
-
-3. Install main server modules, start the websockify proxy and the main server
-
-`cd server && npm install`
-
-`npm run vnc-client`
-
-`npm run server`
-
-![Dockerode in action](./API_interface.png)
-
----
-
-### To do:
-
-- Make a server that can handle multiple websocket proxies at once ✅
-- Make the image more user-friendly ✅
-- Enable NVIDIA hardware acceleration in the containers ✅
-- Run the containers as a non-root user ✅
-- Pipe everything through a single VNC client (instead of having separate one for each container) ✅
-- Dynamic passwords ✅
-- Basic container control API ✅
-- Hook up a database to test user systems and save committed container states
-
 ### Limitations & issues:
 
-- For reasons unknown after starting the container it takes about half a minute before it loads the graphical gnome config for the user.
-- For some reason after the 9th container the vnc servers running in new containers become unresponsive (10+) 
+- After starting the container it initially takes some time before application windows get drawn.
+- With more than 9 containers active the vnc servers running in new containers become unresponsive (10+), possibly something to do with the shared cgroup
 - Cannot edit files that require sudo privileges with GUI applications (e.g. `sudo gedit /etc/hosts`), must use a CLI editor (e.g. nano)
 - SYS_ADMIN container privileges currently required to run systemd, which is needed for gnome
 
----
-
-A very configurable docker-vnc setup providing options between lxde, lxqt and xfce4 environments (no gnome) can be found [here](https://github.com/fcwu/docker-ubuntu-vnc-desktop).
 
 &nbsp;
 
