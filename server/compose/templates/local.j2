@@ -29,9 +29,3 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu, utility, graphics]
-    networks:
-      - simtainers
-networks:
-  simtainers:
-    external: true
-    name: sim_net

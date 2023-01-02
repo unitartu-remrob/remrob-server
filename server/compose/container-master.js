@@ -1,161 +1,18 @@
 var Dockerode = require('dockerode');
 const compose = require('docker-compose');
-const { exec } = require("child_process");
-const axios = require('axios');
 const writeYamlFile = require('write-yaml-file');
 const readYamlFile = require('read-yaml-file');
 var generator = require('generate-password');
 var path = require('path');
 const fs = require("fs");
 var db = require("../data/db.js");
-const { v4: uuidv4 } = require('uuid');
 
-const {
-	createShareLink
-} = require('./ownclouder.js');
 
 // ----------------------------------------------------------------
 // Initialize Dockerode (the interface to the Docker Engine API)
 // ----------------------------------------------------------------
 var docker = new Dockerode();
 // ----------------------------------------------------------------
-
-let HEADERS;
-
-const cleanChars = (name) => {
-	return name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '').replace(/\s/g,'')
-}
-
-const getUserName = async (userId) => {
-	const user_data = await db('user').first().where({ id: userId }).select(['first_name', 'last_name']);
-	let { first_name, last_name } = user_data;
-	if (first_name === null) {
-		first_name = "Roberta"
-	}
-	if (last_name === null) {
-		last_name = "Roos"
-	}
-	return { first_name, last_name }
-}
-
-const createShare = (extFolderName, user) => {
-	createShareLink(extFolderName).then(userToken => {
-		db('user').update({ owncloud_id: userToken }).where({ id: user.sub }).then(res => {
-		}).catch(e => console.log(e));
-	})
-}
-
-const setVolumeMounts = async (composeData, user) => {
-	const { services: { vnc: { environment, volumes } } } = composeData;
-
-	const { first_name, last_name } = await getUserName(user.sub)
-
-	const clean_name = cleanChars(first_name);
-	const clean_surname = cleanChars(last_name);
-
-	const repoContainerName = `${first_name}-${last_name}`;
-	const repoHostName = `${clean_name}-${clean_surname}-${user.sub}`;
-
-	const extFolderName = `${first_name}-${last_name}-${user.sub}`;
-
-	// ====================================================================================================
-	// Set the video submission mount:
-	// ====================================================================================================
-	const mountPath = `${process.env.OWNCLOUD_ROOT}/${extFolderName}`;
-	const isSet = await setSubmissionMount(extFolderName, mountPath, user);
-
-	if (isSet) {
-		volumes.push(`${mountPath}:/home/kasutaja/Submission`)
-	}
-	// ====================================================================================================
-	// Set the git repo mount:
-	// ====================================================================================================
-	const gitMountPath = `${process.env.REPOS_ROOT}/${repoHostName}`
-	const git_auth_token = await setGitRepository(repoHostName, gitMountPath, user);
-
-	environment.push(`GIT_PAT=${git_auth_token}`)
-	volumes.push(`${gitMountPath}:/home/kasutaja/${repoContainerName}`)
-	// ====================================================================================================
-	// Set the workspace mount:
-	// ====================================================================================================
-	const workspaceMount = `${process.env.WORKSPACE_ROOT}/${repoHostName}/catkin_ws`
-	if (!fs.existsSync(workspaceMount)) {
-		// create dir if first time connecting
-		fs.mkdirSync(workspaceMount, { recursive: true });
-		// copy new workspace into the folder
-		exec(`cp -r ${process.env.HOME}/catkin_ws ${process.env.WORKSPACE_ROOT}/${repoHostName}`, (error, stdout, stderr) => {
-			if (error) {
-					console.log(`error: ${error.message}`);
-					return;
-			}
-			if (stderr) {
-					console.log(`stderr: ${stderr}`);
-					return;
-			}
-			console.log(`stdout: ${stdout}`);
-		});
-	} else {
-		volumes.push(`${workspaceMount}:/home/kasutaja/catkin_ws`)
-	}
-
-	// Pass back the reference:
-	composeData.services.vnc.volumes = volumes
-	composeData.services.vnc.environment = environment
-
-	return composeData
-}
-
-const setSubmissionMount = async(extFolderName, mountPath, user) => {
-	if (!fs.existsSync(mountPath)){
-		// If the user folder doesn't exist, we haven't made it before and it means user is connecting for the first time
-		// So let's create a directory with submodule folders for them
-		try {
-			fs.mkdirSync(mountPath);
-		} catch {
-			console.log("sync broken")
-			return false
-		}
-		// Create submission folders (assumption of 6 modules)
-		const moduleCount = [ ...Array(6).keys() ].map( i => i + 1 );
-		await Promise.all(
-			moduleCount.map(i => fs.mkdir(`${mountPath}/solutions-module-${i}`, () => undefined))
-		)	
-		// Now we need to make a POST request to the owncloud servers and ask them to share the folder we just created.
-		// The sync occurs every 5 minutes, so that is the min time we will wait before requesting the share
-		setTimeout(() => {
-			createShare(extFolderName, user)
-		}, 310000)
-		return true
-	} else {
-		// Directory exists
-		// Always return true, the immaculate function
-		return true
-	}
-}
-
-const setGitRepository = async (repoHostName, mountPath, user) => {
-	if (!fs.existsSync(mountPath)) {
-		// Authentication token for pushing from inside the container (only works on macvlan)
-		const git_auth_token = uuidv4();
-		// Update the db with the session token and repo name
-		// ! user_repo currently not used anywhere, might be redundant data !
-		db('user').update({ git_token: git_auth_token, user_repo: repoHostName }).where({ id: user.sub }).then(res => {
-
-		}).catch(e => console.log(e));
-
-		await axios.get(`${process.env.DB_SERVER}/check_user`, { params: { 'user_name': repoHostName }, headers: HEADERS }).then(async res => {
-			console.log("Created new user repo")
-			// Repo created on GitLab, clone it
-			await axios.get(`${process.env.DB_SERVER}/clone_jwt`, { params: { 'user_name': repoHostName }, headers: HEADERS }).catch(e => console.log(e));
-		}).catch(e => console.log(e));
-
-		return git_auth_token
-
-	} else {
-		const { git_token } = await db('user').first().where({ id: user.sub }).select(['git_token']);
-		return git_token
-	}
-}
 
 const setEnvironment = async (composeData, user, robot_cell) => {
 	// Generate the password for vnc and push it into the compose data
@@ -176,8 +33,7 @@ const setEnvironment = async (composeData, user, robot_cell) => {
 	}
 	environment.push(`ROBOT_CELL=${robot_cell}`)
 
-	composeData = await setVolumeMounts(composeData, user);
-	composeData.services.vnc.environment = environment // git has been set, top of with vnc pw token
+	composeData.services.vnc.environment = environment
 
 	return new Promise((resolve, reject) => {
 		if (!user.fresh) {
@@ -194,7 +50,6 @@ const setEnvironment = async (composeData, user, robot_cell) => {
 			resolve(passwordToken)
 		}
 	})
-	// Set the user image if required
 }
 
 const generateCompose = async (id, yamlPath, user) => {
