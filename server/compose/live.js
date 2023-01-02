@@ -1,7 +1,9 @@
 const  { docker, calculate_cpu_percent } = require('./container-master.js')
-// const axios = require('axios');
 var db = require("../data/db.js");
 const ping = require('ping');
+
+const config = require('config');
+const subnet = config.get('Network.SUBNET_PREFIX');
 
 const getInventory = async (stock) => {
 	const id = (stock === "simulation_containers") ? 'container_id' : 'robot_id';
@@ -38,7 +40,7 @@ const containerMonitor = async (table_id, ws) => {
 			getStats(slug, vnc_uri)
 		);
 		if (table_id === "inventory") {
-			let host = `192.168.200.${robot_id}`
+			let host = `${subnet}.${robot_id}`
 			hosts.push(ping.promise.probe(host, {timeout: 0.1}))
 		}
 		users.push(
@@ -99,7 +101,7 @@ const robotMonitor = (ws, req) => {
 	const { id } = req.params;
 	// console.log("received robot monitor websocket request")
 	const pollInterval = setInterval(() => {
-		let host = `192.168.200.${id}`
+		let host = `${subnet}.${id}`
 		ping.sys.probe(host, function(isAlive) {
 			ws.send(JSON.stringify(isAlive))
 		})

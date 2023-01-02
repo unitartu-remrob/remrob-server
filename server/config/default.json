@@ -1,5 +1,8 @@
 {
 	"Time": {
 		"UTC_OFFSET": 3
+	},
+	"Network": {
+		"SUBNET_PREFIX": "192.168.200"
 	}
 }
