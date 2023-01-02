@@ -37,9 +37,9 @@ const containerMonitor = async (table_id, ws) => {
 		calls.push(
 			getStats(slug, vnc_uri)
 		);
-		if (table_id == "inventory") {
+		if (table_id === "inventory") {
 			let host = `192.168.200.${robot_id}`
-			hosts.push(ping.promise.probe(host))
+			hosts.push(ping.promise.probe(host, {timeout: 0.1}))
 		}
 		users.push(
 			db('user').where({id: user}).first()
@@ -75,7 +75,7 @@ const liveStats = async (ws, req) => {
 	console.log("New socket from client")
 
 	const table_id =
-		(version == "simulation")
+		(version === "simulation")
 			? "simulation_containers"
 			: "inventory"; // anything else defaults to physbots
 
@@ -90,6 +90,9 @@ const liveStats = async (ws, req) => {
 		clearInterval(pollInterval);
 		console.log("they left...  what a pity")
 	})
+
+	// send first data immediately
+	await containerMonitor(table_id, ws)
 }
 
 const robotMonitor = (ws, req) => {
