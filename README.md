@@ -33,19 +33,20 @@ git clone https://github.com/unitartu-remrob/remrob-webapp
 cd remrob-webapp
 npm install && npm run build
 ```
-### 3) Generate docker-compose templates
+### 3) Build and run the container API
+```
+git clone --recursive https://github.com/unitartu-remrob/remrob-server
+cd remrob-server/server
+npm install
+# This will start both websockify and node servers:
+npm run prod
+```
+### 4) Generate docker-compose templates
 
 *Optional*: change network config at `remrob-server/server/compose/config` for physical robot support
 ```
 cd remrob-server/server/compose
 python3 compose-generator.py
-```
-### 4) Build and run the container API
-```
-cd remrob-server/server
-npm install
-# This will start both websockify and node servers:
-npm run prod
 ```
 ### 5) Build and run the booking backend
 ```

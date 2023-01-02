@@ -5,7 +5,6 @@ const { killContainer } = require("../compose/container-master");
 const config = require('config');
 // EST: times 3 summer time, times 2 winter time
 const UTC_OFFSET = config.get('Time.UTC_OFFSET');
-console.log(UTC_OFFSET)
 
 const assignContainer = (req, res) => {
 	const { user, user_booking } = res.locals;
