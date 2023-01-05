@@ -1,3 +1,6 @@
 [submodule "server/noVNC"]
 	path = server/noVNC
 	url = https://github.com/novnc/noVNC
+[submodule "remrob-webapp"]
+	path = remrob-webapp
+	url = https://github.com/unitartu-remrob/remrob-webapp

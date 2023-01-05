@@ -49,7 +49,7 @@ const containerMonitor = async (table_id, ws) => {
 	})
 
 	const results = await Promise.allSettled(calls);
-	const pings = await Promise.allSettled(hosts);
+	//const pings = await Promise.allSettled(hosts);
 	const user_info = await Promise.allSettled(users);
 
 	inv.forEach(({ robot_id, slug, user, end_time, issue }, index) => {
@@ -62,7 +62,7 @@ const containerMonitor = async (table_id, ws) => {
 		}
 		//
 		if (table_id == "inventory") {
-			results[index]["robot_status"] = pings[index].value.alive;
+			results[index]["robot_status"] = 0//pings[index].value.alive;
 		}
 		// Add booking info about the specific container
 		results[index]["booking"] = {

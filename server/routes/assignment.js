@@ -4,11 +4,10 @@ const { killContainer } = require("../compose/container-master");
 
 const config = require('config');
 // EST: times 3 summer time, times 2 winter time
-const UTC_OFFSET = config.get('Time.UTC_OFFSET');
+const UTC_OFFSET = process.env.UTC_OFFSET || config.get('Time.UTC_OFFSET');
 
 const assignContainer = (req, res) => {
 	const { user, user_booking } = res.locals;
-	console.log(user_booking)
 	
 	// In case admin tries to get a container without an active booking
 	if (user_booking === undefined) {

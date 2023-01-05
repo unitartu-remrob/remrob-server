@@ -4,7 +4,7 @@ services:
   vnc:
     image: robotont:base
     container_name: {{ name }}
-    hostname: robosim
+    hostname:  {{ name }}
     environment:
       - ROS_MASTER=localhost
       - PASSWORD=remrob # placeholder
@@ -29,3 +29,7 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu, utility, graphics]
+networks:
+  default:
+    name: remrob-server_default
+    external: true
