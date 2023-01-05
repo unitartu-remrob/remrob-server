@@ -20,15 +20,15 @@ services:
       - /tmp/.X11-unix/X1:/tmp/.X11-unix/X1:ro
     ports:
       - {{ port }}:5902
-    deploy:
-      resources:
-        limits:
-          cpus: 3.0
-          memory: 4096M
-        reservations:
-          devices:
-            - driver: nvidia
-              capabilities: [gpu, utility, graphics]
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: 3.0
+#          memory: 4096M
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              capabilities: [gpu, utility, graphics]
 networks:
   default:
     name: remrob-server_default
