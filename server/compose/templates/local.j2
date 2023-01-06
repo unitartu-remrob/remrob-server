@@ -8,7 +8,7 @@ services:
     environment:
       - ROS_MASTER=localhost
       - PASSWORD=remrob # placeholder
-      - VGL_DISPLAY=:1
+      - VGL_DISPLAY=:0
     tmpfs:
       - /run
       - /run/lock
@@ -17,7 +17,7 @@ services:
       - SYS_ADMIN
     volumes: 
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - /tmp/.X11-unix/X1:/tmp/.X11-unix/X1:ro
+      - /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro
     ports:
       - {{ port }}:5902
 #    deploy:
