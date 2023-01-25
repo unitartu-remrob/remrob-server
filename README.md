@@ -187,6 +187,6 @@ Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-mac
 
 # Acknowledgments
 
-Completed with the support by IT Acadamy Programme of Education and Youth Board of Estonia.
+Completed with the support by IT Academy Programme of Education and Youth Board of Estonia.
 
 Valminud Haridus- ja Noorteameti IT Akadeemia programmi toel.
