@@ -9,9 +9,18 @@
 `git clone --recursive https://github.com/unitartu-remrob/remrob-server`
 
 # Docker installation
+
+The Docker installation only provides support to simulation environments, to enable access to physical robots proceed with the manual installation.
+
+To run the application in Docker complete the following steps:
+
+### Step 1:
+
 The [ROS-VNC image](https://github.com/unitartu-remrob/remrob-docker) with user's development environment must be built beforehand (7 GB, will take some time):
 
 	bash build-image.sh
+
+### Step 2:
 
 The application can be orchestrated with docker-compose. Specify the application's timezone in the docker-compose file and launch!
 
@@ -28,29 +37,30 @@ Default user password: **admin**
 
 Only simulation environments are available with the docker installation, to support physical robots proceed with the manual installation.
 
-### Hardware acceleration
+&nbsp;
+# Hardware acceleration
 
 To enable hardware accelerated containers with nvidia video cards:
 1. Install the [nvidia-docker-runtime](https://docs.nvidia.com/ai-enterprise/deployment-guide-vmware/0.1.0/docker.html)
 2. In the j2 template at `server/compose/templates/local.j2`:
 
-a) VGL uses the host's display for 3D rendering, default display nr. assumed is **:0**, can be changed to a different one in the following X11 server socket mount (**X1** in the example):
+	a) VGL uses the host's display for 3D rendering, default display nr. assumed is **:0**, can be changed to a different one in the following X11 server socket mount (**X1** in the example):
 
-```
-volumes: 
-      - /tmp/.X11-unix/X1:/tmp/.X11-unix/X0:ro
-#	               ^
-```
+	```
+	volumes: 
+	- /tmp/.X11-unix/X1:/tmp/.X11-unix/X0:ro
+	#	               ^
+	```
 
-b) To enable GPU resources uncomment:
-```
-deploy:
-resources:
-	reservations:
-	devices:
-		- driver: nvidia
-		capabilities: [gpu, utility, graphics]
-```
+	b) To enable GPU resources uncomment:
+	```
+	# deploy:
+	# resources:
+	#   reservations:
+	#   devices:
+	#     - driver: nvidia
+	#     capabilities: [gpu, utility, graphics]
+	```
 3. Rebuild the compose templates
 
 ```
