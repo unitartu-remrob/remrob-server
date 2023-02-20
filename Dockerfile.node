@@ -4,13 +4,6 @@ FROM nikolaik/python-nodejs:python3.11-nodejs16
 RUN curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 RUN chmod +x /usr/local/bin/docker-compose
 
-# APT PACKAGE OUTDATED!
-# RUN apt-get update -y \
-#     && apt-get install -y --no-install-recommends \
-# 		websockify \
-#     && apt-get clean \
-#     && rm -rf /var/lib/apt/lists/*
-
 RUN git clone https://github.com/novnc/websockify.git \
     && cd websockify \
     && python3 setup.py install
@@ -26,5 +19,3 @@ RUN npm install \
 
 RUN cd /remrob-server/compose \
     && python3 compose_generator.py
-
-# ENTRYPOINT ["npm", "run", "prod"]
