@@ -37,7 +37,7 @@ const setEnvironment = async (composeData, user, robot_cell) => {
 
 	return new Promise((resolve, reject) => {
 		if (!user.fresh) {
-			const name = `robotont:${user.sub}`
+			const name = `remrob:${user.sub}`
 			const image = docker.getImage(name);
 			image.inspect((err, data) => {
 				// If no error, means the image exists, else retain base image
@@ -243,7 +243,7 @@ const commitContainer = (req, res) => {
 	const { user } = res.locals;
 
 	const container = docker.getContainer(id);
-	container.commit({repo: "robotont", tag: user.sub}, (err, data) => {
+	container.commit({repo: "remrob", tag: user.sub}, (err, data) => {
 		if (!err) {
 			docker.pruneImages() // Clean up old versions
 			res.json(data)
