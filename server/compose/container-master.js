@@ -309,7 +309,8 @@ const calculate_cpu_percent = (d) => {
 	if (Object.keys(d.pids_stats).length === 0) {
 		return 0;
 	}
-	const cpu_count = d["cpu_stats"]["cpu_usage"]["percpu_usage"].length;
+	// const cpu_count = d["cpu_stats"]["cpu_usage"]["percpu_usage"].length;
+	const cpu_count = d["cpu_stats"].online_cpus;
 	let cpu_percent = 0.0
 	const cpu_delta = d["cpu_stats"]["cpu_usage"]["total_usage"] -
 							d["precpu_stats"]["cpu_usage"]["total_usage"];
