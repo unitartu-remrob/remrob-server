@@ -19,15 +19,15 @@ services:
       - SYS_ADMIN
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - /tmp/.X11-unix/X1:/tmp/.X11-unix/X1:ro
-    deploy:
-      resources:
-        limits:
-          memory: 4096M
-        reservations:
-          devices:
-            - driver: nvidia
-              capabilities: [gpu, utility, graphics]
+#      - /tmp/.X11-unix/X1:/tmp/.X11-unix/X1:ro
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 4096M
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              capabilities: [gpu, utility, graphics]
     networks:
       ros_net:
         ipv4_address: {{ self_ip }}

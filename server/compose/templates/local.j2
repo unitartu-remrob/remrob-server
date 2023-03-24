@@ -15,11 +15,11 @@ services:
       - /tmp
     cap_add:
       - SYS_ADMIN
-    volumes: 
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro
     ports:
       - {{ port }}:5902
+    volumes: 
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+#     - /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro  
 #    deploy:
 #      resources:
 #        limits:
@@ -31,5 +31,5 @@ services:
 #              capabilities: [gpu, utility, graphics]
 networks:
   default:
-    name: remrob-server_default
+    name: remrob_sim
     external: true

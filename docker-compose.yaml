@@ -3,6 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:14-alpine
+    container_name: remrob_postgres
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
@@ -11,6 +12,7 @@ services:
       - remrob_db:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
   flask:
+    container_name: remrob_booking
     build:
       context: .
       dockerfile: Dockerfile.flask
@@ -20,10 +22,9 @@ services:
       - "postgres"
     environment:
       TZ: "Europe/Tallinn"
-    ports:
-      - 5000:5000
     command: npm start
   node-container-api:
+    container_name: node-container-api
     build:
       context: .
       dockerfile: Dockerfile.node
@@ -33,19 +34,21 @@ services:
       NODE_ENV: production
       TZ: "Europe/Tallinn"
       UTC_OFFSET: '+2'
-    ports:
-      - 9000:9000
-      - 6085:6085
     command: npm run prod
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   web:
     image: nginx:1.22.1
+    container_name: remrob_nginx
     depends_on:
       - flask
       - node-container-api
-    network_mode: host
+    ports:
+      - "8080:80"
     volumes:
     - ./nginx.conf:/etc/nginx/nginx.conf
 volumes:
   remrob_db: {}
+networks:
+  default:
+    name: remrob_sim
