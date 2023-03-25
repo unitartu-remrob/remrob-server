@@ -44,7 +44,6 @@ docker build -t remrob:base ./remrob-docker
 The simulation-only application can be orchestrated with docker-compose.
 
 ```bash
-```bash
 docker-compose up --build
 ```
 
