@@ -10,11 +10,18 @@
 git clone --recursive https://github.com/unitartu-remrob/remrob-server
 ```
 
+## Introduction
+
+Remrob is a web application for a remote web lab that offers an authentic ROS development experience by serving in-browser desktop workstations with the help of [noVNC](https://github.com/novnc/noVNC). Docker containers are used to encapsulate the workstations of which there are two types - simulation and physical robot enabled environments. The users are able to reserve access to the remote lab through a time slot booking module.
+
+Check out [these](https://www.youtube.com/watch?v=A3_WH9BOUK0) [demos](https://www.youtube.com/watch?v=Zb5wu1d1rSU)!
+
 # Install with Docker
 
-The docker installation only provides support to simulation environments, to enable access to physical robots proceed with the manual installation.
-
-To run the application in Docker complete the following steps:
+Requirements:
+- Ubuntu 20.04
+- [Docker Engine](https://docs.docker.com/engine/install/ubuntu/)
+- [Docker Compose](https://docs.docker.com/compose/install/other/)
 
 ### Step 1:
 
@@ -34,12 +41,14 @@ docker build -t remrob:base ./remrob-docker
 
 ### Step 2:
 
-The application can be orchestrated with docker-compose. It requires ports 80, 5000, 9000 and 6085 on the host to be open, make sure they are available.
+The simulation-only application can be orchestrated with docker-compose.
+
+```bash
 ```bash
 docker-compose up --build
 ```
 
-Once the build has finished, the application can be accessed on: http://localhost:80
+Once the build has finished, the application can be accessed on port 8080 (e.g. http://localhost:8080)
 
 Default user email: **admin**
 
@@ -47,15 +56,16 @@ Default user password: **admin**
 
 ![Login window](./docs/login-screen.png)
 
-
 Change the timezone and UTC offset in the compose file to run the session booking calendar in a different timezone (default is Europe/Tallinn).
+
+For this installation only simulation environments are available for you to play with (to enable containers capable of networking with robots, proceed with the more lengthy manual installation).
 
 &nbsp;
 # Hardware acceleration
 
 To enable hardware accelerated containers with nvidia video cards:
 1. Install the [nvidia-docker-runtime](https://docs.nvidia.com/ai-enterprise/deployment-guide-vmware/0.1.0/docker.html)
-2. In the docker-compose robotont template at `server/compose/templates/local.j2`:
+2. In the docker-compose robotont template at `server/compose/templates/{local || macvlan}.j2`:
 
 	a) VGL uses the host's display for 3D rendering, default display nr. assumed is **:0**, can be changed to a different one in the following X11 server socket mount (**X1** in the example):
 
@@ -81,7 +91,7 @@ docker-compose build --no-cache node-container-api
 ```
 Alternatively make the same edits within the node container and regenerate with:
 ```bash
-docker exec -w /remrob-server/compose remrob-server_node-container-api_1 python3 compose_generator.py
+docker exec -w /remrob-server/compose remrob-server_node-container-api python3 compose_generator.py
 ```
 &nbsp;
 
@@ -121,6 +131,10 @@ bash build-image.sh
 ```bash
 # Build frontend
 cd remrob-webapp
+# In the .env example edit SQLALCHEMY_DATABASE_URI environment variable to suit your host
+# (e.g. localhost)
+# Also set VUE_APP_UTC_OFFSET to whatever timezone you want the booking calendar to be based on
+cp .env.production.example .env.production
 npm install && npm run build
 
 # Install py modules
@@ -137,24 +151,27 @@ npm start
 ### 3) Build and run the container API
 ```bash
 cd server && npm install
-# This will start both websockify and node servers:
-npm run prod
+# In the .env example modify DB_SERVER and DB_URL to have your host (e.g. localhost)
+cp .env.example .env
+# Change the server timezone to yours at config/default.json
+npm run prod # this will start both websockify and node servers
 ```
 ### 4) Generate compose templates for starting ROS-VNC containers
 
-*Optional*: change network config at `server/compose/config` & `server/websockify-token.cfg` for physical robot support
+Change network config at `server/compose/config` & `server/websockify-token.cfg` to suit the IP range of your robots.
 ```bash
 cd remrob-server/server/compose
 python3 compose-generator.py
 ```
 ### 5) Set up nginx
 ```bash
+# !NB: modify the proxied endpoints in the nginx.conf file to suit your host
 # Copy configuration and restart
 sudo cp remrob-server/nginx.conf /etc/nginx/sites-enabled/default
 sudo systemctl restart nginx
 ```
 
-Access via http://localhost
+Access via port 80 (e.g. http://127.0.0.1)
 
 &nbsp;
 
@@ -208,6 +225,7 @@ To allow full communication between the containers and the robotonts *macvlan* d
 - After starting the container it initially takes some time before application windows get drawn.
 - For high container load (10+) the default inotify user instances and watch limits must be increased (see [this](https://bugzilla.proxmox.com/show_bug.cgi?id=1042))
 - The containers are run with --cap-add=SYS_ADMIN in order to enable systemd, which is needed for gnome.
+- Does not work with newer versions of Ubuntu (e.g. 22.04) because of a newer, incompatible systemd (see [this](https://github.com/geerlingguy/docker-ubuntu2004-ansible/issues/18))
 
 
 &nbsp;
