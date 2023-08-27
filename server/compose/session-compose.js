@@ -36,7 +36,7 @@ class SessionCompose {
 			// this.gitMountPath = null;
 
 			// this.volumes = [];
-			// this.environment = [];
+			this.environment = [];
 		}
 
 		getInventoryTable = () => {
@@ -75,7 +75,7 @@ class SessionCompose {
 		}
 
 		setVolumeMounts = async (composeData) => {
-			const { services: { vnc: { environment, volumes } } } = composeData;
+			const { services: { vnc: { volumes } } } = composeData;
 			// this.volumes = volumes;
 			// this.environment = environment;
 		
@@ -110,10 +110,10 @@ class SessionCompose {
 			// const gitMountPath = `${process.env.REPOS_ROOT}/${this.extFolderName}`
 			// const gitAuthToken = await setGitRepository(gitMountPath);
 		
-			// environment.push(`GIT_PAT=${gitAuthToken}`)
+			// this.environment.push(`GIT_PAT=${gitAuthToken}`)
 			// volumes.push(`${gitMountPath}:/home/kasutaja/${containerRepoName}`)
 			
-			return  { volumes, volEnv: environment }
+			return  { volumes, volEnv: this.environment }
 		}
 
 		createWorkspaceFolder = (mountDir) => {
