@@ -8,6 +8,7 @@ const fs = require("fs");
 var db = require("../data/db.js");
 
 const SessionCompose = require('./session-compose.js');
+const { env } = require('process');
 let sessionComposer = null;
 
 // ----------------------------------------------------------------
@@ -174,11 +175,9 @@ const setEnvironment = async (composeData) => {
 		environment.push(`ROBOT_CELL=${cell}`)
 	}
 
-	composeData.services.vnc.environment = environment;
-
 	const { volumes, volEnv } = await sessionComposer.setVolumeMounts(composeData);
 	composeData.services.vnc.volumes = volumes;
-	composeData.services.vnc.environment = volEnv;
+	composeData.services.vnc.environment = [...environment, ...volEnv];
 
 	// Set the user-specific image if required
 	return new Promise((resolve, reject) => {
