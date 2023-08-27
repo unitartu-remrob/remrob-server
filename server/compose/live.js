@@ -41,7 +41,7 @@ const containerMonitor = async (table_id, ws) => {
 		);
 		if (table_id === "inventory") {
 			let host = `${subnet}.${robot_id}`
-			hosts.push(ping.promise.probe(host, {timeout: 0.1}))
+			hosts.push(ping.promise.probe(host, {timeout: 1}))
 		}
 		users.push(
 			db('user').where({id: user}).first()
@@ -99,9 +99,9 @@ const liveStats = async (ws, req) => {
 
 const robotMonitor = (ws, req) => {
 	const { id } = req.params;
-	// console.log("received robot monitor websocket request")
+
+	let host = `${subnet}.${id}`
 	const pollInterval = setInterval(() => {
-		let host = `${subnet}.${id}`
 		ping.sys.probe(host, function(isAlive) {
 			ws.send(JSON.stringify(isAlive))
 		})
