@@ -8,7 +8,6 @@ const fs = require("fs");
 var db = require("../data/db.js");
 
 const SessionCompose = require('./session-compose.js');
-const { env } = require('process');
 let sessionComposer = null;
 
 // ----------------------------------------------------------------
@@ -152,7 +151,7 @@ const generateUrl = (tokenPw) => {
 const setEnvironment = async (composeData) => {
 	// Generate the password for vnc and push it into the compose data
 	const { services: { vnc: { environment } } } = composeData;
-	const { containerId, is_simulation, useBaseImage } = sessionComposer;
+	const { containerId, userId, is_simulation, useBaseImage } = sessionComposer;
 
 	// Generate a VNC password token
 	const passwordToken = generator.generate({
@@ -182,7 +181,7 @@ const setEnvironment = async (composeData) => {
 	// Set the user-specific image if required
 	return new Promise((resolve, reject) => {
 		if (!useBaseImage) {
-			const name = `robotont:${user.sub}`
+			const name = `robotont:${userId}`
 			const image = docker.getImage(name);
 			image.inspect((err, data) => {
 				// If no error, means the image exists, else retain base image
