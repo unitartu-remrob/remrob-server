@@ -41,6 +41,7 @@ class gitMaster {
 	initLocalRepo = async(firstName, email) => {
 		try {
 			this.repo = simpleGit(this.repoPath);
+			this.repo.init(); // in case of old workspace
 			await this.repo.addConfig('user.name', firstName);
     	await this.repo.addConfig('user.email', email);
 		} catch (error) {
