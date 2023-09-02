@@ -5,6 +5,7 @@ const readYamlFile = require('read-yaml-file');
 var generator = require('generate-password');
 var path = require('path');
 const fs = require("fs");
+
 var db = require("../data/db.js");
 
 const SessionCompose = require('./session-compose.js');
@@ -74,8 +75,6 @@ const startFromCompose = async (res) => {
 	const { containerId, isAdmin, sessionType, inventoryTable } = sessionComposer;
 	console.log(`Starting ${containerId} from compose...`)
 
-	// Check whether to use a saved image or start fresh, if no image available start fresh
-
 	// cannot run multiple container in the same directory through docker-compose, so create separate ones
 	const composeDir = path.join(__dirname, `${sessionType}/temp/${containerId}`)
 
@@ -101,10 +100,17 @@ const startFromCompose = async (res) => {
 						let now = new Date();
 						let end = new Date(expiry);
 						setTimeout(() => {
-							killContainer(containerId)
+							sessionComposer.gitMaster.gitPushUpstream().then(_ => {
+								console.log("Pushed to git, now killing the container")
+								killContainer(containerId);
+							}).catch(e => {
+								// if the push fails, we still want to kill the container
+								console.log(e);
+								killContainer(containerId);
+							})
 						}, end - now - 3000)
 					}
-				})	
+				})
 			res.json({
 				path: targetUrl
 			})
@@ -139,7 +145,7 @@ const generateCompose = async () => {
 const generateUrl = (tokenPw) => {
 	const vncUrl = new URL(`http:/localhost/novnc/vnc.html`); // hostname excluded in return
 	vncUrl.searchParams.append("autoconnect", "true");
-  vncUrl.searchParams.append("resize", "remote");
+	vncUrl.searchParams.append("resize", "remote");
 	vncUrl.searchParams.append("password", tokenPw);
 	// order for the following matters
 	vncUrl.searchParams.append("path", "novnc");
@@ -186,11 +192,13 @@ const setEnvironment = async (composeData) => {
 			image.inspect((err, data) => {
 				// If no error, means the image exists, else retain base image
 				if (!err) {
-					composeData.services.vnc.image = name
+					composeData.services.vnc.image = name;
 				}
+				resolve(passwordToken);
 			})
+		} else {
+			resolve(passwordToken);
 		}
-		resolve(passwordToken);
 	})
 }
 
@@ -198,7 +206,7 @@ const stopContainer = (req, res) => {
 	const { id } = req.params;
 	
 	const container = docker.getContainer(id);
-	container.stop({t: 2}, (err, data) => {
+	container.stop({t: 3}, (err, data) => {
 		if (!err) {
 			res.json(data)
 		} else {
@@ -239,12 +247,12 @@ const killContainer = (id) => {
 		container.kill().then(res => {
 			container.remove().then(res => {
 				resolve(0)
-			})		
+			})
 		}).catch(err => {
 			if (err.statusCode === 409) {
 				container.remove().then(res => {
 					resolve(0)
-				})	
+				})
 			} else {
 				resolve(1)
 			}

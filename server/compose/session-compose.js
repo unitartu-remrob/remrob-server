@@ -1,8 +1,9 @@
 var path = require('path');
 const fs = require("fs");
 const { exec } = require("child_process");
-const { v4: uuidv4 } = require('uuid');
+
 var db = require("../data/db.js");
+const gitMaster = require('./code_upload/git-master.js');
 
 const {
 	createShareLink
@@ -65,13 +66,15 @@ class SessionCompose {
 			// will make POST request to owncloud requesting that the folder named `$extFolderName` under the /remrob directory be shared with a token
 			// the returned access token is stored in the db, later it is included in a URL issued to user for accessing their owncloud submission folder
 			createShareLink(this.extFolderName).then(userToken => {
-				db('user').update({
-					owncloud_id: userToken
-				}).where({
-					id: this.userId
-				}).then(res => {
-				}).catch(e => console.log(e));
-			})
+				if (userToken !== undefined) {
+					db('user').update({
+						owncloud_id: userToken
+					}).where({
+						id: this.userId
+					}).then(res => {
+					}).catch(e => console.log(e));
+				}
+			});
 		}
 
 		setVolumeMounts = async (composeData) => {
@@ -93,8 +96,16 @@ class SessionCompose {
 			// ----------------------------------
 			// Workspace mount uses the cleaned name and surname so the workspace cp command works
 			const workspaceMountPath = `${process.env.WORKSPACE_ROOT}/${this.cleanFolderName}`
-			this.createWorkspaceFolder(workspaceMountPath);
+			await this.createWorkspaceFolder(workspaceMountPath);
 			volumes.push(`${workspaceMountPath}/catkin_ws:/home/kasutaja/catkin_ws`)
+
+			// Set the git repo mount:
+			// ----------------------------------
+			const prettyName = `${first_name} ${last_name}`;
+			await this.setGitRepository(prettyName);
+			
+			// const gitMountPath = `${process.env.REPOS_ROOT}/${this.cleanFolderName}`
+			// volumes.push(`${gitMountPath}:/home/kasutaja/${containerRepoName}`) // this is unnecessary when the git repo is within the catkin_ws
 
 			// Set the video submission mount:
 			// ----------------------------------
@@ -104,39 +115,35 @@ class SessionCompose {
 			if (isSet) {
 				volumes.push(`${submissionMountPath}:/home/kasutaja/Submission`)
 			}
-
-			// Set the git repo mount:
-			// ----------------------------------
-			// const gitMountPath = `${process.env.REPOS_ROOT}/${this.extFolderName}`
-			// const gitAuthToken = await setGitRepository(gitMountPath);
-		
-			// this.environment.push(`GIT_PAT=${gitAuthToken}`)
-			// volumes.push(`${gitMountPath}:/home/kasutaja/${containerRepoName}`)
 			
 			return  { volumes, volEnv: this.environment }
 		}
 
 		createWorkspaceFolder = (mountDir) => {
-			if (!fs.existsSync(mountDir)) {
-				// create dir if first time connecting
-				fs.mkdirSync(mountDir, { recursive: true });
-				// Copy a clean catkin_ws to the user's folder
-				exec(`cp -r ${process.env.BASE_WS_ROOT}/catkin_ws ${mountDir}`, (error, stdout, stderr) => {
-					if (error) {
-							console.log(`error: ${error.message}`);
-							return;
-					}
-					if (stderr) {
-							console.log(`stderr: ${stderr}`);
-							return;
-					}
-					console.log(`stdout: ${stdout}`);
-				});
-			}
+			return new Promise((resolve, reject) => {
+				if (!fs.existsSync(mountDir)) {
+					// create dir if first time connecting
+					fs.mkdirSync(mountDir, { recursive: true });
+					// Copy a clean catkin_ws to the user's folder
+					exec(`cp -r ${process.env.BASE_WS_ROOT}/catkin_ws ${mountDir}`, (error, stdout, stderr) => {
+						if (error) {
+								console.log(`error: ${error.message}`);
+								reject("failed to initialize workspace folder")
+						}
+						if (stderr) {
+								console.log(`stderr: ${stderr}`);
+								reject("failed to initialize workspace folder")
+						}
+						// console.log(`Workspace copied, stdout: ${stdout}`);
+						resolve("workspace folder initialized")
+					});
+				} else {
+					resolve("workspace folder already exists")
+				}
+			})
 		}
 
 		setSubmissionMount = async(mountDir) => {
-
 			if (!fs.existsSync(mountDir)){
 				// If the user folder doesn't exist, we haven't made it before and it means user is connecting for the first time
 				// So let's create a directory with submodule folders for them
@@ -160,55 +167,92 @@ class SessionCompose {
 				// directory exists
 				// check if the user has a share token (if for some reason the previous share request failed)
 				// this runs every time, so not very efficient, should be done elsewhere
-				const token = await db('user').first().where({ id: this.userId }).select(['owncloud_id']);
-				if (token === null) {
+				const { owncloud_id } = await db('user').first().where({ id: this.userId }).select(['owncloud_id']);
+				if (owncloud_id === null  || owncloud_id === "") {
 					this.createShare()
 				}
 			}
 			return true
 		}
 
-		setGitRepository = async(mountPath) => {
+		setGitRepository = async(prettyName) => {
 
-			const repoHostName = this.cleanFolderName; 
-			
-			if (!fs.existsSync(mountPath)) {
-				// Authentication token for pushing from inside the container (only works on macvlan)
-				const git_auth_token = uuidv4();
-				// Update the db with the session token and repo name
-				// ! user_repo currently not used anywhere, might be redundant data !
-				db('user').update({
-						git_token: git_auth_token,
-						user_repo: repoHostName
+			let isFirstSession = false;
+			let {
+				git_token: studentGitToken,
+				user_repo: repoHostName,
+				project_id: projectId,
+				first_name: firstName,
+				email
+			} = await db('user').first().where({ id: this.userId }).select([
+				'git_token', 'user_repo', 'project_id', 'first_name', 'email'
+			]);
+
+			if (repoHostName === null) {
+				// if there's no project ID, it means there's no initialized repo for the user
+				isFirstSession = true;
+				repoHostName = this.cleanFolderName;
+			}
+			this.gitMaster = new gitMaster(repoHostName, firstName, email);
+			console.log(this.gitMaster.repoPath)
+
+			// Initialize the repository on the remote, and retrieve the access token
+			if (projectId === null) {
+				projectId = await this.gitMaster.initRemoteRepo(prettyName);
+				if (projectId) {
+					db('user').update({
+						project_id: projectId
 					}).where({
 						id: this.userId
 					}).then(res => {
-			
+						
 					}).catch(e => console.log(e));
-
 				
-				await axios.get(`${process.env.DB_SERVER}/check_user`, {
-					params: {
-						'user_name': repoHostName
-					},
-					headers: HEADERS
-				}).then(async res => {
-					console.log("Created new user repo")
-					// Repo created on GitLab, clone it
-					await axios.get(`${process.env.DB_SERVER}/clone_jwt`,
-					{
-						params: {
-							'user_name': repoHostName
-						},
-						headers: HEADERS
-					}).catch(e => console.log(e));
-				}).catch(e => console.log(e));
-		
-				return git_auth_token
-		
+				} else {
+					console.log(`remote for ${repoHostName} already exists, attempt first commit again`)
+				}
+			}
+
+			if (studentGitToken === null) {
+				// if the token is missing, attempt to create one
+				studentGitToken = await this.gitMaster.createAccessToken(projectId);
+				if (studentGitToken) {
+					db('user').update({
+							git_token: studentGitToken
+						}).where({
+							id: this.userId
+						}).then(res => {
+				
+						}).catch(e => console.log(e));
+				} else {
+					console.log(`access token creation for ${repoHostName} failed`)
+				}
+			}
+
+			this.gitMaster.studentGitToken = studentGitToken;
+
+			if (isFirstSession) {
+				try {
+					// now set the origin (for <user>/catkin_ws/src) to the remote repository and push the initial commit
+					await this.gitMaster.gitSetOrigin();
+					const pushSuccessful = await this.gitMaster.gitPushUpstream();
+					if (pushSuccessful) {
+						// if everything passes without error mark in the database that the user has a repo now
+						db('user').update({
+								user_repo: repoHostName
+							}).where({
+								id: this.userId
+							}).then(res => {
+					
+							}).catch(e => console.log(e));
+						console.log(`initial commit and push successful for ${repoHostName}`) 
+					}
+				} catch (error) {
+					console.error('Failed the initial push to remote:', error);
+				}
 			} else {
-				const { git_token } = await db('user').first().where({ id: this.userId }).select(['git_token']);
-				return git_token
+				// if user has decided to make their own commits from outside a remrob session
+				this.gitMaster.gitPull();
 			}
 		}
 }

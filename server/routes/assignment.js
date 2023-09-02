@@ -8,7 +8,6 @@ const UTC_OFFSET = config.get('Time.UTC_OFFSET');
 
 const assignContainer = (req, res) => {
 	const { user, user_booking } = res.locals;
-	console.log(user_booking)
 	
 	// In case admin tries to get a container without an active booking
 	if (user_booking === undefined) {
@@ -40,7 +39,7 @@ const assignContainer = (req, res) => {
 				}).then(item => {
 					// Update the inventory item user column with the respective user ID coming from the JWT token
 					if (item) {	
-						console.log(item)
+						console.log(`Item ${item.slug} has been claimed by #${user.sub}. Session ends on ${user_booking.end}`)
 						const bookingData = {
 							'user': user.sub,
 							'end_time': user_booking.end
@@ -48,19 +47,19 @@ const assignContainer = (req, res) => {
 						db(inventoryTable)
 							.update(bookingData)
 							.where('id', item["id"])
-							.then(async blank => {
+							.then(async _ => {
 								killContainer(item.slug).then(async() => {
 									const claimed_item = { ...item, ...bookingData } // start_time: user_booking.start 
 									setSessionTimeout(claimed_item, inventoryTable)
 									res.json(claimed_item)
-								})	
+								})
 							})
 						// Mark that the booking has been activated
 						db('bookings')
 							.update({ "activated": true })
 							.where('id', user_booking.id)
-							.then(resp => {
-								console.log("Booking activated!")
+							.then(_ => {
+								// console.log("Booking activated!")
 							})
 					} else {
 						res.status(500).send('No free inventory available')

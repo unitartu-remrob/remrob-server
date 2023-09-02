@@ -111,8 +111,6 @@ Based on [this article](https://blog.oddbit.com/post/2018-03-12-using-docker-mac
 
 ### Limitations & issues:
 
-- After starting the container it initially takes some time before application windows get drawn.
-- With more than 9 containers active the vnc servers running in new containers become unresponsive (10+), possibly something to do with the shared cgroup
 - Cannot edit files that require sudo privileges with GUI applications (e.g. `sudo gedit /etc/hosts`), must use a CLI editor (e.g. nano)
 - SYS_ADMIN container privileges currently required to run systemd, which is needed for gnome
 

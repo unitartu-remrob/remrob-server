@@ -18,12 +18,12 @@ const createShareLink = async (name) => {
 			headers: {
 				"OCS-APIRequest": true
 			}
-	}).catch(e => { console.log(e) })
+	}).catch(e => { console.log(`Failed to create an owncloud share link for ${name}`) })
 	if (shareStuff !== undefined) {
 		const { data } = shareStuff.data.ocs;
 		return data.token
 	} else {
-		return ""
+		return undefined
 	}
 }
 
