@@ -31,7 +31,7 @@ class gitMaster {
 		// this.remoteWithAuth = `${beginning}${TOKEN_NAME}:${TOKEN}@${end}/${this.repoName}.git`;
 	}
 
-	constructRemoteWithAuth = (token) => {
+	constructRemoteWithAuth = () => {
 		const injectPoint = GITLAB_PROJECT_URL.indexOf('gitlab');
 		const beginning = GITLAB_PROJECT_URL.slice(0, injectPoint);
 		const end = GITLAB_PROJECT_URL.slice(injectPoint);
@@ -132,12 +132,12 @@ class gitMaster {
 
 	gitPushUpstream = async() => {
 		try {
-			this.gitCommit();
+			await this.gitCommit();
 			const remoteWithAuth = this.constructRemoteWithAuth()
 			await this.repo.push(remoteWithAuth, ['--set-upstream', 'master']);
 			return true;
 		} catch (error) {
-			console.error('Failed pushing to remote:', error);
+			console.error('Failed initial push to remote:', error);
 			return false;
 		}
 	}
@@ -150,15 +150,15 @@ class gitMaster {
 		}
 	}
 
-	// gitPush = async() => {
-	// 	try {
-	//	 	this.gitCommit();
-	// 		await this.repo.push();
-	// 		console.log("Push to remote succeeded!")
-	// 	} catch {
-	// 		console.log('Push to remote failed')
-	// 	}
-	// }
+	gitPush = async() => {
+		try {
+		 	await this.gitCommit();
+			const remoteWithAuth = this.constructRemoteWithAuth();
+			await this.repo.push(remoteWithAuth);
+		} catch {
+			console.log('End of session push failed')
+		}
+	}
 
 	// gitClone = async(force = false) => {
 

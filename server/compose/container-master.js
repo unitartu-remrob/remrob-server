@@ -100,7 +100,7 @@ const startFromCompose = async (res) => {
 						let now = new Date();
 						let end = new Date(expiry);
 						setTimeout(async() => {
-							await sessionComposer.gitMaster.gitPushUpstream()
+							await sessionComposer.gitMaster.gitPush();
 							killContainer(containerId);
 						}, end - now - 3000)
 					}
