@@ -253,6 +253,7 @@ class SessionCompose {
 			} else {
 				// if user has decided to make their own commits from outside a remrob session
 				this.gitMaster.gitPull();
+				// this.gitMaster.gitPushUpstream();
 			}
 		}
 }

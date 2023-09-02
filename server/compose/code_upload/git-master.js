@@ -130,24 +130,14 @@ class gitMaster {
 	}
 
 	gitPushUpstream = async() => {
-		this.gitCommit();
 		try {
+			this.gitCommit();
 			const remoteWithAuth = this.constructRemoteWithAuth()
 			await this.repo.push(remoteWithAuth, ['--set-upstream', 'master']);
 			return true;
 		} catch (error) {
 			console.error('Failed pushing to remote:', error);
 			return false;
-		}
-	}
-
-	gitPush = async() => {
-		this.gitCommit();
-		try {
-			await this.repo.push();
-			console.log("Push to remote succeeded!")
-		} catch {
-			console.log('Push to remote failed')
 		}
 	}
 
@@ -158,6 +148,16 @@ class gitMaster {
 			console.log('Pulling from remote failed')
 		}
 	}
+
+	// gitPush = async() => {
+	// 	try {
+	//	 	this.gitCommit();
+	// 		await this.repo.push();
+	// 		console.log("Push to remote succeeded!")
+	// 	} catch {
+	// 		console.log('Push to remote failed')
+	// 	}
+	// }
 
 	// gitClone = async(force = false) => {
 

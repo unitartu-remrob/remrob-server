@@ -99,15 +99,9 @@ const startFromCompose = async (res) => {
 						const expiry = item[0].end_time;
 						let now = new Date();
 						let end = new Date(expiry);
-						setTimeout(() => {
-							sessionComposer.gitMaster.gitPushUpstream().then(_ => {
-								console.log("Pushed to git, now killing the container")
-								killContainer(containerId);
-							}).catch(e => {
-								// if the push fails, we still want to kill the container
-								console.log(e);
-								killContainer(containerId);
-							})
+						setTimeout(async() => {
+							await sessionComposer.gitMaster.gitPushUpstream()
+							killContainer(containerId);
 						}, end - now - 3000)
 					}
 				})
