@@ -194,7 +194,6 @@ class SessionCompose {
 				repoHostName = this.cleanFolderName;
 			}
 			this.gitMaster = new gitMaster(repoHostName, firstName, email);
-			console.log(this.gitMaster.repoPath)
 
 			// Initialize the repository on the remote, and retrieve the access token
 			if (projectId === null) {

@@ -146,7 +146,7 @@ class gitMaster {
 		try {
 			await this.repo.pull('origin', 'master');
 		} catch {
-			console.log('Pulling from remote failed')
+
 		}
 	}
 
