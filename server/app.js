@@ -11,6 +11,8 @@ console.log(`Running ${process.env.NODE_ENV} server`);
 
 var app = express();
 var expressWs = require('express-ws')(app);
+
+const { authenticateAdminJWT }  = require('./middleware/auth');
 var containerAPI = require('./routes/api'); // must be loaded after setting up ws
 
 // view engine setup
@@ -26,6 +28,10 @@ app.use(cookieParser());
 // ------------------------------
 app.use('/', containerAPI)
 // ------------------------------
+
+// Documentation
+app.use('/guide', authenticateAdminJWT);
+app.use('/guide', express.static(process.env['DOC_ROOT']));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

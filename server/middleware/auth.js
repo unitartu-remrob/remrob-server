@@ -32,30 +32,16 @@ const authenticateJWT = (req, res, next) => {
 }
 
 const authenticateAdminJWT = (req, res, next) => {
-	const tokenHeader = req.headers.authorization;
-	const authHeader = {
-		'Authorization': tokenHeader,
-		'Content-Type': 'application/json'
-	}
-
-	if (tokenHeader) {
-			const token = tokenHeader.split(' ')[1];
-
-			jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-					if (err) {
-						return res.sendStatus(401);
-					}
-					if (user.is_administrator !== true) {
-						return res.sendStatus(403);
-					}
-					res.locals.user = user;
-					res.locals.authHeader = authHeader;
-					
-					next();
-			});
-	} else {
+	const token = req.cookies.refresh_token_cookie
+	jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+		if (err) {
 			res.sendStatus(401);
-	}
+		}
+		if (user.is_administrator !== true) {
+			return res.sendStatus(403);
+		}		
+		next();
+	});
 }
 
 const authenticateAdminWs = (ws, req, next) => {
