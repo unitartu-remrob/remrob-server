@@ -30,8 +30,7 @@ app.use('/', containerAPI)
 // ------------------------------
 
 // Documentation
-app.use('/guide', authenticateAdminJWT);
-app.use('/guide', express.static(process.env['DOC_ROOT']));
+app.use('/guide', authenticateAdminJWT, express.static(process.env['DOC_ROOT']));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
