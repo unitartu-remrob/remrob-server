@@ -26,7 +26,7 @@ class gitMaster {
 		this.firstName = firstName;
 		this.initLocalRepo(firstName, email);
 
-		this.studentTokenName = "remrob_student";
+		this.studentTokenName = `remrob_student_${uuidv4().substring(0, 5)}`;
 		this.studentGitToken = "";
 		// this.remoteWithAuth = `${beginning}${TOKEN_NAME}:${TOKEN}@${end}/${this.repoName}.git`;
 	}
