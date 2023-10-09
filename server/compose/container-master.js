@@ -9,6 +9,7 @@ const fs = require("fs");
 var db = require("../data/db.js");
 
 const SessionCompose = require('./session-compose.js');
+const gitMaster = require('./code_upload/git-master.js');
 let sessionComposer = null;
 
 // ----------------------------------------------------------------
@@ -89,7 +90,7 @@ const startFromCompose = async (res) => {
 		() => {
 			const targetUrl = generateUrl(tokenPw);
 			db(inventoryTable)
-				.returning('end_time')
+				.returning(['end_time', 'user'])
 				.where({ slug: containerId })
 				.update({
 					"vnc_uri": targetUrl,
@@ -100,7 +101,15 @@ const startFromCompose = async (res) => {
 						let now = new Date();
 						let end = new Date(expiry);
 						setTimeout(async() => {
-							await sessionComposer.gitMaster.gitPush();
+							try {
+								// for some reason (perhaps if the session is restarted with start -> stop -> remove?)
+								// the session compose object is not accessible anymore
+								// so we try to make the operation independent of session compose (which can become inaccessible)
+								const { user_repo } = await db('user').first().where({ id: item[0].user }).select(['user_repo']);
+								await (new gitMaster(user_repo).gitPushAll());
+							} catch (err) {
+								console.log(`Did not manage to push end of session code for ${containerId}`, err);
+							}
 							killContainer(containerId);
 						}, end - now - 3000)
 					}

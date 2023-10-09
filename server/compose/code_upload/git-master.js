@@ -153,8 +153,19 @@ class gitMaster {
 	gitPush = async() => {
 		try {
 		 	await this.gitCommit();
+			// requires that gittoken be set prior
 			const remoteWithAuth = this.constructRemoteWithAuth();
 			await this.repo.push(remoteWithAuth);
+		} catch {
+			console.log('End of session push failed')
+		}
+	}
+
+	gitPushAll = async() => {
+		try {
+		 	await this.gitCommit();
+			// const remoteWithAuth = this.constructRemoteWithAuth();
+			await this.repo.push();
 		} catch {
 			console.log('End of session push failed')
 		}
