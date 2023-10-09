@@ -134,6 +134,7 @@ class gitMaster {
 		try {
 			await this.gitCommit();
 			const remoteWithAuth = this.constructRemoteWithAuth()
+			console.log(remoteWithAuth)
 			await this.repo.push(remoteWithAuth, ['--set-upstream', 'master']);
 			return true;
 		} catch (error) {
