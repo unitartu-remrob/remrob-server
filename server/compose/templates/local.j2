@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   vnc:
-    image: robotont:base
+    image: robotont:performance-tests-gazebo
     container_name: {{ name }}
     hostname: robosim
     environment:
@@ -18,6 +18,12 @@ services:
     volumes: 
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - /tmp/.X11-unix/X1:/tmp/.X11-unix/X1:ro
+      - ./FPS_out.txt:/home/kasutaja/.ros/FPS_out.txt
+      - ./GAZEBO_FPS_out.txt:/home/kasutaja/.ros/GAZEBO_FPS_out.txt
+      # - metrics_vol:/home/kasutaja/.ros
+      # - ./metrics:/home/kasutaja/.ros
+      #- ./metrics:/home/kasutaja/.ros/FPS_out.txt
+      #- ./metrics:/home/kasutaja/.ros/GAZEBO_FPS_out.txt
     ports:
       - {{ port }}:5902
     deploy:
@@ -35,3 +41,5 @@ networks:
   simtainers:
     external: true
     name: sim_net
+volumes:
+  metrics_vol:

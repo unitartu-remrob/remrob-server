@@ -1,4 +1,5 @@
 import yaml
+import os
 from jinja2 import Environment, FileSystemLoader
 
 if __name__ == "__main__":
@@ -33,4 +34,12 @@ if __name__ == "__main__":
 		file = open(f"./local/robosim-{i+1}.yaml", "w")
 		file.write(output)
 		file.close()
+
+	for i, robot in enumerate(robo_config_local):
+		os.mknod(f"local/temp/robosim-{i+1}/FPS_out.txt")
+		os.mknod(f"local/temp/robosim-{i+1}/GAZEBO_FPS_out.txt")
+		# rviz_fps_log = open(f"config/temp/robosim-{i+1}/FPS_out.txt", 'w')
+		# rviz_fps_log.close()
+		# gazebo_fps_log = open(f"config/temp/robosim-{i+1}/GAZEBO_FPS_out.txt", 'w')
+		# gazebo_fps_log.close()
 
