@@ -20,17 +20,13 @@ services:
       - /tmp/.X11-unix/X1:/tmp/.X11-unix/X1:ro
       - ./FPS_out.txt:/home/kasutaja/.ros/FPS_out.txt
       - ./GAZEBO_FPS_out.txt:/home/kasutaja/.ros/GAZEBO_FPS_out.txt
-      # - metrics_vol:/home/kasutaja/.ros
-      # - ./metrics:/home/kasutaja/.ros
-      #- ./metrics:/home/kasutaja/.ros/FPS_out.txt
-      #- ./metrics:/home/kasutaja/.ros/GAZEBO_FPS_out.txt
     ports:
       - {{ port }}:5902
     deploy:
       resources:
-        limits:
-          cpus: 3.0
-          memory: 4096M
+#        limits:
+#          cpus: 3.0
+#          memory: 4096M
         reservations:
           devices:
             - driver: nvidia
@@ -41,5 +37,3 @@ networks:
   simtainers:
     external: true
     name: sim_net
-volumes:
-  metrics_vol:
