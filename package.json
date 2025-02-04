@@ -1,0 +1,46 @@
+{
+	"name": "remrob",
+	"version": "2.0.0",
+	"type": "module",
+	"scripts": {
+		"server": "NODE_ENV=production node index.js",
+		"dev": "nodemon index.js --ignore node_modules/",
+		"vnc-client": "websockify --web ./noVNC --token-plugin=TokenFile --token-source=${PWD}/websockify-token.cfg 6085",
+		"prod": "concurrently \"npm run server\" \"npm run vnc-client\"",
+		"pm2:prod": "pm2 start npm --no-automation --name \"remrob\" -- run server",
+		"pm2:cluster": "pm2 start ecosystem.config.js --env production",
+		"lint": "eslint .",
+		"format": "prettier --write ."
+	},
+	"dependencies": {
+		"axios": "^1.7.9",
+		"config": "^3.3.12",
+		"cookie-parser": "~1.4.4",
+		"cors": "^2.8.5",
+		"debug": "^4.4.0",
+		"docker-compose": "^1.1.0",
+		"dockerode": "^4.0.4",
+		"dotenv": "^16.4.7",
+		"express": "^4.21.2",
+		"express-ws": "^5.0.2",
+		"generate-password": "^1.7.1",
+		"hbs": "^4.2.0",
+		"http-errors": "^2.0.0",
+		"jsonwebtoken": "^9.0.2",
+		"knex": "^3.1.0",
+		"morgan": "^1.10.0",
+		"pg": "^8.13.1",
+		"ping": "^0.4.4",
+		"read-yaml-file": "^2.1.0",
+		"uuid": "^11.0.5",
+		"write-yaml-file": "^5.0.0"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.19.0",
+		"concurrently": "^9.1.2",
+		"eslint": "^9.19.0",
+		"globals": "^15.14.0",
+		"nodemon": "^3.1.9",
+		"prettier": "^3.4.2"
+	}
+}

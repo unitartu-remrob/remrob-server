@@ -1,0 +1,11 @@
+{
+	"Time": {
+		"UTC_OFFSET": 2
+	},
+	"Network": {
+		"SUBNET_PREFIX": "192.168.200"
+	},
+	"RobotNetworkSubnetPrefix": "192.168.200",
+	"RecordingSubmissionsEnabled": false,
+	"UserWorkspacesEnabled": false
+}
