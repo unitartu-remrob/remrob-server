@@ -1,5 +1,5 @@
 const verifyTimeInterval = (bookings) => {
-	let currentDate = new Date();
+	const currentDate = new Date();
 
 	const timeSlot = bookings.find((booking) => {
 		const { start, end } = booking;
@@ -12,6 +12,7 @@ const verifyTimeInterval = (bookings) => {
 			return true;
 		}
 	});
+
 	return timeSlot;
 };
 

@@ -51,26 +51,22 @@ const removeContainer = async (id) => {
 	return await container.remove();
 };
 
-const killContainer = (id) => {
-	return new Promise(async (resolve, reject) => {
-		const container = docker.getContainer(id);
+const killContainer = async (id) => {
+	const container = docker.getContainer(id);
 
-		try {
-			await container.kill();
+	try {
+		await container.kill();
+		await container.remove();
+	} catch (err) {
+		if (err.statusCode === 409) {
+			// container is already stopped -> remove it
 			await container.remove();
-			resolve(0);
-		} catch (err) {
-			if (err.statusCode === 409) {
-				// container is already stopped -> remove it
-				await container.remove();
-				resolve(0);
-			} else if (err.statusCode === 404) {
-				resolve(0);
-			} else {
-				reject(err);
-			}
+		} else if (err.statusCode === 404) {
+			// container does not exist
+		} else {
+			throw err;
 		}
-	});
+	}
 };
 
 export {

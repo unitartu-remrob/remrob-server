@@ -101,8 +101,8 @@ class SessionCompose {
 	};
 
 	cleanChars = (name) => {
-		// remove special and Non-ASCII characters
-		return name.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '').replace(/\s/g, '');
+		// allow only alphanumeric characters, underscores, and hyphens
+		return name.replace(/[^a-zA-Z0-9_-]/g, '');
 	};
 
 	updateVNCLink = async (vncUri) => {
@@ -228,6 +228,7 @@ class SessionCompose {
 				console.log(
 					'Failed to create user homework submission folder: Owncloud sync broken'
 				);
+
 				return false;
 			}
 			// create separate submission folders (assumption of 6 modules)
@@ -250,6 +251,7 @@ class SessionCompose {
 				this.initHomeworkSubmissionFolder();
 			}
 		}
+
 		return true;
 	};
 

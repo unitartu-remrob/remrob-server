@@ -21,7 +21,7 @@ const checkIfUserAlreadyHasItem = async (inventoryTable, user, endTime) => {
 		.andWhere('end_time', '>', endTime);
 
 	if (inventoryItems.length) {
-		return items[0];
+		return inventoryItems[0];
 	} else {
 		return null;
 	}
@@ -62,7 +62,7 @@ const lockInventoryItem = async (inventoryTable, inventoryItem, user, userBookin
 		...inventoryItem,
 		...bookingData,
 	};
-
+	
 	await killContainer(inventoryItem.slug);
 	setSessionTimeout(inventoryTable, lockedItem);
 
@@ -70,8 +70,8 @@ const lockInventoryItem = async (inventoryTable, inventoryItem, user, userBookin
 };
 
 const setSessionTimeout = (inventoryTable, inventoryItem) => {
-	let now = new Date();
-	let end = new Date(inventoryItem.end_time);
+	const now = new Date();
+	const end = new Date(inventoryItem.end_time);
 
 	setTimeout(
 		() => {

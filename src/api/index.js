@@ -18,7 +18,6 @@ import inspectContainer from './routes/container/inspectContainer.js';
 import containerStats from './routes/container/containerStats.js';
 import stopContainer from './routes/container/stopContainer.js';
 import removeContainer from './routes/container/removeContainer.js';
-import killContainer from './routes/container/killContainer.js';
 
 const userHasActiveSessionOrIsAdmin = [authenticateJWT, checkSession, checkContainerOwnership];
 
@@ -33,8 +32,6 @@ router.get('/inspect/:id', userHasActiveSessionOrIsAdmin, inspectContainer);
 router.get('/stats/:id', userHasActiveSessionOrIsAdmin, containerStats);
 router.post('/start/:id', userHasActiveSessionOrIsAdmin, startContainer);
 router.post('/stop/:id', userHasActiveSessionOrIsAdmin, stopContainer);
-
 router.post('/remove/:id', userHasActiveSessionOrIsAdmin, removeContainer);
-router.post('/kill/:id', killContainer);
 
 export default router;

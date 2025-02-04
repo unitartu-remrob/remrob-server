@@ -8,10 +8,9 @@ export default [
 			globals: globals.node,
 		},
 		rules: {
-			'no-unused-vars': 'warn',
 			'no-console': 'off',
+			'no-unused-vars': 'warn',
 			'prefer-const': 'warn',
-			'no-unused-imports': 'error',
 			'no-duplicate-imports': 'error',
 			'newline-before-return': 'error',
 		},
