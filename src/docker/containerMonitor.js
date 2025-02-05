@@ -1,11 +1,11 @@
 import ping from 'ping';
 
-import { USER_TABLE, SIMTAINER_INVENTORY_TABLE, ROBOT_INVENTORY_TABLE } from './constants.js';
+import { USER_TABLE, SIMTAINER_INVENTORY_TABLE, ROBOT_INVENTORY_TABLE } from '../constants.js';
 import config from 'config';
 import db from '../data/db.js';
-import { getInventoryTable } from './session/inventory.js';
-import docker from './docker/index.js';
-import calculateCpuPercentage from './util/calculateCpuPercentage.js';
+import { getInventoryTable } from '../session/inventory.js';
+import docker from './index.js';
+import calculateCpuPercentage from '../util/calculateCpuPercentage.js';
 
 const subnet = config.get('RobotNetworkSubnetPrefix');
 

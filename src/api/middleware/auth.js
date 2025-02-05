@@ -3,7 +3,7 @@
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
 
-import db from '../../../data/db.js';
+import db from '../../data/db.js';
 import verifyTimeInterval from '../../util/time.js';
 import { getInventoryTable } from '../../session/inventory.js';
 

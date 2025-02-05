@@ -7,7 +7,7 @@ import { exec } from 'child_process';
 
 import config from 'config';
 import { USER_TABLE } from '../constants.js';
-import db from '../../data/db.js';
+import db from '../data/db.js';
 import { getInventoryTable, getRobotCell } from './inventory.js';
 import {
 	createOwncloudShareLink,

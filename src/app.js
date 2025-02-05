@@ -16,7 +16,7 @@ console.log(`Running ${process.env.NODE_ENV} server`);
 const app = express();
 expressWs(app);
 
-import containerAPI, { mountWsRoutes } from './src/api/index.js';
+import containerAPI, { mountWsRoutes } from './api/index.js';
 mountWsRoutes();
 
 // view engine setup

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import db from '../../data/db.js';
+import db from '../data/db.js';
 
 import { USER_TABLE } from '../constants.js';
 

@@ -1,4 +1,4 @@
-import db from '../../data/db.js';
+import db from '../data/db.js';
 import { killContainer } from '../docker/containerManager.js';
 import { SIMTAINER_INVENTORY_TABLE, ROBOT_INVENTORY_TABLE } from '../constants.js';
 

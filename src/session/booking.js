@@ -1,4 +1,4 @@
-import db from '../../data/db.js';
+import db from '../data/db.js';
 import { BOOKING_TABLE } from '../constants.js';
 
 export const markBookingAsActivated = (bookingId) => {

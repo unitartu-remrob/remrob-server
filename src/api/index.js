@@ -9,7 +9,7 @@ import {
 	checkContainerOwnership,
 } from './middleware/auth.js';
 
-import { liveStats, robotMonitor } from '../containerMonitor.js';
+import { liveStats, robotMonitor } from '../docker/containerMonitor.js';
 
 import assignContainer from './routes/assignContainer.js';
 
