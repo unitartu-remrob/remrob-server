@@ -3,7 +3,6 @@ services:
     image: robotont:base
     container_name: {{ name }}
     hostname: {{ name }}
-    cgroup: host
     extra_hosts:
       - "{{ robotont }}:{{ master_ip }}"
     environment:
