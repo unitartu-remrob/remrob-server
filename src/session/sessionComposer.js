@@ -146,7 +146,7 @@ class SessionCompose {
 		}
 
 		if (!this.isSimtainer) {
-			const cell = getRobotCell(this.containerId);
+			const cell = await getRobotCell(this.containerId);
 			environment.push(`ROBOT_CELL=${cell}`);
 		}
 
