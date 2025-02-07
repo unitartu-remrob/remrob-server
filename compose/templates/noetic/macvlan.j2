@@ -1,6 +1,6 @@
 services:
   vnc:
-    image: robotont:base
+    image: {{ image }}
     container_name: {{ name }}
     hostname: {{ name }}
     extra_hosts:
@@ -17,7 +17,7 @@ services:
       - SYS_ADMIN
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup
-      - /tmp/.X11-unix/X1:/tmp/.X11-unix/X1:ro
+      - /tmp/.X11-unix/{{ display_socket }}:/tmp/.X11-unix/X1:ro
     deploy:
       resources:
         limits:
@@ -33,4 +33,4 @@ services:
 networks:
   ros_net:
     external: true
-    name: remrob # - macvlan network
+    name: {{ network_name }} # - macvlan network

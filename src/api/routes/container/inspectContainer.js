@@ -4,19 +4,19 @@ export default async (req, res) => {
 	const { id } = req.params;
 
 	try {
-		const { Id, State, Config, NetworkSettings, Extrahosts } = await inspectContainer(id);
+		const { status, createdAt, ipAddress, image} = await inspectContainer(id);
 
 		res.json({
-			Id,
-			State,
-			Config,
-			NetworkSettings,
-			Extrahosts,
+			status,
+			createdAt,
+			ipAddress,
+			image,
 		});
 	} catch (err) {
 		if (err.statusCode === 404) {
 			res.status(404).send('No container with that ID');
 		} else {
+			console.log(err.message);
 			res.status(500).send('Server error: Failed to inspect container');
 		}
 	}

@@ -5,6 +5,7 @@ import config from 'config';
 import db from '../data/db.js';
 import { getInventoryTable } from '../session/inventory.js';
 import docker from './index.js';
+import { inspectContainer } from './containerManager.js';
 import calculateCpuPercentage from '../util/calculateCpuPercentage.js';
 
 const subnet = config.get('RobotNetworkSubnetPrefix');
@@ -19,53 +20,49 @@ const getInventoryStock = async (inventoryTableName) => {
 	return await db(inventoryTableName).select().orderBy(stockItemId, 'asc');
 };
 
-const getStats = async (containerId, vncUri) => {
+const getContainerInfo = async (containerId) => {
 	const container = docker.getContainer(containerId);
-
 	const containerStats = await container.stats({ stream: false }).catch(() => null);
-	const inspectData = await container.inspect({ stream: false }).catch(() => null);
 
-	const { State, Config, NetworkSettings, Extrahosts } = inspectData;
+	const inspectData = await inspectContainer(containerId).catch(() => null);
 
 	const cpu_percent = calculateCpuPercentage(containerStats);
 
 	return {
-		State,
-		Config,
-		NetworkSettings,
-		Extrahosts,
+		...inspectData,
 		cpu_percent,
-		vnc_uri: vncUri,
 	};
 };
 
 const containerMonitor = async (tableId, ws) => {
 	const inventoryStock = await getInventoryStock(tableId);
 
-	const calls = [];
-	const hosts = [];
-	const users = [];
+	const containerInfoCalls = [];
+	const hostsCalls = [];
+	const usersCalls = [];
 
-	inventoryStock.forEach(({ slug, vnc_uri, robot_id, user }) => {
-		calls.push(getStats(slug, vnc_uri));
+	inventoryStock.forEach(({ slug, robot_id, user }) => {
+		containerInfoCalls.push(getContainerInfo(slug));
 
 		if (tableId === ROBOT_INVENTORY_TABLE) {
 			const host = `${subnet}.${robot_id}`;
 
-			hosts.push(ping.promise.probe(host, { timeout: 1 }));
+			hostsCalls.push(ping.promise.probe(host, { timeout: 1 }));
 		}
 
-		users.push(db(USER_TABLE).where({ id: user }).first());
+		usersCalls.push(db(USER_TABLE).where({ id: user }).first());
 	});
 
-	const results = await Promise.allSettled(calls);
-	const pings = await Promise.allSettled(hosts);
-	const userInfo = await Promise.allSettled(users);
+	const results = await Promise.allSettled(containerInfoCalls);
+	const pings = await Promise.allSettled(hostsCalls);
+	const userInfo = await Promise.allSettled(usersCalls);
 
-	inventoryStock.forEach(({ robot_id, slug, user, end_time, issue }, index) => {
+	inventoryStock.forEach(({ robot_id, slug, end_time, vnc_uri }, index) => {
 		// add slug ID to know which container was rejected
 		results[index]['slug'] = slug;
 		results[index]['robot_id'] = robot_id;
+		results[index]['end_time'] = end_time;
+		results[index]['vnc_uri'] = vnc_uri;
 
 		if (userInfo[index].value != undefined) {
 			const { first_name, last_name } = userInfo[index].value;
@@ -74,14 +71,7 @@ const containerMonitor = async (tableId, ws) => {
 
 		if (tableId == ROBOT_INVENTORY_TABLE) {
 			results[index]['robot_status'] = pings[index].value.alive;
-		}
-
-		// add booking info about the specific container
-		results[index]['booking'] = {
-			user,
-			end_time,
-			issue,
-		};
+		}		
 	});
 
 	ws.send(JSON.stringify(results));

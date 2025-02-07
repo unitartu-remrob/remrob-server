@@ -6,7 +6,7 @@ import generator from 'generate-password';
 import { exec } from 'child_process';
 
 import config from 'config';
-import { USER_TABLE } from '../constants.js';
+import { USER_TABLE, ROS_VERSION_JAZZY } from '../constants.js';
 import db from '../data/db.js';
 import { getInventoryTable, getRobotCell } from './inventory.js';
 import {
@@ -17,6 +17,8 @@ import {
 
 const __dirname = import.meta.dirname;
 const composeRootPath = path.resolve(__dirname, '../../compose');
+
+const DEFAULT_IMAGE = config.get('AvailableImages').find((image => image.default === true));
 
 const isRecordingSubmissionsEnabled = config.get('RecordingSubmissionsEnabled');
 const userWorkspacesEnabled = config.get('UserWorkspacesEnabled');
@@ -45,13 +47,15 @@ export const getVncUrl = async (containerId, isSimtainer) => {
 };
 
 class SessionCompose {
-	constructor({ containerId, userId, userBooking, isAdmin, isSimtainer, useBaseImage }) {
+	constructor({ containerId, userId, userBooking, isAdmin, isSimtainer, rosVersion, imageTag }) {
 		this.containerId = containerId;
 		this.userId = userId;
 		this.userBooking = userBooking;
 		this.isAdmin = isAdmin;
 		this.isSimtainer = isSimtainer;
-		this.useBaseImage = useBaseImage;
+
+		this.rosVersion = rosVersion ?? DEFAULT_IMAGE.rosVersion;
+		this.imageTag = imageTag ?? DEFAULT_IMAGE.imageTag;
 
 		this.inventoryTable = getInventoryTable(isSimtainer);
 		this.sessionType = this.getSessionType(isSimtainer);
@@ -71,9 +75,11 @@ class SessionCompose {
 		}
 
 		// read in the template
+		
+
 		const composeFileHandle = path.join(
 			composeRootPath,
-			`${this.sessionType}/${this.containerId}.yaml`
+			`${this.sessionType}/${this.rosVersion}/${this.containerId}.yaml`
 		);
 
 		this.composeData = await readYamlFile(composeFileHandle);
@@ -150,6 +156,13 @@ class SessionCompose {
 			environment.push(`ROBOT_CELL=${cell}`);
 		}
 
+		if (this.rosVersion === ROS_VERSION_JAZZY) {
+			// ...get domain ID
+			const rosDomainId = 42
+			environment.push(`ROS_DOMAIN_ID=${rosDomainId}`);
+		}
+
+		this.composeData.services.vnc.image = this.imageTag;
 		this.composeData.services.vnc.environment = environment;
 
 		const vncUri = generateUrl(this.containerId, passwordToken);

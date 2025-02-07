@@ -7,5 +7,21 @@
 	},
 	"RobotNetworkSubnetPrefix": "192.168.200",
 	"RecordingSubmissionsEnabled": false,
-	"UserWorkspacesEnabled": false
+	"UserWorkspacesEnabled": false,
+	"AvailableImages": [
+		{
+			"label": "ROS Noetic - Robotont",
+			"rosVersion": "noetic",
+			"imageTag": "robotont:base",
+			"simulationExclusive": false,
+			"default": true
+		},
+		{	
+			"label": "ROS2 Jazzy - xArm",
+			"rosVersion": "jazzy",
+			"imageTag": "xarm:jazzy-cudagl",
+			"simulationExclusive": true,
+			"default": false
+		}
+	]
 }

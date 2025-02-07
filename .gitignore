@@ -1,8 +1,15 @@
 node_modules/
 .env
 
-# Generated compose files
-compose/local/temp/robo*
-compose/macvlan/temp/robo*
-compose/local/robo*
-compose/macvlan/robo*
+
+# Generated compose templates
+compose/macvlan/noetic/*
+compose/macvlan/jazzy/*
+
+compose/local/noetic/*
+compose/local/jazzy/*
+
+# Generated docker-compose files
+compose/local/temp/
+compose/macvlan/temp/
+

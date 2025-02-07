@@ -1,36 +1,33 @@
 services:
   vnc:
-    image: robotont:base
+    image: {{ image }}
     container_name: {{ name }}
     hostname: {{ name }}
     environment:
-      - ROS_MASTER=localhost
-      - PASSWORD=remrob # placeholder
+      - PASSWORD=remrob
       - VGL_DISPLAY=:1
     tmpfs:
       - /run
       - /run/lock
       - /tmp
-    cap_add:
-      - SYS_ADMIN
     volumes: 
       - /sys/fs/cgroup:/sys/fs/cgroup
-      - /tmp/.X11-unix/X1:/tmp/.X11-unix/X1
+      - /tmp/.X11-unix/{{ display_socket }}:/tmp/.X11-unix/X1:ro
+    cap_add:
+      - SYS_ADMIN
+      - SYS_BOOT
+    security_opt:
+      - 'apparmor=unconfined'
     ports:
       - {{ port }}:5902
     deploy:
       resources:
-        limits:
-          cpus: "3.0"
-          memory: 4096M
         reservations:
           devices:
             - driver: nvidia
               count: 'all'
               capabilities: [gpu]
-    networks:
-      - simtainers
 networks:
   simtainers:
     external: true
-    name: sim_net
+    name: {{ network_name }}

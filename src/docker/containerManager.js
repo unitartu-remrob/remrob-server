@@ -17,11 +17,13 @@ const startContainer = async (composeParams) => {
 			try {
 				await dockerCompose.upAll(containerConfig);
 			} catch (err) {
-				console.log('Error in starting the container via the compose file', err);
+				console.log('Error in starting the container via the compose file;', err);
 				throw err;
 			}
+		} else if (err.statusCode === 304) {
+			// container already running
 		} else {
-			console.log('Error in starting the container', err);
+			console.log('Error in starting the container;', err);
 			throw err;
 		}
 	}
@@ -29,8 +31,15 @@ const startContainer = async (composeParams) => {
 
 const inspectContainer = async (id) => {
 	const container = docker.getContainer(id);
+	
+	const { State, Config, NetworkSettings } = await container.inspect();
 
-	return await container.inspect();
+	return {
+		status: State.Status,
+		createdAt: State.StartedAt,
+		ipAddress: Object.values(NetworkSettings.Networks)[0].IPAddress,
+		image: Config.Image,
+	}
 };
 
 const getContainerStats = async (id) => {

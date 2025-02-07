@@ -7,13 +7,22 @@ export default async (req, res) => {
 		user: { sub: userId, is_administrator: isAdmin },
 		userBooking,
 	} = res.locals;
-	const { fresh } = req.query;
+
+	const { rosVersion, imageTag } = req.body;
 
 	const isSimtainer =
 		userBooking && !isAdmin ? userBooking.is_simulation : req.query.is_simulation === 'true';
 
 	try {
-		await startContainer({ containerId, userId, userBooking, isSimtainer, isAdmin, fresh });
+		await startContainer({
+			containerId,
+			userId,
+			userBooking,
+			isSimtainer,
+			isAdmin,
+			rosVersion,
+			imageTag
+		});
 
 		const vncUrl = await getVncUrl(containerId, isSimtainer);
 
