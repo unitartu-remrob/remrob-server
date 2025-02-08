@@ -69,7 +69,11 @@ const killContainer = async (id) => {
 	} catch (err) {
 		if (err.statusCode === 409) {
 			// container is already stopped -> remove it
-			await container.remove();
+			try {
+				await container.remove();
+			} catch (err) {
+				// container already removed
+			}
 		} else if (err.statusCode === 404) {
 			// container does not exist
 		} else {

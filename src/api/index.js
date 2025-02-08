@@ -30,7 +30,7 @@ export const mountWsRoutes = () => {
 
 router.get('/assign', [authenticateJWT, checkSession], assignContainer);
 
-router.get('/images', userHasActiveSessionOrIsAdmin, getContainerImages);
+router.get('/images', [authenticateJWT], getContainerImages);
 
 router.get('/inspect/:id', userHasActiveSessionOrIsAdmin, inspectContainer);
 router.get('/stats/:id', userHasActiveSessionOrIsAdmin, containerStats);

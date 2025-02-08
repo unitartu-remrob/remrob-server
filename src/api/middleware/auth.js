@@ -69,11 +69,6 @@ const checkSession = (req, res, next) => {
 	// get the user ID of who's trying to access container management
 	const { user } = res.locals;
 
-	if (user.is_administrator === true) {
-		// admin is not bound by any session
-		return next();
-	}
-
 	axios
 		.get(`${process.env.DB_SERVER}/bookings/${user.sub}`, {
 			headers: req.headers,
@@ -82,7 +77,7 @@ const checkSession = (req, res, next) => {
 			const { user_bookings: userBookings } = resp.data;
 			const activeBooking = verifyTimeInterval(userBookings);
 
-			if (activeBooking !== undefined) {
+			if (activeBooking !== undefined || user.is_administrator === true) { // admin is not bound by any session
 				res.locals.userBooking = activeBooking;
 				next();
 			} else {
