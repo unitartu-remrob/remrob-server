@@ -5,6 +5,7 @@ module.exports = {
 			script: 'index.js',
 			instances: '4',
 			exec_mode: 'cluster',
+			instance_var: 'INSTANCE_ID',
 			env_production: {
 				NODE_ENV: 'production',
 			},
