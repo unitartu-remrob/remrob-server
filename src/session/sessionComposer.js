@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import writeYamlFile from 'write-yaml-file';
 import readYamlFile from 'read-yaml-file';
 import generator from 'generate-password';
@@ -15,7 +16,9 @@ import {
 	updateOwncloudShareLink,
 } from './owncloud.js';
 
-const __dirname = import.meta.dirname;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const composeRootPath = path.resolve(__dirname, '../../compose');
 
 const DEFAULT_IMAGE = config.get('AvailableImages').find((image => image.default === true));
