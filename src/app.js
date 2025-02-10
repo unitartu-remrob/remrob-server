@@ -1,11 +1,15 @@
 import createError from 'http-errors';
 import express from 'express';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import expressWs from 'express-ws';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // load env
 dotenv.config();
@@ -20,7 +24,7 @@ import containerAPI, { mountWsRoutes } from './api/index.js';
 mountWsRoutes();
 
 // view engine setup
-app.set('views', path.join(import.meta.dirname, 'views'));
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
 app.use(cors());
