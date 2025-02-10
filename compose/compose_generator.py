@@ -1,15 +1,20 @@
 import yaml
 from jinja2 import Environment, FileSystemLoader
 
+USE_NVIDIA_RUNTIME = False
+
 # Default params
 #----------------
-DEFAULT_IMAGE_NOETIC = "remrob:noetic-cudagl"
-DEFAULT_IMAGE_JAZZY = "remrob:jazzy-cudagl"
+if USE_NVIDIA_RUNTIME:
+	DEFAULT_IMAGE_NOETIC = "remrob:noetic-cudagl"
+	DEFAULT_IMAGE_JAZZY = "remrob:jazzy-cudagl"
+else:
+	DEFAULT_IMAGE_NOETIC = "remrob:noetic-base"
+	DEFAULT_IMAGE_JAZZY = "remrob:jazzy-base"
 
 DISPLAY_SOCKET = "X1"
 MACVLAN_NETWORK_NAME = "remrob"
 SIMULATION_NETWORK_NAME = "sim_net"
-
 #----------------
 
 # Constants
@@ -17,6 +22,7 @@ ROS_VERSION_NOETIC = "noetic"
 ROS_VERSION_JAZZY = "jazzy"
 MACVLAN = 'macvlan'
 LOCAL = 'local'
+NVIDIA_SUFFIX = '-nvidia'
 
 
 TEMPLATES = Environment(loader = FileSystemLoader('./templates'), trim_blocks=True, lstrip_blocks=True)
@@ -26,7 +32,12 @@ CONFIG_LOCAL = yaml.safe_load(open('config/config-local.yaml'))
 
 
 def get_template(ros_version, template_type):
-	return TEMPLATES.get_template(f'{ros_version}/{template_type}.j2')
+	if (USE_NVIDIA_RUNTIME):
+		file = f'{ros_version}/{template_type}{NVIDIA_SUFFIX}.j2'
+	else:
+		file = f'{ros_version}/{template_type}.j2'
+
+	return TEMPLATES.get_template(file)
 
 
 def write_generated_file(file_name, output):

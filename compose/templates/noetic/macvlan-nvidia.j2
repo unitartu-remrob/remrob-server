@@ -8,6 +8,7 @@ services:
     environment:
       - ROS_MASTER={{ robotont }} # Will be used to set master in ~/.bashrc
       - PASSWORD=remrob # placeholder
+      - VGL_DISPLAY=:1
     tmpfs:
       - /run
       - /run/lock
@@ -16,10 +17,16 @@ services:
       - SYS_ADMIN
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup
+      - /tmp/.X11-unix/{{ display_socket }}:/tmp/.X11-unix/X1:ro
     deploy:
       resources:
         limits:
           memory: 4096M
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     networks:
       ros_net:
         ipv4_address: {{ self_ip }}

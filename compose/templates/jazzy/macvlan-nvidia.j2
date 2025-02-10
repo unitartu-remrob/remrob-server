@@ -5,12 +5,14 @@ services:
     hostname: {{ name }}
     environment:
       - PASSWORD=remrob
+      - VGL_DISPLAY=:1
     tmpfs:
       - /run
       - /run/lock
       - /tmp
     volumes: 
       - /sys/fs/cgroup:/sys/fs/cgroup
+      - /tmp/.X11-unix/{{ display_socket }}:/tmp/.X11-unix/X1:ro
     cap_add:
       - SYS_ADMIN
       - SYS_BOOT
@@ -18,7 +20,19 @@ services:
       - 'apparmor=unconfined'
     ports:
       - {{ port }}:5902
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 'all'
+              capabilities: [gpu]
+    networks:
+      ros_net:
+        ipv4_address: {{ self_ip }}
 networks:
-  simtainers:
+  ros_net:
     external: true
-    name: {{ network_name }}
+    name: {{ network_name }} # - macvlan network
+    
+    
