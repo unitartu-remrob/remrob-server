@@ -1,7 +1,13 @@
 import yaml
 from jinja2 import Environment, FileSystemLoader
+import argparse
 
-USE_NVIDIA_RUNTIME = False
+parser = argparse.ArgumentParser(description='Compose Generator')
+parser.add_argument('--nvidia', action='store_true', help='use HW accelerated container compose templates')
+
+args = parser.parse_args()
+
+USE_NVIDIA_RUNTIME = args.nvidia
 
 # Default params
 #----------------
