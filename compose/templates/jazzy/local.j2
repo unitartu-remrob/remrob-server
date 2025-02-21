@@ -5,6 +5,7 @@ services:
     hostname: {{ name }}
     environment:
       - PASSWORD=remrob
+      - ROS_DOMAIN_ID={{ ros_domain_id }}
     tmpfs:
       - /run
       - /run/lock
