@@ -1,13 +1,21 @@
+#!/usr/bin/python3
+
 import yaml
 from jinja2 import Environment, FileSystemLoader
 import argparse
 
 parser = argparse.ArgumentParser(description='Compose Generator')
 parser.add_argument('--nvidia', action='store_true', help='use HW accelerated container compose templates')
+parser.add_argument('--xsocket', type=str, help='X11 display socket to use for VirtualGL')
+parser.add_argument('--macvlan', type=str, help='Docker MACVLAN network name')
+parser.add_argument('--sim-net', type=str, help='Docker bridge network name (for simulation containers)')
 
 args = parser.parse_args()
 
 USE_NVIDIA_RUNTIME = args.nvidia
+DISPLAY_SOCKET = "X1" if args.xsocket == None else args.xsocket
+MACVLAN_NETWORK_NAME = "remrob" if args.macvlan == None else args.macvlan
+SIMULATION_NETWORK_NAME = "sim_net" if args.sim_net == None else args.sim_net
 
 # Default params
 #----------------
@@ -17,10 +25,6 @@ if USE_NVIDIA_RUNTIME:
 else:
 	DEFAULT_IMAGE_NOETIC = "remrob:noetic-base"
 	DEFAULT_IMAGE_JAZZY = "remrob:jazzy-base"
-
-DISPLAY_SOCKET = "X1"
-MACVLAN_NETWORK_NAME = "remrob"
-SIMULATION_NETWORK_NAME = "sim_net"
 #----------------
 
 # Constants
