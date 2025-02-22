@@ -1,6 +1,6 @@
 {
 	"Time": {
-		"UTC_OFFSET": 2
+		"UTC_OFFSET": 3
 	},
 	"Network": {
 		"SUBNET_PREFIX": "192.168.200"
@@ -12,7 +12,7 @@
 		{
 			"label": "ROS Noetic - Robotont",
 			"rosVersion": "noetic",
-			"imageTag": "robotont:base",
+			"imageTag": "robotont:noetic-cudagl",
 			"simulationExclusive": false,
 			"default": true
 		},
@@ -21,6 +21,13 @@
 			"rosVersion": "jazzy",
 			"imageTag": "xarm:jazzy-cudagl",
 			"simulationExclusive": true,
+			"default": false
+		},
+		{	
+			"label": "ROS2 Jazzy - Robotont",
+			"rosVersion": "jazzy",
+			"imageTag": "robotont:jazzy-cudagl",
+			"simulationExclusive": false,
 			"default": false
 		}
 	]
