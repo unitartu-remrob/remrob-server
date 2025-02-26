@@ -159,12 +159,6 @@ class SessionCompose {
 			environment.push(`ROBOT_CELL=${cell}`);
 		}
 
-		if (this.rosVersion === ROS_VERSION_JAZZY) {
-			// ...get domain ID
-			const rosDomainId = 42
-			environment.push(`ROS_DOMAIN_ID=${rosDomainId}`);
-		}
-
 		this.composeData.services.vnc.image = this.imageTag;
 		this.composeData.services.vnc.environment = environment;
 
