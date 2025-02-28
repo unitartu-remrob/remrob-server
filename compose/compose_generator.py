@@ -97,12 +97,13 @@ def render_local_templates(ros_version):
 	}
 
 	image = DEFAULT_IMAGE_NOETIC if ros_version == ROS_VERSION_NOETIC else DEFAULT_IMAGE_JAZZY
-
+	
 	for i, robot in enumerate(CONFIG_LOCAL):
 		output = j2_template.render(
 			name=robot["name"],
 			port=robot["port"],
 			image=image,
+			ros_domain_id=50+i+1 if ros_version == ROS_VERSION_JAZZY else None,
 			**default_sim_params
 		)
 		write_generated_file(f"./{LOCAL}/{ros_version}/robosim-{i+1}.yaml", output)
