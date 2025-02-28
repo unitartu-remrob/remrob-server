@@ -1,3 +1,5 @@
+.venv
+
 # Generated compose templates
 macvlan/noetic/*
 !macvlan/noetic/generated_templates_go_here
