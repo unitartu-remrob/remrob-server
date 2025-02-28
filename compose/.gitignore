@@ -1,0 +1,17 @@
+# Generated compose templates
+macvlan/noetic/*
+!macvlan/noetic/generated_templates_go_here
+macvlan/jazzy/*
+!macvlan/jazzy/generated_templates_go_here
+
+local/noetic/*
+!local/noetic/generated_templates_go_here
+local/jazzy/*
+!local/jazzy/generated_templates_go_here
+
+# Generated session docker-compose files
+local/temp/*
+!local/temp/session_compose_files
+
+macvlan/temp/*
+!macvlan/temp/session_compose_files
