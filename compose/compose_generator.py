@@ -70,7 +70,7 @@ def render_macvlan_templates(ros_version):
 		if ros_version == ROS_VERSION_NOETIC:
 			output = j2_template.render(
 				name=robot["name"],
-				robotont=robot["master_name"],
+				robot_hostname=robot["master_name"],
 				master_ip=robot["master_ip"],
 				self_ip=robot["self_ip"],
 				image=DEFAULT_IMAGE_NOETIC,

@@ -4,9 +4,9 @@ services:
     container_name: {{ name }}
     hostname: {{ name }}
     extra_hosts:
-      - "{{ robotont }}:{{ master_ip }}"
+      - "{{ robot_hostname }}:{{ master_ip }}"
     environment:
-      - ROS_MASTER={{ robotont }} # Will be used to set master in ~/.bashrc
+      - ROS_MASTER={{ robot_hostname }} # Will be used to set master in ~/.bashrc
       - PASSWORD=remrob # placeholder
     tmpfs:
       - /run
