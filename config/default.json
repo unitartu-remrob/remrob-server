@@ -2,13 +2,26 @@
 	"Time": {
 		"UTC_OFFSET": 3
 	},
-	"Network": {
-		"SUBNET_PREFIX": "192.168.200"
-	},
 	"RobotNetworkSubnetPrefix": "192.168.200",
 	"RecordingSubmissionsEnabled": false,
 	"UserWorkspacesEnabled": false,
-	"AvailableImages": [
+	"RemrobDockerImages": [
+		{
+			"label": "ROS Noetic",
+			"rosVersion": "noetic",
+			"imageTag": "remrob:noetic-base",
+			"overridenBy": "remrob:noetic-cudagl",
+			"simulationExclusive": false,
+			"default": false
+		},
+		{
+			"label": "ROS2 Jazzy",
+			"rosVersion": "jazzy",
+			"imageTag": "remrob:jazzy-base",
+			"overridenBy": "remrob:jazzy-cudagl",
+			"simulationExclusive": false,
+			"default": false
+		},
 		{
 			"label": "ROS Noetic - Robotont",
 			"rosVersion": "noetic",

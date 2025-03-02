@@ -21,7 +21,7 @@ const __dirname = path.dirname(__filename);
 
 const composeRootPath = path.resolve(__dirname, '../../compose');
 
-const DEFAULT_IMAGE = config.get('AvailableImages').find((image => image.default === true));
+const DEFAULT_IMAGE = config.get('RemrobDockerImages').find((image => image.default === true));
 
 const isRecordingSubmissionsEnabled = config.get('RecordingSubmissionsEnabled');
 const userWorkspacesEnabled = config.get('UserWorkspacesEnabled');

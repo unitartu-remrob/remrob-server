@@ -13,7 +13,7 @@ import { liveStats, robotMonitor } from '../docker/containerMonitor.js';
 
 import assignContainer from './routes/assignContainer.js';
 
-import getContainerImages from './routes/getContainerImages.js';
+import getImages from './routes/getImages.js';
 
 import startContainer from './routes/container/startContainer.js';
 import inspectContainer from './routes/container/inspectContainer.js';
@@ -30,7 +30,7 @@ export const mountWsRoutes = () => {
 
 router.get('/assign', [authenticateJWT, checkSession], assignContainer);
 
-router.get('/images', [authenticateJWT], getContainerImages);
+router.get('/images', [authenticateJWT], getImages);
 
 router.get('/inspect/:id', userHasActiveSessionOrIsAdmin, inspectContainer);
 router.get('/stats/:id', userHasActiveSessionOrIsAdmin, containerStats);
