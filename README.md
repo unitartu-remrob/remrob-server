@@ -1,47 +1,86 @@
-## API for starting and managing live noVNC container sessions
+# REMROB: a web-based robotics learning and development environment
 
-Requires websockify, can install with apt (`sudo apt install websockify`)
+|   |   |
+|---|---|
+![GNOME ROS VNC](./docs/user-panel.png) | ![GNOME ROS VNC](./docs/user-session.png)
+![GNOME ROS VNC](./docs/sim-panel.png) | ![GNOME ROS VNC](./docs/browser-desktop.png)
 
-1. Install the server modules
+## Introduction
 
-    `npm install`
+Remrob is a web application for a remote web lab that offers an authentic ROS development experience by serving in-browser desktop workstations with the help of [noVNC](https://github.com/novnc/noVNC). Docker containers are used to encapsulate the workstations of which there are two types - simulation and physical robot enabled environments. The users are able to reserve access to the remote lab through a time slot booking module.
 
-2. Run the noVNC client on port 6085
+See ["Open Remote Web Lab for Learning Robotics and ROS With Physical and Simulated Robots in an Authentic Developer Environment"](https://ieeexplore.ieee.org/document/10480223) published in IEEE Transactions on Learning Technologies for more details.
 
-    `npm run vnc-client`
+Demo video: https://www.youtube.com/watch?v=FGVpwIwRrwc
 
-    If the 6085 port is being proxied via `/novnc` path then the containers running VNC servers can now be excessed with a link of the following format:
+## Remrob installation
 
-    http://localhost/novnc/vnc.html?autoconnect=true&resize=remote&password=remrob&path=novnc?token=robo-1
-
-3. Run the server
-
-    `npm run server`
-
-
-### Dev server with hot updates
-
-`npm run dev`
+See https://github.com/unitartu-remrob/remrob-setup for installation instructions.
 
 ---
 
-To change to ip's of different subnet being used (other than 192.168.200.192/27), modify the compose config under `compose/config` and run the Jinja2 template parser (`compose_generator.py`), to enable connections also change `websockify-token.cfg`
+# remrob-server: ROS-VNC container management API
 
+The remrob-server is a Node.js app for launching [ROS-VNC containers](https://github.com/unitartu-remrob/remrob-docker) via an API.
 
-### Running as an auto-restarting background process under systemd
+The app provides authentication and authorization layers, and uses Docker compose to craft user-specific container environments.
+
+## Requirements
+
+- Node v20
+- Docker & Docker compose
+
+## Setup
+
+```
+npm install
+```
+
+### Dev server with hot updates
+
+```
+npm run dev
+```
+
+### Production server
+
+```
+npm run server
+```
+
+### Running multiple instances with pm2
 
 Install the pm2 daemon process manager (available via npm)
 
     npm install pm2@latest -g
 
+Start with pm2:
+
+    npm run pm2:cluster
+
+Run as a persistent background process:
+
     pm2 startup // follow instructions
 
-    pm2 start ecosystem.config.js
+    pm2 start ecosystem.config.cjs
 
-Restart with changes
+Check status:
+
+    pm2 status remrob
+
+Restart with changes:
 
     pm2 reload remrob
 
-Stream logs
+Stream logs:
 
     pm2 logs
+
+
+&nbsp;&nbsp;
+
+# Acknowledgments
+
+Completed with the support by IT Academy Programme of Education and Youth Board of Estonia.
+
+Valminud Haridus- ja Noorteameti IT Akadeemia programmi toel.
