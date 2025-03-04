@@ -8,7 +8,7 @@ export default async (req, res) => {
 	try {
 		const stats = await getContainerStats(id);
 		const inspectData = await inspectContainer(id);
-		const cpuPercentage = calculateCpuPercentage(stats);	
+		const cpuPercentage = calculateCpuPercentage(stats);
 
 		res.json({
 			...inspectData,

@@ -77,7 +77,8 @@ const checkSession = (req, res, next) => {
 			const { user_bookings: userBookings } = resp.data;
 			const activeBooking = verifyTimeInterval(userBookings);
 
-			if (activeBooking !== undefined || user.is_administrator === true) { // admin is not bound by any session
+			if (activeBooking !== undefined || user.is_administrator === true) {
+				// admin is not bound by any session
 				res.locals.userBooking = activeBooking;
 				next();
 			} else {

@@ -4,7 +4,7 @@ export default async (req, res) => {
 	const { id } = req.params;
 
 	try {
-		const { status, createdAt, ipAddress, image} = await inspectContainer(id);
+		const { status, createdAt, ipAddress, image } = await inspectContainer(id);
 
 		res.json({
 			status,

@@ -7,7 +7,7 @@ import generator from 'generate-password';
 import { exec } from 'child_process';
 
 import config from 'config';
-import { USER_TABLE, ROS_VERSION_JAZZY } from '../constants.js';
+import { USER_TABLE } from '../constants.js';
 import db from '../data/db.js';
 import { getInventoryTable, getRobotCell } from './inventory.js';
 import {
@@ -21,7 +21,7 @@ const __dirname = path.dirname(__filename);
 
 const composeRootPath = path.resolve(__dirname, '../../compose');
 
-const DEFAULT_IMAGE = config.get('RemrobDockerImages').find((image => image.default === true));
+const DEFAULT_IMAGE = config.get('RemrobDockerImages').find((image) => image.default === true);
 
 const isRecordingSubmissionsEnabled = config.get('RecordingSubmissionsEnabled');
 const userWorkspacesEnabled = config.get('UserWorkspacesEnabled');
@@ -78,7 +78,6 @@ class SessionCompose {
 		}
 
 		// read in the template
-		
 
 		const composeFileHandle = path.join(
 			composeRootPath,
@@ -251,7 +250,8 @@ class SessionCompose {
 			setTimeout(() => {
 				this.initHomeworkSubmissionFolder();
 			}, 310000);
-		} else { // submission folder exists for the user
+		} else {
+			// submission folder exists for the user
 
 			// check if the user has a share token in case the previous share request failed due to sync issues
 			const owncloud_id = getOwncloudShareLink(this.userId);

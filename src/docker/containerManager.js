@@ -31,7 +31,7 @@ const startContainer = async (composeParams) => {
 
 const inspectContainer = async (id) => {
 	const container = docker.getContainer(id);
-	
+
 	const { State, Config, NetworkSettings } = await container.inspect();
 
 	return {
@@ -39,7 +39,7 @@ const inspectContainer = async (id) => {
 		createdAt: State.StartedAt,
 		ipAddress: Object.values(NetworkSettings.Networks)[0].IPAddress,
 		image: Config.Image,
-	}
+	};
 };
 
 const getContainerStats = async (id) => {

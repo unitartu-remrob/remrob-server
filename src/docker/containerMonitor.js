@@ -75,7 +75,7 @@ const containerMonitor = async (tableId, ws) => {
 
 		if (tableId == ROBOT_INVENTORY_TABLE) {
 			results[index]['robot_status'] = pings[index].value.alive;
-		}		
+		}
 	});
 
 	ws.send(JSON.stringify(results));

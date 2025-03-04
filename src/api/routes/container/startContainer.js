@@ -21,7 +21,7 @@ export default async (req, res) => {
 			isSimtainer,
 			isAdmin,
 			rosVersion,
-			imageTag
+			imageTag,
 		});
 
 		const vncUrl = await getVncUrl(containerId, isSimtainer);
