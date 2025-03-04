@@ -1,33 +1,32 @@
-import config from 'config';
-
 import {
 	getInventoryTable,
 	checkIfUserAlreadyHasItem,
 	findFreeInventoryItem,
 	lockInventoryItem,
+	lockPublicContainer,
 } from './inventory.js';
 
-import { markBookingAsActivated } from './booking.js';
+import { generatePublicSessionCookieToken } from '../util/cookies.js';
+import ErrorWithStatus from '../util/erorrs.js';
 
-const UTC_OFFSET = config.get('Time.UTC_OFFSET');
+import { SIMTAINER_INVENTORY_TABLE } from '../constants.js';
+import { markBookingAsActivated } from './booking.js';
 
 const assignContainer = async (user, userBooking) => {
 	const isSimtainer = userBooking.is_simulation;
 	const bookingId = userBooking.id;
 
 	const inventoryTable = getInventoryTable(isSimtainer);
-	const currentTime = new Date(new Date().getTime() + UTC_OFFSET * 3600000).toISOString();
-
-	const inventoryItem = await checkIfUserAlreadyHasItem(inventoryTable, user, currentTime);
+	const inventoryItem = await checkIfUserAlreadyHasItem(inventoryTable, user);
 
 	if (inventoryItem !== null) {
 		return inventoryItem;
 	}
 
-	const freeItem = await findFreeInventoryItem(inventoryTable, currentTime);
+	const freeItem = await findFreeInventoryItem(inventoryTable);
 
 	if (freeItem === null) {
-		throw new Error('No free inventory available');
+		throw new ErrorWithStatus('No free inventory available', 404);
 	}
 
 	const lockedItem = await lockInventoryItem(inventoryTable, freeItem, user, userBooking);
@@ -36,4 +35,17 @@ const assignContainer = async (user, userBooking) => {
 	return lockedItem;
 };
 
-export { assignContainer };
+const claimPublicContainer = async () => {
+	const freeItem = await findFreeInventoryItem(SIMTAINER_INVENTORY_TABLE, true);
+
+	if (freeItem === null) {
+		throw new ErrorWithStatus('No free inventory available', 404);
+	}
+
+	const publicSessionCookieToken = generatePublicSessionCookieToken();
+	const lockedItem = await lockPublicContainer(freeItem, publicSessionCookieToken);
+
+	return lockedItem;
+};
+
+export { assignContainer, claimPublicContainer };

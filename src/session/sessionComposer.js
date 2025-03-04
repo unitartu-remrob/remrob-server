@@ -26,8 +26,10 @@ const DEFAULT_IMAGE = config.get('RemrobDockerImages').find((image) => image.def
 const isRecordingSubmissionsEnabled = config.get('RecordingSubmissionsEnabled');
 const userWorkspacesEnabled = config.get('UserWorkspacesEnabled');
 
-export const composeContainerConfig = async (composeParams) => {
-	const composeFilePath = await new SessionCompose(composeParams).generateComposeFile();
+export const composeContainerConfig = async (composeParams, isPublicContainer) => {
+	const composeFilePath = await new SessionCompose(composeParams).generateComposeFile(
+		isPublicContainer
+	);
 
 	return {
 		cwd: composeFilePath,
@@ -66,7 +68,7 @@ class SessionCompose {
 		this.composeData = null;
 	}
 
-	generateComposeFile = async () => {
+	generateComposeFile = async (isPublicContainer) => {
 		// create a separate directory for the generated compose file
 		const composeDir = path.join(
 			composeRootPath,
@@ -78,7 +80,6 @@ class SessionCompose {
 		}
 
 		// read in the template
-
 		const composeFileHandle = path.join(
 			composeRootPath,
 			`${this.sessionType}/${this.rosVersion}/${this.containerId}.yaml`
@@ -86,7 +87,11 @@ class SessionCompose {
 
 		this.composeData = await readYamlFile(composeFileHandle);
 		await this.setEnvironment();
-		await this.setVolumeMounts();
+
+		console.log('isPublicContainer', isPublicContainer);
+		if (!isPublicContainer) {
+			await this.setVolumeMounts();
+		}
 
 		// write out the compose file to be used for a session
 		const tempFile = path.join(
@@ -172,7 +177,7 @@ class SessionCompose {
 			},
 		} = this.composeData;
 
-		const { first_name, last_name } = await this.getUserName(this.userId);
+		const { first_name, last_name } = await this.getUserName();
 
 		const clean_name = this.cleanChars(first_name);
 		const clean_surname = this.cleanChars(last_name);

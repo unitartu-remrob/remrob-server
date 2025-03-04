@@ -1,5 +1,23 @@
 import { startContainer } from '../../../docker/containerManager.js';
 import { getVncUrl } from '../../../session/sessionComposer.js';
+import ErrorWithStatus from '../../../util/erorrs.js';
+import { getAvailableRemrobImages } from '../getImages.js';
+
+export const validateImageParams = async (rosVersion, imageTag) => {
+	if (!rosVersion || !imageTag) {
+		throw new ErrorWithStatus('Missing required parameters: rosVersion, imageTag', 400);
+	}
+
+	const remrobImages = await getAvailableRemrobImages();
+
+	const image = remrobImages.find(
+		(image) => image.rosVersion === rosVersion && image.imageTag === imageTag
+	);
+
+	if (!image) {
+		throw new ErrorWithStatus(`ROS ${rosVersion} image ${imageTag} not present`, 400);
+	}
+};
 
 export default async (req, res) => {
 	const { id: containerId } = req.params; // id = robo(sim)-{x}
@@ -14,6 +32,8 @@ export default async (req, res) => {
 		userBooking && !isAdmin ? userBooking.is_simulation : req.query.is_simulation === 'true';
 
 	try {
+		await validateImageParams(rosVersion, imageTag);
+
 		await startContainer({
 			containerId,
 			userId,
@@ -28,6 +48,10 @@ export default async (req, res) => {
 
 		res.json({ path: vncUrl });
 	} catch (err) {
-		res.status(500).json(`Failed to start container: ${err.message}`);
+		if (err.statusCode === 400) {
+			return res.status(400).json(err.message);
+		} else {
+			res.status(500).json('Server error: Failed to start container');
+		}
 	}
 };

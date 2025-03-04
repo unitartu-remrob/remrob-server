@@ -6,6 +6,7 @@ import axios from 'axios';
 import db from '../../data/db.js';
 import verifyTimeInterval from '../../util/time.js';
 import { getInventoryTable } from '../../session/inventory.js';
+import { verifyPublicSessionToken } from '../../session/inventory.js';
 
 const verifyToken = (token, callback) => {
 	return jwt.verify(token, process.env.JWT_SECRET, callback);
@@ -119,10 +120,29 @@ const checkContainerOwnership = (req, res, next) => {
 		});
 };
 
+const authenticatePublicSessionCookie = async (req, res, next) => {
+	const token = req.cookies.remrob_session_cookie;
+
+	if (!token) {
+		return res.sendStatus(401);
+	}
+
+	const publicContainer = await verifyPublicSessionToken(token);
+
+	if (!publicContainer) {
+		return res.sendStatus(401);
+	}
+
+	res.locals.simtainer_id = publicContainer.slug;
+
+	next();
+};
+
 export {
 	authenticateJWT,
 	authenticateAdminJWT,
 	authenticateAdminJWTWebSocket,
 	checkSession,
 	checkContainerOwnership,
+	authenticatePublicSessionCookie,
 };

@@ -14,6 +14,6 @@ export default async (_, res) => {
 		res.json(container);
 	} catch (err) {
 		console.log(err);
-		res.send(`error: ${err.message}`);
+		res.status(500).send('Server error: Failed to stop container');
 	}
 };

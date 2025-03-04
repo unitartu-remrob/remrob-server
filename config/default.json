@@ -1,7 +1,6 @@
 {
-	"Time": {
-		"UTC_OFFSET": 3
-	},
+	"UTC_OFFSET_HOURS": 2,
+	"PublicSessionTimeoutMinutes": 60,
 	"RobotNetworkSubnetPrefix": "192.168.200",
 	"RecordingSubmissionsEnabled": false,
 	"UserWorkspacesEnabled": false,
@@ -29,14 +28,14 @@
 			"simulationExclusive": false,
 			"default": true
 		},
-		{	
+		{
 			"label": "ROS2 Jazzy - xArm",
 			"rosVersion": "jazzy",
 			"imageTag": "xarm:jazzy-cudagl",
 			"simulationExclusive": true,
 			"default": false
 		},
-		{	
+		{
 			"label": "ROS2 Jazzy - Robotont",
 			"rosVersion": "jazzy",
 			"imageTag": "robotont:jazzy-cudagl",

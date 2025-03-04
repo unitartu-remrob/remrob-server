@@ -3,12 +3,11 @@ import getDockerImages from '../../docker/getDockerImages.js';
 
 const remrobImages = config.get('RemrobDockerImages');
 
-const overrides = remrobImages.filter((image) => image.overridenBy !== undefined);
-
-export default async (_, res) => {
+export const getAvailableRemrobImages = async () => {
 	const builtImages = await getDockerImages();
+	const overrides = remrobImages.filter((image) => image.overridenBy !== undefined);
 
-	const remrobAvailableImages = remrobImages
+	return remrobImages
 		.filter((image) => builtImages.includes(image.imageTag))
 		.map((image) => {
 			const override = overrides.find(
@@ -22,6 +21,10 @@ export default async (_, res) => {
 
 			return override ? { ...image, imageTag: override.overridenBy } : image;
 		});
+};
+
+export default async (_, res) => {
+	const remrobAvailableImages = await getAvailableRemrobImages();
 
 	res.json(remrobAvailableImages);
 };

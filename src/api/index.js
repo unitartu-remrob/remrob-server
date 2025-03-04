@@ -7,11 +7,18 @@ import {
 	authenticateAdminJWTWebSocket,
 	checkSession,
 	checkContainerOwnership,
+	authenticatePublicSessionCookie,
 } from './middleware/auth.js';
 
 import { liveStats, robotMonitor } from '../docker/containerMonitor.js';
 
 import assignContainer from './routes/assignContainer.js';
+
+import claimPublicContainer from './routes/claimPublicContainer.js';
+import startPublicContainer from './routes/container/public/startContainer.js';
+import stopPublicContainer from './routes/container/public/stopContainer.js';
+import removePublicContainer from './routes/container/public/removeContainer.js';
+import inspectPublicContainer from './routes/container/public/inspectContainer.js';
 
 import getImages from './routes/getImages.js';
 
@@ -28,9 +35,16 @@ export const mountWsRoutes = () => {
 	router.ws('/robot-status/:id', robotMonitor);
 };
 
-router.get('/assign', [authenticateJWT, checkSession], assignContainer);
+// Public endpoints
+router.get('/images', getImages);
+router.get('/claim', claimPublicContainer);
+router.post('/start-public-container', authenticatePublicSessionCookie, startPublicContainer);
+router.post('/stop-public-container', authenticatePublicSessionCookie, stopPublicContainer);
+router.post('/remove-public-container', authenticatePublicSessionCookie, removePublicContainer);
+router.post('/inspect-public-container', authenticatePublicSessionCookie, inspectPublicContainer);
 
-router.get('/images', [authenticateJWT], getImages);
+// Authenticated user endpoints
+router.get('/assign', [authenticateJWT, checkSession], assignContainer);
 
 router.get('/inspect/:id', userHasActiveSessionOrIsAdmin, inspectContainer);
 router.get('/stats/:id', userHasActiveSessionOrIsAdmin, containerStats);

@@ -3,7 +3,7 @@ import dockerCompose from 'docker-compose';
 
 import { composeContainerConfig } from '../session/sessionComposer.js';
 
-const startContainer = async (composeParams) => {
+const startContainer = async (composeParams, isPublicContainer = false) => {
 	const id = composeParams.containerId;
 	const container = docker.getContainer(id);
 
@@ -12,7 +12,7 @@ const startContainer = async (composeParams) => {
 	} catch (err) {
 		if (err.statusCode === 404) {
 			// container does not exist -> start it via compose
-			const containerConfig = await composeContainerConfig(composeParams);
+			const containerConfig = await composeContainerConfig(composeParams, isPublicContainer);
 
 			try {
 				await dockerCompose.upAll(containerConfig);
