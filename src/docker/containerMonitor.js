@@ -57,12 +57,16 @@ const containerMonitor = async (tableId, ws) => {
 	const pings = await Promise.allSettled(hostsCalls);
 	const userInfo = await Promise.allSettled(usersCalls);
 
-	inventoryStock.forEach(({ robot_id, slug, end_time, vnc_uri }, index) => {
+	inventoryStock.forEach(({ robot_id, slug, end_time, vnc_uri, open_to_public }, index) => {
 		// add slug ID to know which container was rejected
 		results[index]['slug'] = slug;
 		results[index]['robot_id'] = robot_id;
 		results[index]['end_time'] = end_time;
 		results[index]['vnc_uri'] = vnc_uri;
+
+		if (tableId == SIMTAINER_INVENTORY_TABLE) {
+			results[index]['open_to_public'] = open_to_public;
+		}
 
 		if (userInfo[index].value != undefined) {
 			const { first_name, last_name } = userInfo[index].value;
