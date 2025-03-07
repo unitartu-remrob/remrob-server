@@ -1,4 +1,4 @@
-import { assignContainer } from '../../session/assignment.js';
+import { assignContainer } from '../../../session/assignment.js';
 
 export default async (_, res) => {
 	const { user, userBooking } = res.locals;
@@ -14,6 +14,6 @@ export default async (_, res) => {
 		res.json(container);
 	} catch (err) {
 		console.log(err);
-		res.status(500).send('Server error: Failed to stop container');
+		res.status(500).send('Server error: Failed to assign container');
 	}
 };

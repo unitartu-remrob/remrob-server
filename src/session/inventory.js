@@ -40,7 +40,7 @@ const checkIfUserAlreadyHasItem = async (inventoryTable, user) => {
 	}
 };
 
-const findFreeInventoryItem = async (inventoryTable, searchForPublic = false) => {
+const findFreeInventoryItem = async (inventoryTable, publicContainerId = null) => {
 	const query = db(inventoryTable)
 		.first()
 		.where(function () {
@@ -54,10 +54,11 @@ const findFreeInventoryItem = async (inventoryTable, searchForPublic = false) =>
 		query.andWhere({ status: true });
 	}
 
-	if (searchForPublic) {
+	if (publicContainerId) {
 		query.andWhere({
 			open_to_public: true,
 			public_user: null,
+			slug: publicContainerId,
 		});
 	}
 
@@ -89,6 +90,15 @@ const lockInventoryItem = async (inventoryTable, inventoryItem, user, userBookin
 	return lockedItem;
 };
 
+const getPublicContainers = async () => {
+	return await db(SIMTAINER_INVENTORY_TABLE)
+		.where({
+			open_to_public: true,
+			user: null,
+		})
+		.select(['container_id', 'slug', 'end_time', 'public_user']);
+}
+
 const lockPublicContainer = async (inventoryItem, sessionToken) => {
 	const sessionExpirationTime = getExpirationDate(PUBLIC_SESSION_TIMEOUT);
 
@@ -110,6 +120,16 @@ const lockPublicContainer = async (inventoryItem, sessionToken) => {
 
 	return lockedItem;
 };
+
+const unlockPublicContainer = async (slug) => {
+	const cleanUpPayload = {
+		public_user: null,
+		end_time: null,
+	};
+
+	await db(SIMTAINER_INVENTORY_TABLE).update(cleanUpPayload).where('slug', slug);
+	killContainer(slug);
+}
 
 const verifyPublicSessionToken = async (sessionToken) => {
 	const publicContainer = await db(SIMTAINER_INVENTORY_TABLE)
@@ -153,7 +173,9 @@ export {
 	getRobotCell,
 	checkIfUserAlreadyHasItem,
 	findFreeInventoryItem,
+	getPublicContainers,
 	lockInventoryItem,
 	verifyPublicSessionToken,
 	lockPublicContainer,
+	unlockPublicContainer,
 };

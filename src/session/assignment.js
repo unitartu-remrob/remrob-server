@@ -35,15 +35,15 @@ const assignContainer = async (user, userBooking) => {
 	return lockedItem;
 };
 
-const claimPublicContainer = async () => {
-	const freeItem = await findFreeInventoryItem(SIMTAINER_INVENTORY_TABLE, true);
+const claimPublicContainer = async (containerId) => {
+	const publicContainer = await findFreeInventoryItem(SIMTAINER_INVENTORY_TABLE, containerId);
 
-	if (freeItem === null) {
-		throw new ErrorWithStatus('No free inventory available', 404);
+	if (publicContainer === null) {
+		throw new ErrorWithStatus(`Container ${containerId} is not available for taking`, 403);
 	}
 
 	const publicSessionCookieToken = generatePublicSessionCookieToken();
-	const lockedItem = await lockPublicContainer(freeItem, publicSessionCookieToken);
+	const lockedItem = await lockPublicContainer(publicContainer, publicSessionCookieToken);
 
 	return lockedItem;
 };

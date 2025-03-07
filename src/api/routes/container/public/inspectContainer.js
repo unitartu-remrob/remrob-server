@@ -1,10 +1,10 @@
 import { inspectContainer } from '../../../../docker/containerManager.js';
 
-export default async (req, res) => {
-	const { id } = req.params;
+export default async (_, res) => {
+	const { simtainer_id } = res.locals;
 
 	try {
-		const { status, createdAt, image } = await inspectContainer(id);
+		const { status, createdAt, image } = await inspectContainer(simtainer_id);
 
 		res.json({
 			status,

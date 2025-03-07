@@ -12,9 +12,12 @@ import {
 
 import { liveStats, robotMonitor } from '../docker/containerMonitor.js';
 
-import assignContainer from './routes/assignContainer.js';
+import assignContainer from './routes/inventory/assignContainer.js';
 
-import claimPublicContainer from './routes/claimPublicContainer.js';
+import getPublicContainers from './routes/inventory/public/getPublicContainers.js';
+import claimPublicContainer from './routes/inventory/public/claimPublicContainer.js';
+import yieldPublicSession from './routes/inventory/public/yieldPublicSession.js';
+
 import startPublicContainer from './routes/container/public/startContainer.js';
 import stopPublicContainer from './routes/container/public/stopContainer.js';
 import removePublicContainer from './routes/container/public/removeContainer.js';
@@ -37,11 +40,14 @@ export const mountWsRoutes = () => {
 
 // Public endpoints
 router.get('/images', getImages);
-router.get('/claim', claimPublicContainer);
+router.get('/public-containers', getPublicContainers);
+router.get('/claim/:id', claimPublicContainer);
+router.delete('/claim/:id', yieldPublicSession);
+
+router.get('/inspect-public-container', authenticatePublicSessionCookie, inspectPublicContainer);
 router.post('/start-public-container', authenticatePublicSessionCookie, startPublicContainer);
 router.post('/stop-public-container', authenticatePublicSessionCookie, stopPublicContainer);
 router.post('/remove-public-container', authenticatePublicSessionCookie, removePublicContainer);
-router.post('/inspect-public-container', authenticatePublicSessionCookie, inspectPublicContainer);
 
 // Authenticated user endpoints
 router.get('/assign', [authenticateJWT, checkSession], assignContainer);
