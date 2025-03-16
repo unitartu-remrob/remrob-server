@@ -7,7 +7,7 @@ import generator from 'generate-password';
 import { exec } from 'child_process';
 
 import config from 'config';
-import { USER_TABLE } from '../constants.js';
+import { USER_TABLE, ROS_VERSION_JAZZY, ROS_VERSION_NOETIC } from '../constants.js';
 import db from '../data/db.js';
 import { getInventoryTable, getRobotCell } from './inventory.js';
 import {
@@ -88,7 +88,6 @@ class SessionCompose {
 		this.composeData = await readYamlFile(composeFileHandle);
 		await this.setEnvironment();
 
-		console.log('isPublicContainer', isPublicContainer);
 		if (!isPublicContainer) {
 			await this.setVolumeMounts();
 		}
@@ -188,11 +187,19 @@ class SessionCompose {
 		if (userWorkspacesEnabled) {
 			// workspace mount uses the cleaned name and surname so the workspace cp command works
 			const workspaceMountPath = `${process.env.WORKSPACE_ROOT}/${cleanFolderName}`;
+
+			const wsName =
+				this.rosVersion === ROS_VERSION_JAZZY
+					? 'ros2_ws'
+					: this.rosVersion === ROS_VERSION_NOETIC
+						? 'catkin_ws'
+						: 'ros_ws';
+
 			try {
-				await this.createWorkspaceFolder(workspaceMountPath);
-				volumes.push(`${workspaceMountPath}/catkin_ws:/home/kasutaja/catkin_ws`);
-			} catch (e) {
-				console.log(`Failed to mount user workspace for ${this.userId}: ${e.message}`);
+				await this.createWorkspaceFolder(workspaceMountPath, wsName);
+				volumes.push(`${workspaceMountPath}/${wsName}:/home/kasutaja/${wsName}`);
+			} catch (err) {
+				console.log(`Failed to mount user workspace for ${this.userId}: ${err}`);
 			}
 		}
 
@@ -209,26 +216,29 @@ class SessionCompose {
 		this.composeData.services.vnc.volumes = volumes;
 	};
 
-	createWorkspaceFolder = (mountDir) => {
+	createWorkspaceFolder = (mountDir, wsName) => {
 		return new Promise((resolve, reject) => {
-			if (!fs.existsSync(mountDir)) {
+			if (!fs.existsSync(`${mountDir}/${wsName}`)) {
+				const baseWsPath = `${process.env.BASE_WS_ROOT}/${wsName}`;
+
+				if (!fs.existsSync(baseWsPath)) {
+					return reject(`Base workspace ${baseWsPath} does not exist`);
+				}
+
 				// create workspace dir if first time connecting
 				fs.mkdirSync(mountDir, { recursive: true });
-				// copy a clean catkin_ws to the user's folder
-				exec(
-					`cp -r ${process.env.BASE_WS_ROOT}/catkin_ws ${mountDir}`,
-					(error, _, stderr) => {
-						if (error) {
-							reject(error);
-						}
-						if (stderr) {
-							reject(stderr);
-						}
-						resolve('Workspace folder initialized');
+				// copy a clean ROS workspace to the user's folder
+				exec(`cp -r ${baseWsPath} ${mountDir}`, (error, _, stderr) => {
+					if (error) {
+						reject(error);
 					}
-				);
+					if (stderr) {
+						reject(stderr);
+					}
+					return resolve('Workspace folder initialized');
+				});
 			} else {
-				resolve('Workspace folder already exists');
+				return resolve('Workspace folder already exists');
 			}
 		});
 	};
