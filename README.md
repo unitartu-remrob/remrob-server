@@ -29,32 +29,51 @@ The API has authentication and authorization middleware, and uses Docker compose
 
 - Node v20
 - Docker & Docker compose
+- websockify
 
 ## Setup
 
+### Install node packages
 ```
 npm install
 ```
 
-### Dev server with hot updates
+### Copy and fill example env file
+```
+cp .env.example .env
+```
 
+### Dev server with hot updates
 ```
 npm run dev
 ```
 
-### Production server
+### Lint and formatting
+```
+npm run lint
 
+npm run format
+```
+
+### Production server
 ```
 npm run server
+```
+
+### Websockify client
+```
+npm run vnc-client
 ```
 
 ## Set available images
 
 The images that are used by [remrob-webapp](https://github.com/unitartu-remrob/remrob-webapp) are listed under `RemrobDockerImages` at [config/default.json](./config/default.json).
+
 All images that can be created with the help of [remrob-docker](remrob-docker) are listed, although only ones that have been built will be returned when calling `GET /images`.
+
 Nvidia CudaGL images will be returned over same version of non-nvidia images (these are specified with the `overridenBy` flag).
 
-### Running multiple service instances with pm2
+## Running multiple service instances with pm2
 
 Install the pm2 daemon process manager (available via npm)
 
