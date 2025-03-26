@@ -1,9 +1,9 @@
 # REMROB: a web-based robotics learning and development environment
 
-|   |   |
-|---|---|
-![GNOME ROS VNC](./docs/user-panel.png) | ![GNOME ROS VNC](./docs/user-session.png)
-![GNOME ROS VNC](./docs/sim-panel.png) | ![GNOME ROS VNC](./docs/browser-desktop.png)
+|                                         |                                              |
+| --------------------------------------- | -------------------------------------------- |
+| ![GNOME ROS VNC](./docs/user-panel.png) | ![GNOME ROS VNC](./docs/user-session.png)    |
+| ![GNOME ROS VNC](./docs/sim-panel.png)  | ![GNOME ROS VNC](./docs/browser-desktop.png) |
 
 ## Introduction
 
@@ -75,7 +75,6 @@ Restart with changes:
 Stream logs:
 
     pm2 logs
-
 
 &nbsp;&nbsp;
 

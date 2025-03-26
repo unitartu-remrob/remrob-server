@@ -5,6 +5,7 @@ pip install -r requirements.txt
 ```
 
 Modify config or templates and run the generator:
+
 ```bash
 python3 compose_generator.py
 ```

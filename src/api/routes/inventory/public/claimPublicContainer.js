@@ -10,10 +10,14 @@ export default async (req, res) => {
 		const { remrob_session_cookie } = req.cookies;
 
 		if (remrob_session_cookie !== undefined) {
-			const publicUserContainer = await verifyPublicSessionToken(remrob_session_cookie, id)
+			const publicUserContainer = await verifyPublicSessionToken(remrob_session_cookie, id);
 
 			if (publicUserContainer && publicUserContainer.slug !== id) {
-				return res.status(400).send(`Error: Cannot claim ${id}, you have already claimed ${publicUserContainer.slug}`);
+				return res
+					.status(400)
+					.send(
+						`Error: Cannot claim ${id}, you have already claimed ${publicUserContainer.slug}`
+					);
 			} else if (publicUserContainer) {
 				return res.json(publicUserContainer);
 			} else {

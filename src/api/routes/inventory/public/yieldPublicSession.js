@@ -6,14 +6,14 @@ export default async (req, res) => {
 		const { remrob_session_cookie } = req.cookies;
 
 		if (remrob_session_cookie !== undefined) {
-			const publicUserContainer = await verifyPublicSessionToken(remrob_session_cookie, id)
+			const publicUserContainer = await verifyPublicSessionToken(remrob_session_cookie, id);
 
 			if (publicUserContainer && publicUserContainer.slug !== id) {
 				return res.status(400).send(`Error: Cannot yield ${id}, you have no claim over it`);
 			} else if (publicUserContainer) {
 				await unlockPublicContainer(id);
 				res.clearCookie('remrob_session_cookie');
-				return res.json("Session successfully given up");
+				return res.json('Session successfully given up');
 			} else {
 				// cookie expired
 			}

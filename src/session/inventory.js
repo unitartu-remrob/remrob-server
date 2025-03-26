@@ -97,7 +97,7 @@ const getPublicContainers = async () => {
 			user: null,
 		})
 		.select(['container_id', 'slug', 'end_time', 'public_user']);
-}
+};
 
 const lockPublicContainer = async (inventoryItem, sessionToken) => {
 	const sessionExpirationTime = getExpirationDate(PUBLIC_SESSION_TIMEOUT);
@@ -129,7 +129,7 @@ const unlockPublicContainer = async (slug) => {
 
 	await db(SIMTAINER_INVENTORY_TABLE).update(cleanUpPayload).where('slug', slug);
 	killContainer(slug);
-}
+};
 
 const verifyPublicSessionToken = async (sessionToken) => {
 	const publicContainer = await db(SIMTAINER_INVENTORY_TABLE)
@@ -148,7 +148,7 @@ const setSessionTimeout = (inventoryTable, inventoryItem, publicSession = false)
 	const end = new Date(inventoryItem.end_time);
 
 	const cleanUpPayload = {
-		[publicSession ? "public_user" : "user"]: null,
+		[publicSession ? 'public_user' : 'user']: null,
 		end_time: null,
 	};
 

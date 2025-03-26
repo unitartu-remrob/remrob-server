@@ -5,7 +5,7 @@ import { validateImageParams } from '../startContainer.js';
 
 export default async (req, res) => {
 	const { simtainer_id: containerId } = res.locals;
-	
+
 	const { rosVersion, imageTag } = req.body;
 
 	try {
