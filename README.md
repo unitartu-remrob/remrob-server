@@ -15,15 +15,15 @@ Demo video: https://www.youtube.com/watch?v=FGVpwIwRrwc
 
 ## Remrob installation
 
-See https://github.com/unitartu-remrob/remrob-setup for installation instructions.
+See https://github.com/unitartu-remrob/remrob-setup for full remrob app installation instructions.
 
 ---
 
-# remrob-server: ROS-VNC container management API
+# remrob-server
 
-The remrob-server is a Node.js app for launching [ROS-VNC containers](https://github.com/unitartu-remrob/remrob-docker) via an API.
+A Node.js API for launching and monitoring [ROS-VNC containers](https://github.com/unitartu-remrob/remrob-docker).
 
-The app provides authentication and authorization layers, and uses Docker compose to craft user-specific container environments.
+The API has authentication and authorization middleware, and uses Docker compose to craft user-specific container environments.
 
 ## Requirements
 
@@ -48,7 +48,13 @@ npm run dev
 npm run server
 ```
 
-### Running multiple instances with pm2
+## Set available images
+
+The images that are used by [remrob-webapp](https://github.com/unitartu-remrob/remrob-webapp) are listed under `RemrobDockerImages` at [config/default.json](./config/default.json).
+All images that can be created with the help of [remrob-docker](remrob-docker) are listed, although only ones that have been built will be returned when calling `GET /images`.
+Nvidia CudaGL images will be returned over same version of non-nvidia images (these are specified with the `overridenBy` flag).
+
+### Running multiple service instances with pm2
 
 Install the pm2 daemon process manager (available via npm)
 
