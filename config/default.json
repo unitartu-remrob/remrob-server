@@ -4,7 +4,7 @@
 	"RobotNetworkSubnetPrefix": "192.168.200",
 	"RecordingSubmissionsEnabled": false,
 	"UserWorkspacesEnabled": false,
-	"LocalRemrob": true,
+	"LocalRemrob": false,
 	"RobotsAvailable": ["robotont"],
 	"RemrobDockerImages": [
 		{
