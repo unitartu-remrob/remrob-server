@@ -64,7 +64,7 @@ const claimPublicContainer = async (containerId) => {
 const checkIfReservedUser = async (userId) => {
 	const user = await db(USER_TABLE).where({ id: userId }).select('email').first();
 
-	return user.email.includes('robotont-');
+	return user.email.includes('robotont-') ? user : null;
 };
 
 const assignLocalRobContainer = async (robotUser, isSim) => {
