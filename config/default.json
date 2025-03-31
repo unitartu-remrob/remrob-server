@@ -12,7 +12,8 @@
 			"imageTag": "remrob:noetic-base",
 			"overridenBy": "remrob:noetic-cudagl",
 			"simulationExclusive": false,
-			"default": false
+			"default": false,
+			"enabled": true
 		},
 		{
 			"label": "ROS2 Jazzy",
@@ -20,28 +21,32 @@
 			"imageTag": "remrob:jazzy-base",
 			"overridenBy": "remrob:jazzy-cudagl",
 			"simulationExclusive": false,
-			"default": false
+			"default": false,
+			"enabled": true
 		},
 		{
 			"label": "ROS Noetic - Robotont",
 			"rosVersion": "noetic",
 			"imageTag": "robotont:noetic-cudagl",
 			"simulationExclusive": false,
-			"default": true
+			"default": true,
+			"enabled": true
 		},
 		{
 			"label": "ROS2 Jazzy - xArm",
 			"rosVersion": "jazzy",
 			"imageTag": "xarm:jazzy-cudagl",
 			"simulationExclusive": true,
-			"default": false
+			"default": false,
+			"enabled": true
 		},
 		{
 			"label": "ROS2 Jazzy - Robotont",
 			"rosVersion": "jazzy",
 			"imageTag": "robotont:jazzy-cudagl",
 			"simulationExclusive": false,
-			"default": false
+			"default": false,
+			"enabled": true
 		}
 	]
 }
