@@ -7,12 +7,15 @@ import {
 } from './inventory.js';
 
 import db from '../data/db.js';
+import config from 'config';
 
 import { generatePublicSessionCookieToken } from '../util/cookies.js';
 import ErrorWithStatus from '../util/erorrs.js';
 
 import { SIMTAINER_INVENTORY_TABLE, ROBOT_INVENTORY_TABLE, USER_TABLE } from '../constants.js';
 import { markBookingAsActivated } from './booking.js';
+
+const inventoryRobotsAvailable = config.get('RobotsAvailable');
 
 const assignContainer = async (user, userBooking, isLocalRob, isSim) => {
 	if (isLocalRob) {
@@ -64,7 +67,9 @@ const claimPublicContainer = async (containerId) => {
 const checkIfReservedUser = async (userId) => {
 	const user = await db(USER_TABLE).where({ id: userId }).select('email').first();
 
-	return user.email.includes('robotont-') ? user : null;
+	const isRobotUser = inventoryRobotsAvailable.some((robot) => user.email.includes(robot));
+
+	return isRobotUser ? user : null;
 };
 
 const assignLocalRobContainer = async (robotUser, isSim) => {
