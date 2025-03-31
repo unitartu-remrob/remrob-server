@@ -8,7 +8,8 @@ export const getAvailableRemrobImages = async () => {
 	const overrides = remrobImages.filter((image) => image.overridenBy !== undefined);
 
 	return remrobImages
-		.filter((image) => builtImages.includes(image.imageTag))
+		.filter((image) => image.enabled)
+		.filter((image) => builtImages.includes(image.imageTag) || builtImages.includes(image.overridenBy))
 		.map((image) => {
 			const override = overrides.find(
 				(override) =>
