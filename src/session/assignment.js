@@ -6,17 +6,27 @@ import {
 	lockPublicContainer,
 } from './inventory.js';
 
+import db from '../data/db.js';
+
 import { generatePublicSessionCookieToken } from '../util/cookies.js';
 import ErrorWithStatus from '../util/erorrs.js';
 
-import { SIMTAINER_INVENTORY_TABLE } from '../constants.js';
+import { SIMTAINER_INVENTORY_TABLE, ROBOT_INVENTORY_TABLE, USER_TABLE } from '../constants.js';
 import { markBookingAsActivated } from './booking.js';
 
-const assignContainer = async (user, userBooking) => {
-	const isSimtainer = userBooking.is_simulation;
-	const bookingId = userBooking.id;
+const assignContainer = async (user, userBooking, isLocalRob, isSim) => {
+	if (isLocalRob) {
+		const reservedUser = await checkIfReservedUser(user.sub);
 
+		if (reservedUser) {
+			const robotUser = reservedUser.email;
+			return await assignLocalRobContainer(robotUser, isSim);
+		}
+	}
+
+	const isSimtainer = userBooking.is_simulation;
 	const inventoryTable = getInventoryTable(isSimtainer);
+
 	const inventoryItem = await checkIfUserAlreadyHasItem(inventoryTable, user);
 
 	if (inventoryItem !== null) {
@@ -30,7 +40,10 @@ const assignContainer = async (user, userBooking) => {
 	}
 
 	const lockedItem = await lockInventoryItem(inventoryTable, freeItem, user, userBooking);
-	markBookingAsActivated(bookingId);
+
+	if (!isLocalRob) {
+		markBookingAsActivated(userBooking.id);
+	}
 
 	return lockedItem;
 };
@@ -46,6 +59,28 @@ const claimPublicContainer = async (containerId) => {
 	const lockedItem = await lockPublicContainer(publicContainer, publicSessionCookieToken);
 
 	return lockedItem;
+};
+
+const checkIfReservedUser = async (userId) => {
+	const user = await db(USER_TABLE).where({ id: userId }).select('email').first();
+
+	return user.email.includes('robotont-');
+};
+
+const assignLocalRobContainer = async (robotUser, isSim) => {
+	const robotId = robotUser.split('-')[1];
+
+	if (!isSim) {
+		const robotContainer = await db(ROBOT_INVENTORY_TABLE).first().where('robot_id', robotId);
+
+		if (robotContainer) {
+			return robotContainer;
+		} else {
+			throw new ErrorWithStatus(`No robot container available for user ${robotUser}`, 404);
+		}
+	} else {
+		return await findFreeInventoryItem(SIMTAINER_INVENTORY_TABLE);
+	}
 };
 
 export { assignContainer, claimPublicContainer };

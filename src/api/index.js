@@ -11,6 +11,7 @@ import {
 } from './middleware/auth.js';
 
 import { liveStats, robotMonitor } from '../docker/containerMonitor.js';
+import { LOCALROB_APP } from '../constants.js';
 
 import assignContainer from './routes/inventory/assignContainer.js';
 
@@ -31,7 +32,10 @@ import containerStats from './routes/container/containerStats.js';
 import stopContainer from './routes/container/stopContainer.js';
 import removeContainer from './routes/container/removeContainer.js';
 
-const userHasActiveSessionOrIsAdmin = [authenticateJWT, checkSession, checkContainerOwnership];
+const userHasActiveSessionOrIsAdmin = [
+	authenticateJWT,
+	...(!LOCALROB_APP ? [checkSession, checkContainerOwnership] : []),
+];
 
 export const mountWsRoutes = () => {
 	router.ws('/live/:version', authenticateAdminJWTWebSocket, liveStats);
@@ -50,7 +54,7 @@ router.post('/stop-public-container', authenticatePublicSessionCookie, stopPubli
 router.post('/remove-public-container', authenticatePublicSessionCookie, removePublicContainer);
 
 // Authenticated user endpoints
-router.get('/assign', [authenticateJWT, checkSession], assignContainer);
+router.get('/assign', [authenticateJWT, ...(!LOCALROB_APP ? [checkSession] : [])], assignContainer);
 
 router.get('/inspect/:id', userHasActiveSessionOrIsAdmin, inspectContainer);
 router.get('/stats/:id', userHasActiveSessionOrIsAdmin, containerStats);
