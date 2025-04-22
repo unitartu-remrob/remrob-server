@@ -1,5 +1,6 @@
 import { startContainer } from '../../../../docker/containerManager.js';
 import { getVncUrl } from '../../../../session/sessionComposer.js';
+import { ROS_VERSION_JAZZY, JAZZY_STARTUP_DELAY } from '../../../../constants.js';
 
 import { validateImageParams } from '../startContainer.js';
 
@@ -20,6 +21,11 @@ export default async (req, res) => {
 			},
 			true
 		);
+
+		if (rosVersion === ROS_VERSION_JAZZY) {
+			// for jazzy we need to wait a bit more for container to get ready
+			await new Promise((resolve) => setTimeout(resolve, JAZZY_STARTUP_DELAY));
+		}
 
 		const vncUrl = await getVncUrl(containerId, true);
 

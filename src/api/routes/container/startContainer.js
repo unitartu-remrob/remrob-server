@@ -2,6 +2,7 @@ import { startContainer } from '../../../docker/containerManager.js';
 import { getVncUrl } from '../../../session/sessionComposer.js';
 import ErrorWithStatus from '../../../util/erorrs.js';
 import { getAvailableRemrobImages } from '../getImages.js';
+import { ROS_VERSION_JAZZY, JAZZY_STARTUP_DELAY } from '../../../constants.js';
 
 export const validateImageParams = async (rosVersion, imageTag) => {
 	if (!rosVersion || !imageTag) {
@@ -43,6 +44,11 @@ export default async (req, res) => {
 			rosVersion,
 			imageTag,
 		});
+
+		if (rosVersion === ROS_VERSION_JAZZY) {
+			// for jazzy we need to wait a bit more for container to get ready
+			await new Promise((resolve) => setTimeout(resolve, JAZZY_STARTUP_DELAY));
+		}
 
 		const vncUrl = await getVncUrl(containerId, isSimtainer);
 

@@ -9,6 +9,6 @@ export const USER_TABLE = 'user';
 export const ROS_VERSION_NOETIC = 'noetic';
 export const ROS_VERSION_JAZZY = 'jazzy';
 
-//
+export const JAZZY_STARTUP_DELAY = 10000; // ms
 
 export const LOCALROB_APP = config.get('LocalRemrob');
