@@ -14,7 +14,7 @@
 			"overridenBy": "remrob:noetic-cudagl",
 			"simulationExclusive": false,
 			"default": false,
-			"enabled": true
+			"enabled": false
 		},
 		{
 			"label": "ROS2 Jazzy",
@@ -23,7 +23,7 @@
 			"overridenBy": "remrob:jazzy-cudagl",
 			"simulationExclusive": false,
 			"default": false,
-			"enabled": true
+			"enabled": false
 		},
 		{
 			"label": "ROS Noetic - Robotont",
@@ -38,6 +38,14 @@
 			"rosVersion": "jazzy",
 			"imageTag": "xarm:jazzy-cudagl",
 			"simulationExclusive": true,
+			"default": false,
+			"enabled": true
+		},
+		{
+			"label": "ROS2 Jazzy - UR5",
+			"rosVersion": "jazzy",
+			"imageTag": "ur5:jazzy-cudagl",
+			"simulationExclusive": false,
 			"default": false,
 			"enabled": true
 		},
