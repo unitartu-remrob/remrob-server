@@ -36,7 +36,7 @@ const assignContainer = async (user, userBooking, isLocalRob, isSim) => {
 		return inventoryItem;
 	}
 
-	const freeItem = await findFreeInventoryItem(inventoryTable);
+	const freeItem = await findFreeInventoryItem(inventoryTable, userBooking.project);
 
 	if (freeItem === null) {
 		throw new ErrorWithStatus('No free inventory available', 404);
@@ -52,7 +52,7 @@ const assignContainer = async (user, userBooking, isLocalRob, isSim) => {
 };
 
 const claimPublicContainer = async (containerId) => {
-	const publicContainer = await findFreeInventoryItem(SIMTAINER_INVENTORY_TABLE, containerId);
+	const publicContainer = await findFreeInventoryItem(SIMTAINER_INVENTORY_TABLE, null, containerId);
 
 	if (publicContainer === null) {
 		throw new ErrorWithStatus(`Container ${containerId} is not available for taking`, 403);

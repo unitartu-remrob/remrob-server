@@ -40,10 +40,11 @@ const checkIfUserAlreadyHasItem = async (inventoryTable, user) => {
 	}
 };
 
-const findFreeInventoryItem = async (inventoryTable, publicContainerId = null) => {
+const findFreeInventoryItem = async (inventoryTable, robot = null, publicContainerId = null) => {
 	const query = db(inventoryTable)
 		.first()
-		.where(function () {
+		.where({ project: robot })
+		.andWhere(function () {
 			this.orWhere({ user: null })
 				.orWhere({ end_time: null })
 				.orWhere('end_time', '<', getCurrentTime());
