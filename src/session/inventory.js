@@ -43,7 +43,6 @@ const checkIfUserAlreadyHasItem = async (inventoryTable, user) => {
 const findFreeInventoryItem = async (inventoryTable, robot = null, publicContainerId = null) => {
 	const query = db(inventoryTable)
 		.first()
-		.where({ project: robot })
 		.andWhere(function () {
 			this.orWhere({ user: null })
 				.orWhere({ end_time: null })
@@ -51,8 +50,8 @@ const findFreeInventoryItem = async (inventoryTable, robot = null, publicContain
 		});
 
 	if (inventoryTable === ROBOT_INVENTORY_TABLE) {
-		// for robot inventory check if the robot is active
-		query.andWhere({ status: true });
+		// for robot inventory filter booked robot type and allow only active robots
+		query.andWhere({ project: robot, status: true });
 	}
 
 	if (publicContainerId) {
@@ -65,11 +64,7 @@ const findFreeInventoryItem = async (inventoryTable, robot = null, publicContain
 
 	const freeItem = await query;
 
-	if (freeItem) {
-		return freeItem;
-	} else {
-		return null;
-	}
+	return freeItem ?? null;
 };
 
 const lockInventoryItem = async (inventoryTable, inventoryItem, user, userBooking) => {
