@@ -30,7 +30,7 @@
 			"rosVersion": "noetic",
 			"imageTag": "robotont:noetic-cudagl",
 			"simulationExclusive": false,
-			"default": true,
+			"default": false,
 			"enabled": true
 		},
 		{
@@ -54,7 +54,7 @@
 			"rosVersion": "jazzy",
 			"imageTag": "robotont:jazzy-cudagl",
 			"simulationExclusive": false,
-			"default": false,
+			"default": true,
 			"enabled": true
 		}
 	]
